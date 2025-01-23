@@ -1,6 +1,7 @@
+
 /* Fondo azul oscuro */
 body {
-    background-color: #191133;
+    background-color: #212f3c;
     font-family: Arial, sans-serif;
     margin: 0;
     height: 100vh;
@@ -15,7 +16,7 @@ body {
     height: 70%;
     border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 8px 15px rgba(234, 234, 14, 1);
+    box-shadow: 0 8px 15px rgba(40, 138, 237, 1);
 }
 
 /* Parte izquierda (azul oscuro) */
@@ -53,7 +54,6 @@ body {
     border-radius: 10px;
     margin-bottom: 20px;
     padding: 10px;
-
 }
 
 .btn-primary {
@@ -80,10 +80,10 @@ body {
         width: 100%;
     }
 }
+
 .input-group {
     display: flex;
     align-items: center;
-    
 }
 
 
@@ -98,5 +98,3 @@ body {
         color: #333;
         cursor: pointer;
     }
-
-
