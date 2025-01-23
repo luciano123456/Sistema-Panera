@@ -1,16 +1,15 @@
 ﻿let gridUsuarios;
-let isEditing = false;
 
 const columnConfig = [
-    { index: 0, filterType: 'text' },
     { index: 1, filterType: 'text' },
     { index: 2, filterType: 'text' },
     { index: 3, filterType: 'text' },
     { index: 4, filterType: 'text' },
     { index: 5, filterType: 'text' },
-    { index: 6, filterType: 'select', fetchDataFunc: listaRolesFilter },
-    { index: 7, filterType: 'select', fetchDataFunc: listaEstadosFilter },
-    { index: 8, filterType: 'text' },
+    { index: 6, filterType: 'text' },
+    { index: 7, filterType: 'select', fetchDataFunc: listaRolesFilter },
+    { index: 8, filterType: 'select', fetchDataFunc: listaEstadosFilter },
+    { index: 9, filterType: 'text' },
 ];
 
 const Modelo_base = {
@@ -68,10 +67,6 @@ function guardarCambios() {
                     mensaje = "Contrasena incorrecta";
                     errorModal(mensaje);
                     return false;
-                } else if (dataJson.valor === 'Usuario') {
-                        mensaje = "El usuario ya existe en el sistema";
-                        errorModal(mensaje);
-                        return false;
                 } else {
                     $('#modalEdicion').modal('hide');
                     exitoModal(mensaje);
@@ -240,6 +235,29 @@ async function configurarDataTable(data) {
             scrollX: "100px",
             scrollCollapse: true,
             columns: [
+                {
+                    data: "Id",
+                    title: '',
+                    width: "1%", // Ancho fijo para la columna
+                    render: function (data) {
+                        return `
+                <div class="acciones-menu" data-id="${data}">
+                    <button class='btn btn-sm btnacciones' type='button' onclick='toggleAcciones(${data})' title='Acciones'>
+                        <i class='fa fa-ellipsis-v fa-lg text-white' aria-hidden='true'></i>
+                    </button>
+                    <div class="acciones-dropdown" style="display: none;">
+                        <button class='btn btn-sm btneditar' type='button' onclick='editarUsuario(${data})' title='Editar'>
+                            <i class='fa fa-pencil-square-o fa-lg text-success' aria-hidden='true'></i> Editar
+                        </button>
+                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarUsuario(${data})' title='Eliminar'>
+                            <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i> Eliminar
+                        </button>
+                    </div>
+                </div>`;
+                    },
+                    orderable: false,
+                    searchable: false,
+                },
                 { data: 'Usuario' },
                 { data: 'Nombre' },
                 { data: 'Apellido' },
@@ -254,20 +272,7 @@ async function configurarDataTable(data) {
                         return data === "Bloqueado" ? `<span style="color: red">${data}</span>` : data;
                     }
                 },
-                {
-                    data: "Id",
-                    render: function (data) {
-                        return `
-                <button class='btn btn-sm btneditar btnacciones' type='button' onclick='editarUsuario(${data})' title='Editar'>
-                    <i class='fa fa-pencil-square-o fa-lg text-white' aria-hidden='true'></i>
-                </button>
-                <button class='btn btn-sm btneditar btnacciones' type='button' onclick='eliminarUsuario(${data})' title='Eliminar'>
-                    <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i>
-                </button>`;
-                    },
-                    orderable: true,
-                    searchable: true,
-                }
+
             ],
             dom: 'Bfrtip',
             buttons: [
@@ -342,8 +347,9 @@ async function configurarDataTable(data) {
                     }
                 });
 
-                var lastColIdx = api.columns().indexes().length - 1;
-                $('.filters th').eq(lastColIdx).html(''); // Limpiar la última columna si es necesario
+                $('.filters th').eq(0).html('');
+
+                configurarOpcionesColumnas();
 
                 setTimeout(function () {
                     gridUsuarios.columns.adjust();
@@ -363,228 +369,11 @@ async function configurarDataTable(data) {
 
             },
         });
-
-        $('#grd_Usuarios tbody').on('dblclick', 'td', async function () {
-            var cell = gridUsuarios.cell(this);
-            var originalData = cell.data();
-            var colIndex = cell.index().column;
-            var rowData = gridUsuarios.row($(this).closest('tr')).data();
-
-            // Verificar si la columna es la de acciones (última columna)
-            if (colIndex === gridUsuarios.columns().indexes().length - 1) {
-                return; // No permitir editar en la columna de acciones
-            }
-
-
-            if (isEditing == true) {
-                return;
-            } else {
-                isEditing = true;
-            }
-
-            // Eliminar la clase 'blinking' si está presente
-            if ($(this).hasClass('blinking')) {
-                $(this).removeClass('blinking');
-            }
-
-            // Si ya hay un input o select, evitar duplicados
-            if ($(this).find('input').length > 0 || $(this).find('select').length > 0) {
-                return;
-            }
-
-            // Si la columna es la de la provincia (por ejemplo, columna 3)
-            if (colIndex === 6 || colIndex === 7) {
-                var select = $('<select class="form-control" style="background-color: transparent; border: none; border-bottom: 2px solid green; color: green; text-align: center;" />')
-                    .appendTo($(this).empty())
-                    .on('change', function () {
-                        // No hacer nada en el change, lo controlamos con el botón de aceptar
-                    });
-
-                // Estilo para las opciones del select
-                select.find('option').css('color', 'white'); // Cambiar el color del texto de las opciones a blanco
-                select.find('option').css('background-color', 'black'); // Cambiar el fondo de las opciones a negro
-
-                // Obtener las provincias disponibles
-                var selectResult = colIndex === 6 ? await obtenerRoles() : await obtenerEstados();
-                selectResult.forEach(function (result) {
-                    select.append('<option value="' + result.Id + '">' + result.Nombre + '</option>');
-                });
-
-                colIndex === 6 ? select.val(rowData.IdRol) : select.val(rowData.IdEstado);
-
-                // Crear los botones de guardar y cancelar
-                var saveButton = $('<i class="fa fa-check text-success"></i>').on('click', function () {
-                    var selectedValue = select.val();
-                    var selectedText = select.find('option:selected').text();
-                    saveEdit(colIndex, gridUsuarios.row($(this).closest('tr')).data(), selectedText, selectedValue, $(this).closest('tr'));
-                });
-
-                var cancelButton = $('<i class="fa fa-times text-danger"></i>').on('click', cancelEdit);
-
-                // Agregar los botones de guardar y cancelar en la celda
-                $(this).append(saveButton).append(cancelButton);
-
-                // Enfocar el select
-                select.focus();
-
-            } else { // Para las demás columnas, como Dirección
-                var valueToDisplay = originalData && originalData.trim() !== "" ? originalData.replace(/<[^>]+>/g, "") : originalData || "";
-
-                var input = $('<input type="text" class="form-control" style="background-color: transparent; border: none; border-bottom: 2px solid green; color: green; text-align: center;" />')
-                    .val(valueToDisplay)
-                    .on('input', function () {
-                        var saveBtn = $(this).siblings('.fa-check'); // Botón de guardar
-
-                        if (colIndex === 0) { // Validar solo si es la columna 0
-                            if ($(this).val().trim() === "") {
-                                $(this).css('border-bottom', '2px solid red'); // Borde rojo
-                                saveBtn.css('opacity', '0.5'); // Desactivar botón de guardar visualmente
-                                saveBtn.prop('disabled', true); // Desactivar funcionalidad del botón
-                            } else {
-                                $(this).css('border-bottom', '2px solid green'); // Borde verde
-                                saveBtn.css('opacity', '1'); // Habilitar botón de guardar visualmente
-                                saveBtn.prop('disabled', false); // Habilitar funcionalidad del botón
-                            }
-                        }
-                    })
-                    .on('keydown', function (e) {
-                        if (e.key === 'Enter') {
-                            saveEdit(colIndex, gridUsuarios.row($(this).closest('tr')).data(), input.val(), input.val(), $(this).closest('tr'));
-                        } else if (e.key === 'Escape') {
-                            cancelEdit();
-                        }
-                    });
-
-                var saveButton = $('<i class="fa fa-check text-success"></i>').on('click', function () {
-                    if (!$(this).prop('disabled')) { // Solo guardar si el botón no está deshabilitado
-                        saveEdit(colIndex, gridUsuarios.row($(this).closest('tr')).data(), input.val(), input.val(), $(this).closest('tr'));
-                    }
-                });
-
-                var cancelButton = $('<i class="fa fa-times text-danger"></i>').on('click', cancelEdit);
-
-                // Reemplazar el contenido de la celda
-                $(this).empty().append(input).append(saveButton).append(cancelButton);
-
-                input.focus();
-            }
-
-            // Función para guardar los cambios
-            async function saveEdit(colIndex, rowData, newText, newValue, trElement) {
-                // Obtener el nodo de la celda desde el índice
-                var celda = $(trElement).find('td').eq(colIndex); // Obtener la celda correspondiente dentro de la fila
-                // Obtener el valor original de la celda
-                var originalText = gridUsuarios.cell(trElement, colIndex).data();
-
-                // Verificar si el texto realmente ha cambiado
-                if (originalText === newText) {
-                    cancelEdit();
-                    return; // Si no ha cambiado, no hacer nada
-                }
-
-                if (colIndex === 6) { // Si es la columna de la provincia
-                    rowData.IdRol = newValue;
-                    rowData.Rol = newText;
-                } else if(colIndex === 7) { // Si es la columna de la provincia
-                        rowData.IdEstado = newValue;
-                        rowData.Estado = newText;
-                } else {
-                    rowData[gridUsuarios.column(colIndex).header().textContent] = newText; // Usamos el nombre de la columna para guardarlo
-                }
-
-               
-
-               
-
-                // Enviar los datos al servidor
-                var resp = await guardarCambiosFila(rowData);
-
-                if (resp) {
-                    // Aplicar el parpadeo solo si el texto cambió
-                    if (originalText !== newText) {
-                        // Actualizar la fila en la tabla con los nuevos datos
-                        gridUsuarios.row(trElement).data(rowData).draw();
-                        celda.addClass('blinking'); // Aplicar la clase 'blinking' a la celda que fue editada
-                    }
-                } else {
-                    cancelEdit();
-                }
-
-                // Desactivar el modo de edición
-                isEditing = false;
-
-                // Eliminar la clase 'blinking' después de 3 segundos (para hacer el efecto de parpadeo)
-                setTimeout(function () {
-                    celda.removeClass('blinking');
-                }, 3000); // Duración de la animación de parpadeo (3 segundos)
-            }
-
-
-            // Función para cancelar la edición
-            function cancelEdit() {
-                // Restaurar el valor original
-                gridUsuarios.cell(cell.index()).data(originalData).draw();
-                isEditing = false;
-            }
-        });
     } else {
         gridUsuarios.clear().rows.add(data).draw();
     }
 }
 
-async function obtenerRoles() {
-    const response = await fetch(`/Roles/Lista`);
-    const result = await response.json();
-    return result;
-}
-
-async function obtenerEstados() {
-    const response = await fetch(`/EstadosUsuarios/Lista`);
-    const result = await response.json();
-    return result;
-}
-
-async function guardarCambiosFila(rowData) {
-    try {
-        rowData.cambioAdmin = 1;  // Puedes modificar este valor según necesites.
-
-        // Realizando la solicitud PUT con fetch.
-        const response = await fetch('/Usuarios/Actualizar', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(rowData)
-        });
-
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        // Parsear la respuesta JSON.
-        const dataJson = await response.json();
-
-        // Verificar los valores en la respuesta y mostrar los mensajes correspondientes.
-        let mensaje = "";
-
-        if (dataJson.valor === 'Contrasena') {
-            mensaje = "Contrasena incorrecta";
-            errorModal(mensaje);
-            return false;
-        } else if (dataJson.valor === 'Usuario') {
-            mensaje = "El usuario ya existe en el sistema";
-            errorModal(mensaje);
-            return false;
-        } else {
-            return true;
-        }
-
-    } catch (error) {
-        // Si hubo un error en la red o en el servidor.
-        console.error('Error de red:', error);
-        errorModal('Ha ocurrido un error al guardar los datos...');
-    }
-}
 
 async function listaRoles() {
     const url = `/Roles/Lista`;
@@ -645,3 +434,68 @@ async function listaRolesFilter() {
     }));
 
 }
+
+function configurarOpcionesColumnas() {
+    const grid = $('#grd_Usuarios').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
+    const columnas = grid.settings().init().columns; // Obtiene la configuración de columnas
+    const container = $('#configColumnasMenu'); // El contenedor del dropdown específico para configurar columnas
+
+    const storageKey = `Usuarios_Columnas`; // Clave única para esta pantalla
+
+    const savedConfig = JSON.parse(localStorage.getItem(storageKey)) || {}; // Recupera configuración guardada o inicializa vacía
+
+    container.empty(); // Limpia el contenedor
+
+    columnas.forEach((col, index) => {
+        if (col.data && col.data !== "Id") { // Solo agregar columnas que no sean "Id"
+            // Recupera el valor guardado en localStorage, si existe. Si no, inicializa en 'false' para no estar marcado.
+            const isChecked = savedConfig && savedConfig[`col_${index}`] !== undefined ? savedConfig[`col_${index}`] : true;
+
+            // Asegúrate de que la columna esté visible si el valor es 'true'
+            grid.column(index).visible(isChecked);
+
+            const columnName = index != 6 ? col.data : "Direccion";
+
+            // Ahora agregamos el checkbox, asegurándonos de que se marque solo si 'isChecked' es 'true'
+            container.append(`
+                <li>
+                    <label class="dropdown-item">
+                        <input type="checkbox" class="toggle-column" data-column="${index}" ${isChecked ? 'checked' : ''}>
+                        ${columnName}
+                    </label>
+                </li>
+            `);
+        }
+    });
+
+    // Asocia el evento para ocultar/mostrar columnas
+    $('.toggle-column').on('change', function () {
+        const columnIdx = parseInt($(this).data('column'), 10);
+        const isChecked = $(this).is(':checked');
+        savedConfig[`col_${columnIdx}`] = isChecked;
+        localStorage.setItem(storageKey, JSON.stringify(savedConfig));
+        grid.column(columnIdx).visible(isChecked);
+    });
+}
+
+
+
+function toggleAcciones(id) {
+    var $dropdown = $(`.acciones-menu[data-id="${id}"] .acciones-dropdown`);
+
+    // Si está visible, lo ocultamos, si está oculto lo mostramos
+    if ($dropdown.is(":visible")) {
+        $dropdown.hide();
+    } else {
+        // Ocultar todos los dropdowns antes de mostrar el seleccionado
+        $('.acciones-dropdown').hide();
+        $dropdown.show();
+    }
+}
+
+$(document).on('click', function (e) {
+    // Verificar si el clic está fuera de cualquier dropdown
+    if (!$(e.target).closest('.acciones-menu').length) {
+        $('.acciones-dropdown').hide(); // Cerrar todos los dropdowns
+    }
+});

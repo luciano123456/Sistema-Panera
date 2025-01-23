@@ -22,19 +22,10 @@ builder.Services.AddDbContext<SistemaPaneraContext>(options =>
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 // Registrar repositorios y servicios
-builder.Services.AddScoped<IGenericRepository<Cliente>, ClienteRepository>();
-builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IProvinciaRepository<Provincia>, ProvinciaRepository>();
 builder.Services.AddScoped<IProvinciaService, ProvinciaService>();
 builder.Services.AddScoped<IGenericRepository<Proveedor>, ProveedorRepository>();
 builder.Services.AddScoped<IProveedorService, ProveedorService>();
-builder.Services.AddScoped<IGenericRepository<ProductosMarca>, MarcaRepository>();
-builder.Services.AddScoped<IMarcaService, MarcaService>();
-builder.Services.AddScoped<IGenericRepository<InsumosCategoria>, InsumoCategoriaRepository>();
-builder.Services.AddScoped<IInsumoCategoriaService, InsumoCategoriaService>();
-
-builder.Services.AddScoped<IGenericRepository<UnidadesDeMedida>, UnidadDeMedidaRepository>();
-builder.Services.AddScoped<IUnidadDeMedidaService, UnidadDeMedidaService>();
 
 builder.Services.AddScoped<IUsuariosRepository<User>, UsuariosRepository>();
 builder.Services.AddScoped<IUsuariosService, UsuariosService>();
@@ -47,16 +38,6 @@ builder.Services.AddScoped<IEstadosUsuariosService, EstadosUsuariosService>();
 
 builder.Services.AddScoped<ILoginRepository<User>, LoginRepository>();
 builder.Services.AddScoped<ILoginService, LoginService>();
-
-builder.Services.AddScoped<IGenericRepository<Insumo>, InsumoRepository>();
-builder.Services.AddScoped<IInsumoService, Insumoservice>();
-
-builder.Services.AddScoped<IGenericRepository<Color>, ColorRepository>();
-builder.Services.AddScoped<IColorService, ColorService>();
-
-builder.Services.AddScoped<IGenericRepository<InsumosTipo>, InsumosTipoRepository>();
-builder.Services.AddScoped<IInsumosTipoService, InsumosTipoService>();
-
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>
@@ -79,7 +60,7 @@ var app = builder.Build();
 // Configurar el pipeline de middleware
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Clientes/Error");
+    app.UseExceptionHandler("/Usuarios/Error");
     app.UseHsts();
 }
 
@@ -93,7 +74,7 @@ app.UseAuthorization();  // Habilitar la autorización
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Clientes}/{action=Index}/{id?}");
+    pattern: "{controller=Usuarios}/{action=Index}/{id?}");
 
 // Asegúrate de que las rutas de login estén excluidas del middleware de autenticación
 app.MapControllerRoute(

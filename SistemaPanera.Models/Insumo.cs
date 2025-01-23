@@ -7,31 +7,23 @@ public partial class Insumo
 {
     public int Id { get; set; }
 
-    public string Descripcion { get; set; } = null!;
+    public int IdUnidadNegocio { get; set; }
 
-    public int IdTipo { get; set; }
+    public string? Sku { get; set; }
 
-    public int IdCategoria { get; set; }
+    public string? Descripcion { get; set; }
 
     public int IdUnidadMedida { get; set; }
 
-    public int IdProveedor { get; set; }
+    public int IdCategoria { get; set; }
 
-    public string? Especificacion { get; set; }
+    public decimal CostoUnitario { get; set; }
 
-    public decimal? PrecioCosto { get; set; }
-
-    public decimal? PorcGanancia { get; set; }
-
-    public decimal? PrecioVenta { get; set; }
+    public DateTime FechaActualizacion { get; set; }
 
     public virtual InsumosCategoria IdCategoriaNavigation { get; set; } = null!;
 
-    public virtual Proveedor IdProveedorNavigation { get; set; } = null!;
+    public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;
 
-    public virtual InsumosTipo IdTipoNavigation { get; set; } = null!;
-
-    public virtual UnidadesDeMedida IdUnidadMedidaNavigation { get; set; } = null!;
-
-    public virtual ICollection<ProductosInsumo> ProductosInsumos { get; set; } = new List<ProductosInsumo>();
+    public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SistemaPanera.DAL.DataContext;
 using SistemaPanera.Models;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using SistemaPanera.DAL.DataContext;
 
 namespace SistemaPanera.DAL.Repository
 {
