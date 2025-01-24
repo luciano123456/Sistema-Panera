@@ -39,6 +39,11 @@ builder.Services.AddScoped<IEstadosUsuariosService, EstadosUsuariosService>();
 builder.Services.AddScoped<ILoginRepository<User>, LoginRepository>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 
+
+builder.Services.AddScoped<IUnidadesNegocioRepository<UnidadesNegocio>, UnidadesNegocioRepository>();
+builder.Services.AddScoped<IUnidadesNegocioService, UnidadesNegocioService>();
+
+
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>
     {
