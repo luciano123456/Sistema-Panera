@@ -11,7 +11,7 @@ public partial class Insumo
 
     public string? Sku { get; set; }
 
-    public string? Descripcion { get; set; }
+    public string Descripcion { get; set; }
 
     public int IdUnidadMedida { get; set; }
 
