@@ -55,6 +55,9 @@ builder.Services.AddScoped<IInsumoService, InsumoService>();
 builder.Services.AddScoped<IGenericRepository<Local>, LocalRepository>();
 builder.Services.AddScoped<ILocalService, LocalService>();
 
+builder.Services.AddScoped<IProductosCategoriaRepository<ProductosCategoria>, ProductosCategoriaRepository>();
+builder.Services.AddScoped<IProductosCategoriaService, ProductosCategoriaService>();
+
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>

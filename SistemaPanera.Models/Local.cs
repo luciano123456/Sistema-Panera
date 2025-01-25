@@ -12,4 +12,6 @@ public partial class Local
     public string Nombre { get; set; } = null!;
 
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
+
+    public virtual ICollection<ProductosStock> ProductosStocks { get; set; } = new List<ProductosStock>();
 }
