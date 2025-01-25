@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using SistemaPanera.Models;
 
+
 namespace SistemaPanera.DAL.DataContext;
 
 public partial class SistemaPaneraContext : DbContext
@@ -29,6 +30,16 @@ public partial class SistemaPaneraContext : DbContext
     public virtual DbSet<InsumosStock> InsumosStocks { get; set; }
 
     public virtual DbSet<Local> Locales { get; set; }
+
+    public virtual DbSet<Producto> Productos { get; set; }
+
+    public virtual DbSet<ProductosCategoria> ProductosCategorias { get; set; }
+
+    public virtual DbSet<ProductosInsumo> ProductosInsumos { get; set; }
+
+    public virtual DbSet<ProductosStock> ProductosStocks { get; set; }
+
+    public virtual DbSet<ProductosTipo> ProductosTipos { get; set; }
 
     public virtual DbSet<Proveedor> Proveedores { get; set; }
 
@@ -126,6 +137,83 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Locales)
                 .HasForeignKey(d => d.IdUnidadNegocio)
                 .HasConstraintName("FK_Locales_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<Producto>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CostoInsumos).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoTotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Sku)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Productos)
+                .HasForeignKey(d => d.IdCategoria)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Productos_Productos_Categorias");
+
+            entity.HasOne(d => d.IdUnidadMedidaNavigation).WithMany(p => p.Productos)
+                .HasForeignKey(d => d.IdUnidadMedida)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Productos_Unidades_Medida");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Productos)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .HasConstraintName("FK_Productos_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<ProductosCategoria>(entity =>
+        {
+            entity.ToTable("Productos_Categorias");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<ProductosInsumo>(entity =>
+        {
+            entity.ToTable("Productos_Insumos");
+
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.ProductosInsumos)
+                .HasForeignKey(d => d.IdProducto)
+                .HasConstraintName("FK_Productos_Insumos_Productos");
+        });
+
+        modelBuilder.Entity<ProductosStock>(entity =>
+        {
+            entity.ToTable("Productos_Stock");
+
+            entity.Property(e => e.Egreso).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Ingreso).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.TipoMovimiento)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.ProductosStocks)
+                .HasForeignKey(d => d.IdLocal)
+                .HasConstraintName("FK_Productos_Stock_Productos_Stock");
+
+            entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.ProductosStocks)
+                .HasForeignKey(d => d.IdProducto)
+                .HasConstraintName("FK_Productos_Stock_Productos");
+        });
+
+        modelBuilder.Entity<ProductosTipo>(entity =>
+        {
+            entity.ToTable("Productos_Tipos");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(255)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Proveedor>(entity =>
