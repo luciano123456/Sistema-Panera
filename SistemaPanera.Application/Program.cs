@@ -46,6 +46,9 @@ builder.Services.AddScoped<IUnidadesNegocioService, UnidadesNegocioService>();
 builder.Services.AddScoped<IUnidadesMedidaRepository<UnidadesMedida>, UnidadesMedidaRepository>();
 builder.Services.AddScoped<IUnidadesMedidaService, UnidadesMedidaService>();
 
+builder.Services.AddScoped<IInsumosCategoriaRepository<InsumosCategoria>, InsumosCategoriaRepository>();
+builder.Services.AddScoped<IInsumosCategoriaService, InsumosCategoriaService>();
+
 builder.Services.AddScoped<IGenericRepository<Local>, LocalRepository>();
 builder.Services.AddScoped<ILocalService, LocalService>();
 
