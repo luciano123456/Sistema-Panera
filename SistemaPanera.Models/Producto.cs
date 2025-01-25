@@ -23,6 +23,8 @@ public partial class Producto
 
     public decimal CostoTotal { get; set; }
 
+    public DateTime FechaActualizacion { get; set; }
+
     public virtual ProductosCategoria IdCategoriaNavigation { get; set; } = null!;
 
     public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;
