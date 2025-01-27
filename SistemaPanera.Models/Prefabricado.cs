@@ -20,6 +20,8 @@ public partial class Prefabricado
 
     public decimal CostoTotal { get; set; }
 
+    public DateTime FechaActualizacion { get; set; }
+
     public virtual PrefabricadosCategoria IdCategoriaNavigation { get; set; } = null!;
 
     public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;
