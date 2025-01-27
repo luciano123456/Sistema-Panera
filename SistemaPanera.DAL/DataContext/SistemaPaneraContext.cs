@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using SistemaPanera.Models;
 
-
 namespace SistemaPanera.DAL.DataContext;
 
 public partial class SistemaPaneraContext : DbContext
@@ -30,6 +29,14 @@ public partial class SistemaPaneraContext : DbContext
     public virtual DbSet<InsumosStock> InsumosStocks { get; set; }
 
     public virtual DbSet<Local> Locales { get; set; }
+
+    public virtual DbSet<Prefabricado> Prefabricados { get; set; }
+
+    public virtual DbSet<PrefabricadosCategoria> PrefabricadosCategorias { get; set; }
+
+    public virtual DbSet<PrefabricadosInsumo> PrefabricadosInsumos { get; set; }
+
+    public virtual DbSet<PrefabricadosStock> PrefabricadosStocks { get; set; }
 
     public virtual DbSet<Producto> Productos { get; set; }
 
@@ -139,15 +146,90 @@ public partial class SistemaPaneraContext : DbContext
                 .HasConstraintName("FK_Locales_Unidades_Negocio");
         });
 
+        modelBuilder.Entity<Prefabricado>(entity =>
+        {
+            entity.Property(e => e.CostoTotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+            entity.Property(e => e.Sku)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Prefabricados)
+                .HasForeignKey(d => d.IdCategoria)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Prefabricados_Categorias");
+
+            entity.HasOne(d => d.IdUnidadMedidaNavigation).WithMany(p => p.Prefabricados)
+                .HasForeignKey(d => d.IdUnidadMedida)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Unidades_Medida");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Prefabricados)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<PrefabricadosCategoria>(entity =>
+        {
+            entity.ToTable("Prefabricados_Categorias");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<PrefabricadosInsumo>(entity =>
+        {
+            entity.ToTable("Prefabricados_Insumos");
+
+            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.PrefabricadosInsumos)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Insumos_Insumos");
+
+            entity.HasOne(d => d.IdPrefabricadoNavigation).WithMany(p => p.PrefabricadosInsumos)
+                .HasForeignKey(d => d.IdPrefabricado)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Insumos_Prefabricados");
+        });
+
+        modelBuilder.Entity<PrefabricadosStock>(entity =>
+        {
+            entity.ToTable("Prefabricados_Stock");
+
+            entity.Property(e => e.Egreso).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Ingreso).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.TipoMovimiento)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.PrefabricadosStocks)
+                .HasForeignKey(d => d.IdLocal)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados_Stock");
+
+            entity.HasOne(d => d.IdPrefabricadoNavigation).WithMany(p => p.PrefabricadosStocks)
+                .HasForeignKey(d => d.IdPrefabricado)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados");
+        });
+
         modelBuilder.Entity<Producto>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.CostoInsumos).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoTotal).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+            entity.Property(e => e.FechaActualizacion).HasColumnType("datetime");
             entity.Property(e => e.Sku)
                 .HasMaxLength(150)
                 .IsUnicode(false);
@@ -200,10 +282,12 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.ProductosStocks)
                 .HasForeignKey(d => d.IdLocal)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Productos_Stock_Productos_Stock");
 
             entity.HasOne(d => d.IdProductoNavigation).WithMany(p => p.ProductosStocks)
                 .HasForeignKey(d => d.IdProducto)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Productos_Stock_Productos");
         });
 

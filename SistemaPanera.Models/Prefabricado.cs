@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
 
-public partial class Insumo
+public partial class Prefabricado
 {
     public int Id { get; set; }
 
@@ -18,15 +18,15 @@ public partial class Insumo
 
     public int IdCategoria { get; set; }
 
-    public decimal CostoUnitario { get; set; }
+    public decimal CostoTotal { get; set; }
 
-    public DateTime FechaActualizacion { get; set; }
-
-    public virtual InsumosCategoria IdCategoriaNavigation { get; set; } = null!;
+    public virtual PrefabricadosCategoria IdCategoriaNavigation { get; set; } = null!;
 
     public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;
 
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 
     public virtual ICollection<PrefabricadosInsumo> PrefabricadosInsumos { get; set; } = new List<PrefabricadosInsumo>();
+
+    public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
 }
