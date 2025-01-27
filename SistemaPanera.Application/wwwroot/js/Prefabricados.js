@@ -87,18 +87,9 @@ function validarCampos() {
 
     return campoValidoDescripcion && campoValidoSku && campoValidoCostoUnitario;
 }
+
 function nuevoPrefabricado() {
-    limpiarModal();
-    listaUnidadesNegocio();
-    listaUnidadesMedida();
-    listaPrefabricadosCategoria();
-    $('#modalEdicion').modal('show');
-    $("#btnGuardar").text("Registrar");
-    $("#modalEdicionLabel").text("Nuevo Prefabricado");
-    $('#lblNombre').css('color', 'red');
-    $('#lblDescripcion, #txtDescripcion').css('color', 'red').css('border-color', 'red');
-    $('#lblSku, #txtSku').css('color', 'red').css('border-color', 'red');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', 'red').css('border-color', 'red');
+    window.location.href = '/Prefabricados/NuevoModif';
 }
 
 async function mostrarModal(modelo) {

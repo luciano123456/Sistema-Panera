@@ -23,6 +23,11 @@ namespace SistemaPanera.Application.Controllers
             return View();
         }
 
+        public IActionResult NuevoModif()
+        {
+            return View();
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Lista(int IdUnidadNegocio)
