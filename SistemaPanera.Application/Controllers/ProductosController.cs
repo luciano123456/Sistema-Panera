@@ -12,10 +12,12 @@ namespace SistemaPanera.Application.Controllers
     public class ProductosController : Controller
     {
         private readonly IProductoService _ProductosService;
+        private readonly IProductoInsumoService _ProductosInsumoService;
 
-        public ProductosController(IProductoService ProductosService)
+        public ProductosController(IProductoService ProductosService, IProductoInsumoService productosInsumoService)
         {
             _ProductosService = ProductosService;
+            _ProductosInsumoService = productosInsumoService;
         }
 
         public IActionResult Index()
@@ -23,6 +25,10 @@ namespace SistemaPanera.Application.Controllers
             return View();
         }
 
+        public IActionResult NuevoModif()
+        {
+            return View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> Lista(int IdUnidadNegocio)
@@ -45,6 +51,29 @@ namespace SistemaPanera.Application.Controllers
                 CostoInsumos = c.CostoInsumos,
                 CostoTotal = c.CostoTotal,
             }).Where(x => x.IdUnidadNegocio == IdUnidadNegocio || IdUnidadNegocio == -1).ToList();
+
+            return Ok(lista);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ListaInsumos(int IdProducto)
+        {
+            var productos = await _ProductosInsumoService.ObtenerInsumosProducto(IdProducto);
+
+            var lista = new List<VMProductoInsumo>();
+
+            foreach (var c in productos)
+            {
+                lista.Add(new VMProductoInsumo
+                {
+                    Id = c.Id,
+                    Cantidad = c.Cantidad,
+                    CostoUnitario = c.CostoUnitario ?? 0,
+                    IdProducto = IdProducto,
+                    IdTipo = c.IdTipo,
+                    SubTotal = c.SubTotal,
+                    Tipo = c.IdProductosTipoNavigation.Nombre
+                });
+            }
 
             return Ok(lista);
         }

@@ -42,12 +42,14 @@ namespace SistemaPanera.DAL.Repository
             return true;
         }
 
-        public async Task<Models.Producto> Obtener(int id)
+        public async Task<Producto> Obtener(int id)
         {
-            Models.Producto model = await _dbcontext.Productos.FindAsync(id);
+            Producto model = await _dbcontext.Productos.FindAsync(id);
             return model;
         }
+        
 
+       
         public async Task<IQueryable<Models.Producto>> ObtenerTodos()
         {
             IQueryable<Models.Producto> query = _dbcontext.Productos;

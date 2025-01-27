@@ -18,4 +18,5 @@ public partial class ProductosInsumo
     public decimal? SubTotal { get; set; }
 
     public virtual Producto? IdProductoNavigation { get; set; }
+    public virtual ProductosTipo? IdProductosTipoNavigation { get; set; }
 }

@@ -90,17 +90,7 @@ function validarCampos() {
     return campoValidoDescripcion && campoValidoSku && campoValidoCostoUnitario;
 }
 function nuevoProducto() {
-    limpiarModal();
-    listaUnidadesNegocio();
-    listaUnidadesMedida();
-    listaProductosCategoria();
-    $('#modalEdicion').modal('show');
-    $("#btnGuardar").text("Registrar");
-    $("#modalEdicionLabel").text("Nuevo Producto");
-    $('#lblNombre').css('color', 'red');
-    $('#lblDescripcion, #txtDescripcion').css('color', 'red').css('border-color', 'red');
-    $('#lblSku, #txtSku').css('color', 'red').css('border-color', 'red');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', 'red').css('border-color', 'red');
+    window.location.href = '/Productos/NuevoModif';
 }
 
 async function mostrarModal(modelo) {
