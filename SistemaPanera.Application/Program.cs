@@ -67,6 +67,9 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IPrefabricadosCategoriaRepository<PrefabricadosCategoria>, PrefabricadosCategoriaRepository>();
 builder.Services.AddScoped<IPrefabricadosCategoriaService, PrefabricadosCategoriaService>();
 
+builder.Services.AddScoped<IPrefabricadoRepository<Prefabricado>, PrefabricadoRepository>();
+builder.Services.AddScoped<IPrefabricadoService, PrefabricadoService>();
+
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>
