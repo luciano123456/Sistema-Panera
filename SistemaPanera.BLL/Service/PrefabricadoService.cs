@@ -31,22 +31,24 @@ namespace SistemaPanera.BLL.Service
         {
             return await _contactRepo.Obtener(id);
         }
-
-        //public async Task<Prefabricado> ObtenerPorNombre(string nombre)
-        //{
-        //    IQueryable<Prefabricado> queryPrefabricadoSQL = await _contactRepo.ObtenerTodos();
-
-        //    Prefabricado Prefabricado = queryPrefabricadoSQL.Where(c => c.Nombre == nombre).FirstOrDefault();
-
-        //    return Prefabricado;
-        //}
-
         public async Task<IQueryable<Prefabricado>> ObtenerTodos()
         {
             return await _contactRepo.ObtenerTodos();
         }
 
+        public async Task<bool> InsertarInsumos(List<PrefabricadosInsumo> insumos)
+        {
+            return await _contactRepo.InsertarInsumos(insumos);
+        }
 
+        public async Task<bool> ActualizarInsumos(List<PrefabricadosInsumo> productos)
+        {
+            return await _contactRepo.ActualizarInsumos(productos);
+        }
 
+        public async Task<List<PrefabricadosInsumo>> ObtenerInsumos(int idPrefabricado)
+        {
+            return await _contactRepo.ObtenerInsumos(idPrefabricado);
+        }
     }
 }

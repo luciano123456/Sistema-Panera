@@ -5,6 +5,8 @@ using SistemaPanera.Application.Models.ViewModels;
 using SistemaPanera.BLL.Service;
 using SistemaPanera.Models;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace SistemaPanera.Application.Controllers
 {
@@ -22,6 +24,7 @@ namespace SistemaPanera.Application.Controllers
         {
             return View();
         }
+
 
 
         [HttpGet]
@@ -65,6 +68,27 @@ namespace SistemaPanera.Application.Controllers
 
             bool respuesta = await _PrefabricadosService.Insertar(Prefabricados);
 
+            List<PrefabricadosInsumo> pedidosInsumo = new List<PrefabricadosInsumo>();
+
+            // Agregar los pagos de clientes
+            if (model.PrefabricadosInsumos != null && model.PrefabricadosInsumos.Any())
+            {
+                foreach (var insumo in model.PrefabricadosInsumos)
+                {
+                    var nuevoInsumo = new PrefabricadosInsumo
+                    {
+                        IdPrefabricado = Prefabricados.Id,
+                        IdInsumo = insumo.IdInsumo,
+                        CostoUnitario = insumo.CostoUnitario,
+                        SubTotal = insumo.SubTotal,
+                        Cantidad = insumo.Cantidad,
+                    };
+                    pedidosInsumo.Add(nuevoInsumo);
+                }
+            }
+
+            bool respInsumos = await _PrefabricadosService.InsertarInsumos(pedidosInsumo);
+
             return Ok(new { valor = respuesta });
         }
 
@@ -86,6 +110,27 @@ namespace SistemaPanera.Application.Controllers
 
             bool respuesta = await _PrefabricadosService.Actualizar(Prefabricados);
 
+            List<PrefabricadosInsumo> prefabricadosInsumo = new List<PrefabricadosInsumo>();
+
+            // Agregar los pagos de clientes
+            if (model.PrefabricadosInsumos != null && model.PrefabricadosInsumos.Any())
+            {
+                foreach (var insumo in model.PrefabricadosInsumos)
+                {
+                    var nuevoInsumo = new PrefabricadosInsumo
+                    {
+                        Cantidad = insumo.Cantidad,
+                        CostoUnitario = insumo.CostoUnitario,
+                        IdInsumo = insumo.IdInsumo,
+                        IdPrefabricado = insumo.IdPrefabricado,
+                        SubTotal = insumo.SubTotal,
+                    };
+                    prefabricadosInsumo.Add(nuevoInsumo);
+                }
+            }
+
+            bool respproductos = await _PrefabricadosService.InsertarInsumos(prefabricadosInsumo);
+
             return Ok(new { valor = respuesta });
         }
 
@@ -100,17 +145,69 @@ namespace SistemaPanera.Application.Controllers
         [HttpGet]
         public async Task<IActionResult> EditarInfo(int id)
         {
-            var EstadosUsuario = await _PrefabricadosService.Obtener(id);
+            Dictionary<string, object> result = new Dictionary<string, object>();
 
-            if (EstadosUsuario != null)
+            if (id > 0)
             {
-                return StatusCode(StatusCodes.Status200OK, EstadosUsuario);
+
+                var model = await _PrefabricadosService.Obtener(id);
+
+                var Prefabricado = new VMPrefabricado
+                {
+                    Id = model.Id,
+                    IdUnidadMedida = model.IdUnidadMedida,
+                    Sku = model.Sku,
+                    IdUnidadNegocio = model.IdUnidadNegocio,
+                    FechaActualizacion = DateTime.Now,
+                    IdCategoria = model.IdCategoria,
+                    Descripcion = model.Descripcion,
+                    CostoTotal = model.CostoTotal,
+                };
+
+                var prefabricadosInsumos = await _PrefabricadosService.ObtenerInsumos(id);
+
+
+                var insumosJson = prefabricadosInsumos.Select(p => new VMPrefabricadosInsumo
+                {
+                    Id = p.Id,
+                    
+                    Cantidad = p.Cantidad,
+                    CostoUnitario = p.CostoUnitario,
+                    IdInsumo = p.IdInsumo,
+                    Nombre = p.IdInsumoNavigation.Descripcion.ToString(),
+                    IdPrefabricado = p.IdPrefabricado,
+                    SubTotal = p.SubTotal,
+                }).ToList();
+
+
+
+                result.Add("prefabricado", Prefabricado);
+                result.Add("Insumos", insumosJson);
+
+                // Serialize with ReferenceHandler.Preserve to handle circular references
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
+
+                return Ok(System.Text.Json.JsonSerializer.Serialize(result, jsonOptions));
             }
-            else
-            {
-                return StatusCode(StatusCodes.Status404NotFound);
-            }
+
+            return Ok(new { });
         }
+
+
+
+
+
+        public async Task<IActionResult> NuevoModif(int? id)
+        {
+            if(id != null) { 
+            ViewBag.data = id;
+            }
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

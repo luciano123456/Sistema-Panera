@@ -44,7 +44,9 @@ namespace SistemaPanera.DAL.Repository
 
         public async Task<Models.Prefabricado> Obtener(int id)
         {
-            Models.Prefabricado model = await _dbcontext.Prefabricados.FindAsync(id);
+            Models.Prefabricado model = await _dbcontext.Prefabricados
+                .Include(p => p.PrefabricadosInsumos)
+                .FirstOrDefaultAsync(p => p.Id == id);
             return model;
         }
 
@@ -54,6 +56,77 @@ namespace SistemaPanera.DAL.Repository
             return await Task.FromResult(query);
         }
 
+        public async Task<bool> InsertarInsumos(List<PrefabricadosInsumo> insumos)
+        {
+            foreach (PrefabricadosInsumo p in insumos)
+            {
+                // Verificar si el insumo ya existe, por ejemplo, por Idinsumo y IdPedido
+                var insumoExistente = await _dbcontext.PrefabricadosInsumos
+                                                         .FirstOrDefaultAsync(x => x.IdPrefabricado == p.IdPrefabricado && x.IdInsumo == p.IdInsumo);
+
+                if (insumoExistente != null)
+                {
+                    // Si el insumo existe, actualizamos sus propiedades
+                    insumoExistente.CostoUnitario = p.CostoUnitario;
+                    insumoExistente.SubTotal = p.SubTotal;
+                    insumoExistente.Cantidad = p.Cantidad;
+                }
+                else
+                {
+                    // Si el insumo no existe, lo agregamos a la base de datos
+                    _dbcontext.PrefabricadosInsumos.Add(p);
+                }
+            }
+
+
+            var insumosIdsModelo = insumos.Select(p => p.IdPrefabricado).Distinct().ToList();
+            var insumosAEliminar = await _dbcontext.PrefabricadosInsumos
+                                                      .Where(x => insumosIdsModelo.Contains(x.IdPrefabricado)
+                                                              && !insumos.Select(p => p.IdInsumo).Contains(x.IdInsumo)
+                                                              && x.Id != 0)
+                                                      .ToListAsync();
+
+
+            foreach (var insumo in insumosAEliminar)
+            {
+                _dbcontext.PrefabricadosInsumos.Remove(insumo);
+            }
+
+            await _dbcontext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ActualizarInsumos(List<PrefabricadosInsumo> insumos)
+        {
+            foreach (PrefabricadosInsumo p in insumos)
+            {
+                _dbcontext.PrefabricadosInsumos.Update(p);
+            }
+
+            await _dbcontext.SaveChangesAsync();
+            return true;
+
+        }
+
+
+        public async Task<List<PrefabricadosInsumo>> ObtenerInsumos(int idPrefabricado)
+        {
+            try
+            {
+
+                List<PrefabricadosInsumo> productos = _dbcontext.PrefabricadosInsumos
+                    .Include(c => c.IdPrefabricadoNavigation)
+                    .Include(c => c.IdInsumoNavigation)
+                    .Where(c => c.IdPrefabricado == idPrefabricado).ToList();
+                return productos;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
+        }
 
 
 
