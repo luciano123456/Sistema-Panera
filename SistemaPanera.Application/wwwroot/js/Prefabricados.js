@@ -138,23 +138,11 @@ async function listaPrefabricados(UnidadNegocio) {
     await configurarDataTable(data);
 }
 
-const editarPrefabricado = id => {
-    fetch("Prefabricados/EditarInfo?id=" + id)
-        .then(response => {
-            if (!response.ok) throw new Error("Ha ocurrido un error.");
-            return response.json();
-        })
-        .then(dataJson => {
-            if (dataJson !== null) {
-                mostrarModal(dataJson);
-            } else {
-                throw new Error("Ha ocurrido un error.");
-            }
-        })
-        .catch(error => {
-            errorModal("Ha ocurrido un error.");
-        });
+function editarPrefabricado(id) {
+    // Redirige a la vista 'PedidoNuevoModif' con el parámetro id
+    window.location.href = '/Prefabricados/NuevoModif/' + id;
 }
+
 async function eliminarPrefabricado(id) {
     let resultado = window.confirm("¿Desea eliminar el Prefabricado?");
 
@@ -325,17 +313,38 @@ async function configurarDataTable(data) {
                     gridPrefabricados.columns.adjust();
                 }, 10);
 
-                $('body').on('mouseenter', '#grd_Prefabricados .fa-map-marker', function () {
+                // Cambiar el cursor a 'pointer' cuando pase sobre cualquier fila o columna
+                $('#grd_Prefabricados tbody').on('mouseenter', 'tr', function () {
                     $(this).css('cursor', 'pointer');
                 });
 
-
-
-                $('body').on('click', '#grd_Prefabricados .fa-map-marker', function () {
-                    var locationText = $(this).parent().text().trim().replace(' ', ' '); // Obtener el texto visible
-                    var url = 'https://www.google.com/maps?q=' + encodeURIComponent(locationText);
-                    window.open(url, '_blank');
+                // Doble clic para ejecutar la función editarPedido(id)
+                $('#grd_Prefabricados tbody').on('dblclick', 'tr', function () {
+                    var id = gridPrefabricados.row(this).data().Id; // Obtener el ID de la fila seleccionada
+                    editarPrefabricado(id); // Llamar a la función de editar
                 });
+
+                let filaSeleccionada = null; // Variable para almacenar la fila seleccionada
+                $('#grd_Prefabricados tbody').on('click', 'tr', function () {
+                    // Remover la clase de la fila anteriormente seleccionada
+                    if (filaSeleccionada) {
+                        $(filaSeleccionada).removeClass('seleccionada');
+                        $('td', filaSeleccionada).removeClass('seleccionada');
+
+                    }
+
+                    // Obtener la fila actual
+                    filaSeleccionada = $(this);
+
+                    // Agregar la clase a la fila actual
+                    $(filaSeleccionada).addClass('seleccionada');
+                    $('td', filaSeleccionada).addClass('seleccionada');
+
+                });
+
+
+
+              
             },
         });
 

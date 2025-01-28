@@ -24,20 +24,22 @@ async function MakeAjaxFormData(options) {
 }
 
 
+// Formatear el número de manera correcta
 function formatNumber(number) {
     if (typeof number !== 'number' || isNaN(number)) {
-        return "$0.00"; // Devuelve un valor predeterminado si 'number' no es válido
+        return "$ 0,00"; // Si el número no es válido, retornar un valor por defecto
     }
 
-    // Asegúrate de que el número tenga dos decimales
-    const parts = number.toFixed(2).split(".");
+    // Asegurarse de que el número tenga dos decimales
+    const parts = number.toFixed(2).split("."); // Dividir en parte entera y decimal
 
-    // Formatea la parte entera con puntos como separadores de miles
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    // Formatear la parte entera con puntos como separadores de miles
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Usar punto para miles
 
-    // Combina la parte entera y la parte decimal
-    return "$" + parts.join(",");
+    // Devolver el número con la coma como separador decimal
+    return "$ " + parts.join(",");
 }
+
 
 
 function mostrarModalConContador(modal, texto, tiempo) {
@@ -67,11 +69,19 @@ const formatoMoneda = new Intl.NumberFormat('es-AR', {
     minimumFractionDigits: 2
 });
 
-function convertirMonedaAfloat(moneda) {
-    // Eliminar el símbolo de la moneda y reemplazar la coma por un punto
-    return parseFloat(moneda.replace(/[^0-9,.-]/g, '').replace(',', '.'));
-}
+function convertirMonedaAFloat(moneda) {
+    // Eliminar el símbolo de la moneda y otros caracteres no numéricos
+    const soloNumeros = moneda.replace(/[^0-9,.-]/g, '');
 
+    // Eliminar separadores de miles y convertir la coma en punto
+    const numeroFormateado = soloNumeros.replace(/\./g, '').replace(',', '.');
+
+    // Convertir a flotante
+    const numero = parseFloat(numeroFormateado);
+
+    // Devolver el número formateado como cadena, asegurando los decimales
+    return numero.toFixed(2); // Asegura siempre dos decimales en la salida
+}
 function convertirAMonedaDecimal(valor) {
     // Reemplazar coma por punto
     if (typeof valor === 'string') {
@@ -99,7 +109,7 @@ function formatMoneda(valor) {
         .replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Agregar separadores de miles
 
     // Agregar el símbolo $ al inicio
-    return `$${formateado}`;
+    return `$ ${formateado}`;
 }
 
 
@@ -133,4 +143,3 @@ function toggleAcciones(id) {
         document.body.appendChild(dropdownClone);
     }
 }
-

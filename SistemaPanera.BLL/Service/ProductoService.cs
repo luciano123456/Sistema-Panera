@@ -32,21 +32,10 @@ namespace SistemaPanera.BLL.Service
             return await _contactRepo.Obtener(id);
         }
 
-        //public async Task<Producto> ObtenerPorNombre(string nombre)
-        //{
-        //    IQueryable<Producto> queryProductoSQL = await _contactRepo.ObtenerTodos();
-
-        //    Producto Producto = queryProductoSQL.Where(c => c.Nombre == nombre).FirstOrDefault();
-
-        //    return Producto;
-        //}
-
         public async Task<IQueryable<Producto>> ObtenerTodos()
         {
             return await _contactRepo.ObtenerTodos();
         }
-
-
 
     }
 }
