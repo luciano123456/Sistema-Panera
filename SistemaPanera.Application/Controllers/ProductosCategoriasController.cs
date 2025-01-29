@@ -9,21 +9,21 @@ using System.Diagnostics;
 namespace SistemaPanera.Application.Controllers
 {
     [Authorize]
-    public class ProductosCategoriaController : Controller
+    public class RecetasCategoriaController : Controller
     {
-        private readonly IProductosCategoriaService _ProductosCategoriaService;
+        private readonly IRecetasCategoriaService _RecetasCategoriaService;
 
-        public ProductosCategoriaController(IProductosCategoriaService ProductosCategoriaService)
+        public RecetasCategoriaController(IRecetasCategoriaService RecetasCategoriaService)
         {
-            _ProductosCategoriaService = ProductosCategoriaService;
+            _RecetasCategoriaService = RecetasCategoriaService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Lista()
         {
-            var ProductosCategoria = await _ProductosCategoriaService.ObtenerTodos();
+            var RecetasCategoria = await _RecetasCategoriaService.ObtenerTodos();
 
-            var lista = ProductosCategoria.Select(c => new VMProductosCategoria
+            var lista = RecetasCategoria.Select(c => new VMRecetasCategoria
             {
                 Id = c.Id,
                 Nombre = c.Nombre,
@@ -34,29 +34,29 @@ namespace SistemaPanera.Application.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Insertar([FromBody] VMProductosCategoria model)
+        public async Task<IActionResult> Insertar([FromBody] VMRecetasCategoria model)
         {
-            var ProductosCategoria = new ProductosCategoria
+            var RecetasCategoria = new RecetasCategoria
             {
                 Id = model.Id,
                 Nombre = model.Nombre,
             };
 
-            bool respuesta = await _ProductosCategoriaService.Insertar(ProductosCategoria);
+            bool respuesta = await _RecetasCategoriaService.Insertar(RecetasCategoria);
 
             return Ok(new { valor = respuesta });
         }
 
         [HttpPut]
-        public async Task<IActionResult> Actualizar([FromBody] VMProductosCategoria model)
+        public async Task<IActionResult> Actualizar([FromBody] VMRecetasCategoria model)
         {
-            var ProductosCategoria = new ProductosCategoria
+            var RecetasCategoria = new RecetasCategoria
             {
                 Id = model.Id,
                 Nombre = model.Nombre,
             };
 
-            bool respuesta = await _ProductosCategoriaService.Actualizar(ProductosCategoria);
+            bool respuesta = await _RecetasCategoriaService.Actualizar(RecetasCategoria);
 
             return Ok(new { valor = respuesta });
         }
@@ -64,7 +64,7 @@ namespace SistemaPanera.Application.Controllers
         [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)
         {
-            bool respuesta = await _ProductosCategoriaService.Eliminar(id);
+            bool respuesta = await _RecetasCategoriaService.Eliminar(id);
 
             return StatusCode(StatusCodes.Status200OK, new { valor = respuesta });
         }
@@ -72,7 +72,7 @@ namespace SistemaPanera.Application.Controllers
         [HttpGet]
         public async Task<IActionResult> EditarInfo(int id)
         {
-             var EstadosUsuario = await _ProductosCategoriaService.Obtener(id);
+             var EstadosUsuario = await _RecetasCategoriaService.Obtener(id);
 
             if (EstadosUsuario != null)
             {

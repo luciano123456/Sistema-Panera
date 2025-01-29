@@ -2,12 +2,12 @@
 
 namespace SistemaPanera.Application.Models.ViewModels
 {
-    public class VMProductosTipo
+    public class VMRecetasTipo
     {
         public int Id { get; set; }
 
         public string Nombre { get; set; } = null!;
 
-        public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
+        public virtual ICollection<Receta> Recetas { get; set; } = new List<Receta>();
     }
 }

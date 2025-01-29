@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
-
 public partial class Local
 {
     public int Id { get; set; }
@@ -15,5 +14,5 @@ public partial class Local
 
     public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
 
-    public virtual ICollection<ProductosStock> ProductosStocks { get; set; } = new List<ProductosStock>();
+    public virtual ICollection<RecetasStock> RecetasStocks { get; set; } = new List<RecetasStock>();
 }

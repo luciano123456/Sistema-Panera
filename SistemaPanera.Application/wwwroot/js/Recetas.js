@@ -1,4 +1,4 @@
-﻿let gridProductos;
+﻿let gridRecetas;
 let isEditing = false;
 
 
@@ -8,7 +8,7 @@ const columnConfig = [
     { index: 3, filterType: 'text' },
     { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesNegocioFilter },
     { index: 5, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
-    { index: 6, filterType: 'select', fetchDataFunc: listaProductosCategoriaFilter },
+    { index: 6, filterType: 'select', fetchDataFunc: listaRecetasCategoriaFilter },
     { index: 7, filterType: 'text' },
     { index: 8, filterType: 'text' },
     { index: 9, filterType: 'text' },
@@ -17,7 +17,7 @@ const columnConfig = [
 $(document).ready(() => {
 
     listaUnidadesNegocioFiltro();
-    listaProductos(-1);
+    listaRecetas(-1);
 
     $('#txtDescripcion, #txtCostoUnitario, #txtSku').on('input', function () {
         validarCampos()
@@ -30,9 +30,9 @@ $(document).ready(() => {
 
 function guardarCambios() {
     if (validarCampos()) {
-        const idProducto = $("#txtId").val();
+        const idReceta = $("#txtId").val();
         const nuevoModelo = {
-            "Id": idProducto !== "" ? idProducto : 0,
+            "Id": idReceta !== "" ? idReceta : 0,
             "Descripcion": $("#txtDescripcion").val(),
             "IdUnidadMedida": $("#UnidadesMedida").val(),
             "IdUnidadNegocio": $("#UnidadesNegocio").val(),
@@ -41,8 +41,8 @@ function guardarCambios() {
             "CostoUnitario": $("#txtCostoUnitario").val(),
         };
 
-        const url = idProducto === "" ? "Productos/Insertar" : "Productos/Actualizar";
-        const method = idProducto === "" ? "POST" : "PUT";
+        const url = idReceta === "" ? "Recetas/Insertar" : "Recetas/Actualizar";
+        const method = idReceta === "" ? "POST" : "PUT";
 
         fetch(url, {
             method: method,
@@ -56,7 +56,7 @@ function guardarCambios() {
                 return response.json();
             })
             .then(dataJson => {
-                const mensaje = idProducto === "" ? "Producto registrado correctamente" : "Producto modificado correctamente";
+                const mensaje = idReceta === "" ? "Receta registrado correctamente" : "Receta modificado correctamente";
                 $('#modalEdicion').modal('hide');
                 exitoModal(mensaje);
                 aplicarFiltros();
@@ -89,18 +89,9 @@ function validarCampos() {
 
     return campoValidoDescripcion && campoValidoSku && campoValidoCostoUnitario;
 }
-function nuevoProducto() {
-    limpiarModal();
-    listaUnidadesNegocio();
-    listaUnidadesMedida();
-    listaProductosCategoria();
-    $('#modalEdicion').modal('show');
-    $("#btnGuardar").text("Registrar");
-    $("#modalEdicionLabel").text("Nuevo Producto");
-    $('#lblNombre').css('color', 'red');
-    $('#lblDescripcion, #txtDescripcion').css('color', 'red').css('border-color', 'red');
-    $('#lblSku, #txtSku').css('color', 'red').css('border-color', 'red');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', 'red').css('border-color', 'red');
+
+async function nuevoReceta() {
+    window.location.href = "/Recetas/NuevoModif";
 }
 
 async function mostrarModal(modelo) {
@@ -111,11 +102,11 @@ async function mostrarModal(modelo) {
 
     listaUnidadesNegocio();
     listaUnidadesMedida();
-    listaProductosCategoria();
+    listaRecetasCategoria();
 
     $('#modalEdicion').modal('show');
     $("#btnGuardar").text("Guardar");
-    $("#modalEdicionLabel").text("Editar Producto");
+    $("#modalEdicionLabel").text("Editar Receta");
 
     $('#lblDescripcion, #txtDescripcion').css('color', '').css('border-color', '');
     $('#lblSku, #txtSku').css('color', '').css('border-color', '');
@@ -138,52 +129,42 @@ function limpiarModal() {
 
 
 async function aplicarFiltros() {
-    listaProductos(document.getElementById("UnidadNegocioFiltro").value)
+    listaRecetas(document.getElementById("UnidadNegocioFiltro").value)
 }
 
 
-async function listaProductos(UnidadNegocio) {
-    const url = `/Productos/Lista?IdUnidadNegocio=${UnidadNegocio}`;
+async function listaRecetas(UnidadNegocio) {
+    const url = `/Recetas/Lista?IdUnidadNegocio=${UnidadNegocio}`;
     const response = await fetch(url);
     const data = await response.json();
     await configurarDataTable(data);
 }
 
-const editarProducto = id => {
-    fetch("Productos/EditarInfo?id=" + id)
-        .then(response => {
-            if (!response.ok) throw new Error("Ha ocurrido un error.");
-            return response.json();
-        })
-        .then(dataJson => {
-            if (dataJson !== null) {
-                mostrarModal(dataJson);
-            } else {
-                throw new Error("Ha ocurrido un error.");
-            }
-        })
-        .catch(error => {
-            errorModal("Ha ocurrido un error.");
-        });
+
+function editarReceta(id) {
+    // Redirige a la vista 'PedidoNuevoModif' con el parámetro id
+    window.location.href = '/Recetas/NuevoModif/' + id;
 }
-async function eliminarProducto(id) {
-    let resultado = window.confirm("¿Desea eliminar el Producto?");
+
+
+async function eliminarReceta(id) {
+    let resultado = window.confirm("¿Desea eliminar el Receta?");
 
     if (resultado) {
         try {
-            const response = await fetch("Productos/Eliminar?id=" + id, {
+            const response = await fetch("Recetas/Eliminar?id=" + id, {
                 method: "DELETE"
             });
 
             if (!response.ok) {
-                throw new Error("Error al eliminar el Producto.");
+                throw new Error("Error al eliminar el Receta.");
             }
 
             const dataJson = await response.json();
 
             if (dataJson.valor) {
                 aplicarFiltros();
-                exitoModal("Producto eliminado correctamente")
+                exitoModal("Receta eliminado correctamente")
             }
         } catch (error) {
             console.error("Ha ocurrido un error:", error);
@@ -192,9 +173,9 @@ async function eliminarProducto(id) {
 }
 
 async function configurarDataTable(data) {
-    if (!gridProductos) {
-        $('#grd_Productos thead tr').clone(true).addClass('filters').appendTo('#grd_Productos thead');
-        gridProductos = $('#grd_Productos').DataTable({
+    if (!gridRecetas) {
+        $('#grd_Recetas thead tr').clone(true).addClass('filters').appendTo('#grd_Recetas thead');
+        gridRecetas = $('#grd_Recetas').DataTable({
             data: data,
             language: {
                 sLengthMenu: "Mostrar MENU registros",
@@ -215,10 +196,10 @@ async function configurarDataTable(data) {
                         <i class='fa fa-ellipsis-v fa-lg text-white' aria-hidden='true'></i>
                     </button>
                     <div class="acciones-dropdown" style="display: none;">
-                        <button class='btn btn-sm btneditar' type='button' onclick='editarProducto(${data})' title='Editar'>
+                        <button class='btn btn-sm btneditar' type='button' onclick='editarReceta(${data})' title='Editar'>
                             <i class='fa fa-pencil-square-o fa-lg text-success' aria-hidden='true'></i> Editar
                         </button>
-                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarProducto(${data})' title='Eliminar'>
+                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarReceta(${data})' title='Eliminar'>
                             <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i> Eliminar
                         </button>
                     </div>
@@ -233,7 +214,7 @@ async function configurarDataTable(data) {
                 { data: 'UnidadNegocio' },
                 { data: 'UnidadMedida' },
                 { data: 'Categoria' },
-                { data: 'CostoUnitario' },
+                { data: 'CostoPrefabricados' },
                 { data: 'CostoInsumos' },
                 { data: 'CostoTotal' },
             ],
@@ -242,7 +223,7 @@ async function configurarDataTable(data) {
                 {
                     extend: 'excelHtml5',
                     text: 'Exportar Excel',
-                    filename: 'Reporte Productos',
+                    filename: 'Reporte Recetas',
                     title: '',
                     exportOptions: {
                         columns: [0, 1, 2, 3]
@@ -252,7 +233,7 @@ async function configurarDataTable(data) {
                 {
                     extend: 'pdfHtml5',
                     text: 'Exportar PDF',
-                    filename: 'Reporte Productos',
+                    filename: 'Reporte Recetas',
                     title: '',
                     exportOptions: {
                         columns: [0, 1, 2, 3]
@@ -335,16 +316,41 @@ async function configurarDataTable(data) {
                 configurarOpcionesColumnas();
 
                 setTimeout(function () {
-                    gridProductos.columns.adjust();
+                    gridRecetas.columns.adjust();
                 }, 10);
 
-                $('body').on('mouseenter', '#grd_Productos .fa-map-marker', function () {
+                // Cambiar el cursor a 'pointer' cuando pase sobre cualquier fila o columna
+                $('#grd_Recetas tbody').on('mouseenter', 'tr', function () {
                     $(this).css('cursor', 'pointer');
+                });
+
+                // Doble clic para ejecutar la función editarPedido(id)
+                $('#grd_Recetas tbody').on('dblclick', 'tr', function () {
+                    var id = gridRecetas.row(this).data().Id; // Obtener el ID de la fila seleccionada
+                    editarReceta(id); // Llamar a la función de editar
+                });
+
+                let filaSeleccionada = null; // Variable para almacenar la fila seleccionada
+                $('#grd_Recetas tbody').on('click', 'tr', function () {
+                    // Remover la clase de la fila anteriormente seleccionada
+                    if (filaSeleccionada) {
+                        $(filaSeleccionada).removeClass('seleccionada');
+                        $('td', filaSeleccionada).removeClass('seleccionada');
+
+                    }
+
+                    // Obtener la fila actual
+                    filaSeleccionada = $(this);
+
+                    // Agregar la clase a la fila actual
+                    $(filaSeleccionada).addClass('seleccionada');
+                    $('td', filaSeleccionada).addClass('seleccionada');
+
                 });
 
 
 
-                $('body').on('click', '#grd_Productos .fa-map-marker', function () {
+                $('body').on('click', '#grd_Recetas .fa-map-marker', function () {
                     var locationText = $(this).parent().text().trim().replace(' ', ' '); // Obtener el texto visible
                     var url = 'https://www.google.com/maps?q=' + encodeURIComponent(locationText);
                     window.open(url, '_blank');
@@ -353,18 +359,18 @@ async function configurarDataTable(data) {
         });
 
     } else {
-        gridProductos.clear().rows.add(data).draw();
+        gridRecetas.clear().rows.add(data).draw();
     }
 }
 
 
 function configurarOpcionesColumnas() {
-    const grid = $('#grd_Productos').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
+    const grid = $('#grd_Recetas').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
     const columnas = grid.settings().init().columns; // Obtiene la configuración de columnas
     const container = $('#configColumnasMenu'); // El contenedor del dropdown específico para configurar columnas
 
 
-    const storageKey = `Productos_Columnas`; // Clave única para esta pantalla
+    const storageKey = `Recetas_Columnas`; // Clave única para esta pantalla
 
     const savedConfig = JSON.parse(localStorage.getItem(storageKey)) || {}; // Recupera configuración guardada o inicializa vacía
 
@@ -435,8 +441,8 @@ async function listaUnidadesMedidaFilter() {
 
 }
 
-async function listaProductosCategoriaFilter() {
-    const url = `/ProductosCategoria/Lista`;
+async function listaRecetasCategoriaFilter() {
+    const url = `/RecetasCategoria/Lista`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -480,8 +486,8 @@ async function listaUnidadesMedida() {
     }
 }
 
-async function listaProductosCategoria() {
-    const data = await listaProductosCategoriaFilter();
+async function listaRecetasCategoria() {
+    const data = await listaRecetasCategoriaFilter();
 
     $('#Categorias option').remove();
 

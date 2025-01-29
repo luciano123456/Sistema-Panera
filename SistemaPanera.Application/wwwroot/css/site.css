@@ -58,11 +58,6 @@ body {
     color: white !important;
 }
 
-.select-modal-personalizado {
-    background: white !important;
-    color: green !important;
-    margin-top: 5px;
-}
 
 #estado option[value="Pendiente"] {
     background-color: yellow; /* Fondo amarillo para 'Pendiente' */
@@ -589,3 +584,4 @@ table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.
 select option:disabled {
     color: red; /* Cambiar el color de la letra a rojo */
 }
+

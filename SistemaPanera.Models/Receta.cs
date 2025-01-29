@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SistemaPanera.Models;
 
-public partial class Producto
+namespace SistemaPanera.Models;
+public partial class Receta
 {
     public int Id { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Producto
 
     public int IdUnidadMedida { get; set; }
 
-    public decimal CostoUnitario { get; set; }
+    public decimal CostoPrefabricados { get; set; }
 
     public decimal CostoInsumos { get; set; }
 
@@ -25,13 +25,13 @@ public partial class Producto
 
     public DateTime FechaActualizacion { get; set; }
 
-    public virtual ProductosCategoria IdCategoriaNavigation { get; set; } = null!;
+    public virtual RecetasCategoria IdCategoriaNavigation { get; set; } = null!;
 
     public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;
 
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 
-    public virtual ICollection<ProductosInsumo> ProductosInsumos { get; set; } = new List<ProductosInsumo>();
+    public virtual ICollection<RecetasInsumo> RecetasInsumos { get; set; } = new List<RecetasInsumo>();
 
-    public virtual ICollection<ProductosStock> ProductosStocks { get; set; } = new List<ProductosStock>();
+    public virtual ICollection<RecetasPrefabricado> RecetasPrefabricados { get; set; } = new List<RecetasPrefabricado>();
 }

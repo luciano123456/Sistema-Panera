@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
 public partial class UnidadesMedida
@@ -11,5 +12,5 @@ public partial class UnidadesMedida
 
     public virtual ICollection<Prefabricado> Prefabricados { get; set; } = new List<Prefabricado>();
 
-    public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
+    public virtual ICollection<Receta> Receta { get; set; } = new List<Receta>();
 }

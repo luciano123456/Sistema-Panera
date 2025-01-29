@@ -9,6 +9,6 @@ namespace SistemaPanera.Application.Models.ViewModels
         public string Nombre { get; set; } = null!;
 
         public virtual ICollection<Insumo> Insumos { get; set; } = new List<Insumo>();
-        public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
+        public virtual ICollection<Receta> Recetas { get; set; } = new List<Receta>();
     }
 }

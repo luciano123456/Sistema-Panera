@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace SistemaPanera.Models;
-
 public partial class Insumo
 {
     public int Id { get; set; }
@@ -29,4 +27,6 @@ public partial class Insumo
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 
     public virtual ICollection<PrefabricadosInsumo> PrefabricadosInsumos { get; set; } = new List<PrefabricadosInsumo>();
+
+    public virtual ICollection<RecetasInsumo> RecetasInsumos { get; set; } = new List<RecetasInsumo>();
 }
