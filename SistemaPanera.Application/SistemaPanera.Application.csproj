@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\css\NavBarLogin.css~RF1f800e21.TMP" />
+    <Content Remove="wwwroot\js\Compras.js" />
+    <Content Remove="wwwroot\js\ComprasNuevoModif.js" />
     <Content Remove="wwwroot\js\Home.js" />
     <Content Remove="wwwroot\js\Insumos.js" />
     <Content Remove="wwwroot\js\Locales.js" />
@@ -25,6 +27,8 @@
 
   <ItemGroup>
     <None Include="wwwroot\Imagenes\Clientes.png" />
+    <None Include="wwwroot\js\ComprasNuevoModif.js" />
+    <None Include="wwwroot\js\Compras.js" />
     <None Include="wwwroot\js\PrefabricadosNuevoModif.js" />
     <None Include="wwwroot\js\Prefabricados.js" />
     <None Include="wwwroot\js\RecetasNuevoModif.js" />

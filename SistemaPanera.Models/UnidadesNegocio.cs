@@ -15,4 +15,6 @@ public partial class UnidadesNegocio
     public virtual ICollection<Prefabricado> Prefabricados { get; set; } = new List<Prefabricado>();
 
     public virtual ICollection<Receta> Receta { get; set; } = new List<Receta>();
+
+    public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
 }

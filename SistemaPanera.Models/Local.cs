@@ -10,6 +10,8 @@ public partial class Local
 
     public string Nombre { get; set; } = null!;
 
+    public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
+
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 
     public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
