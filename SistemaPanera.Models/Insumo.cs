@@ -20,6 +20,8 @@ public partial class Insumo
 
     public DateTime FechaActualizacion { get; set; }
 
+    public virtual ICollection<ComprasDetalle> ComprasDetalles { get; set; } = new List<ComprasDetalle>();
+
     public virtual InsumosCategoria IdCategoriaNavigation { get; set; } = null!;
 
     public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;

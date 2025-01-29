@@ -1,4 +1,4 @@
-﻿let gridInsumos;
+﻿let gridCompras;
 let isEditing = false;
 
 
@@ -6,20 +6,24 @@ const columnConfig = [
     { index: 1, filterType: 'text' },
     { index: 2, filterType: 'text' },
     { index: 3, filterType: 'text' },
-    { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesNegocioFilter },
-    { index: 5, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
-    { index: 6, filterType: 'select', fetchDataFunc: listaInsumosCategoriaFilter },
-    { index: 7, filterType: 'text' },
+    { index: 4, filterType: 'text' },
+    { index: 5, filterType: 'text' },
 ];
 
 $(document).ready(() => {
 
     listaUnidadesNegocioFiltro();
-    listaInsumos(-1);
+
+    listaCompras(-1, -1);
 
     $('#txtDescripcion, #txtCostoUnitario, #txtSku').on('input', function () {
         validarCampos()
     });
+
+    $('#UnidadNegocioFiltro').on('change', function () {
+        listaLocalesFiltro();
+    });
+
 
 
 })
@@ -28,9 +32,9 @@ $(document).ready(() => {
 
 function guardarCambios() {
     if (validarCampos()) {
-        const idInsumo = $("#txtId").val();
+        const idCompra = $("#txtId").val();
         const nuevoModelo = {
-            "Id": idInsumo !== "" ? idInsumo : 0,
+            "Id": idCompra !== "" ? idCompra : 0,
             "Descripcion": $("#txtDescripcion").val(),
             "IdUnidadMedida": $("#UnidadesMedida").val(),
             "IdUnidadNegocio": $("#UnidadesNegocio").val(),
@@ -39,8 +43,8 @@ function guardarCambios() {
             "CostoUnitario": $("#txtCostoUnitario").val(),
         };
 
-        const url = idInsumo === "" ? "Insumos/Insertar" : "Insumos/Actualizar";
-        const method = idInsumo === "" ? "POST" : "PUT";
+        const url = idCompra === "" ? "Compras/Insertar" : "Compras/Actualizar";
+        const method = idCompra === "" ? "POST" : "PUT";
 
         fetch(url, {
             method: method,
@@ -54,7 +58,7 @@ function guardarCambios() {
                 return response.json();
             })
             .then(dataJson => {
-                const mensaje = idInsumo === "" ? "Insumo registrado correctamente" : "Insumo modificado correctamente";
+                const mensaje = idCompra === "" ? "Compra registrado correctamente" : "Compra modificado correctamente";
                 $('#modalEdicion').modal('hide');
                 exitoModal(mensaje);
                 aplicarFiltros();
@@ -87,18 +91,9 @@ function validarCampos() {
 
     return campoValidoDescripcion && campoValidoSku && campoValidoCostoUnitario;
 }
-function nuevoInsumo() {
-    limpiarModal();
-    listaUnidadesNegocio();
-    listaUnidadesMedida();
-    listaInsumosCategoria();
-    $('#modalEdicion').modal('show');
-    $("#btnGuardar").text("Registrar");
-    $("#modalEdicionLabel").text("Nuevo Insumo");
-    $('#lblNombre').css('color', 'red');
-    $('#lblDescripcion, #txtDescripcion').css('color', 'red').css('border-color', 'red');
-    $('#lblSku, #txtSku').css('color', 'red').css('border-color', 'red');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', 'red').css('border-color', 'red');
+
+function nuevoCompra() {
+    window.location.href = '/Compras/NuevoModif';
 }
 
 async function mostrarModal(modelo) {
@@ -109,11 +104,11 @@ async function mostrarModal(modelo) {
 
     listaUnidadesNegocio();
     listaUnidadesMedida();
-    listaInsumosCategoria();
+    listaComprasCategoria();
 
     $('#modalEdicion').modal('show');
     $("#btnGuardar").text("Guardar");
-    $("#modalEdicionLabel").text("Editar Insumo");
+    $("#modalEdicionLabel").text("Editar Compra");
 
     $('#lblDescripcion, #txtDescripcion').css('color', '').css('border-color', '');
     $('#lblSku, #txtSku').css('color', '').css('border-color', '');
@@ -136,52 +131,40 @@ function limpiarModal() {
 
 
 async function aplicarFiltros() {
-    listaInsumos(document.getElementById("UnidadNegocioFiltro").value)
+    listaCompras(document.getElementById("UnidadNegocioFiltro").value, document.getElementById("LocalesFiltro").value)
 }
 
 
-async function listaInsumos(UnidadNegocio) {
-    const url = `/Insumos/Lista?IdUnidadNegocio=${UnidadNegocio}`;
+async function listaCompras(UnidadNegocio, Local) {
+    const url = `/Compras/Lista?IdUnidadNegocio=${UnidadNegocio}&IdLocal=${Local}`;
     const response = await fetch(url);
     const data = await response.json();
     await configurarDataTable(data);
 }
 
-const editarInsumo = id => {
-    fetch("Insumos/EditarInfo?id=" + id)
-        .then(response => {
-            if (!response.ok) throw new Error("Ha ocurrido un error.");
-            return response.json();
-        })
-        .then(dataJson => {
-            if (dataJson !== null) {
-                mostrarModal(dataJson);
-            } else {
-                throw new Error("Ha ocurrido un error.");
-            }
-        })
-        .catch(error => {
-            errorModal("Ha ocurrido un error.");
-        });
+function editarCompra(id) {
+    // Redirige a la vista 'PedidoNuevoModif' con el parámetro id
+    window.location.href = '/Compras/NuevoModif/' + id;
 }
-async function eliminarInsumo(id) {
-    let resultado = window.confirm("¿Desea eliminar el Insumo?");
+
+async function eliminarCompra(id) {
+    let resultado = window.confirm("¿Desea eliminar el Compra?");
 
     if (resultado) {
         try {
-            const response = await fetch("Insumos/Eliminar?id=" + id, {
+            const response = await fetch("Compras/Eliminar?id=" + id, {
                 method: "DELETE"
             });
 
             if (!response.ok) {
-                throw new Error("Error al eliminar el Insumo.");
+                throw new Error("Error al eliminar el Compra.");
             }
 
             const dataJson = await response.json();
 
             if (dataJson.valor) {
                 aplicarFiltros();
-                exitoModal("Insumo eliminado correctamente")
+                exitoModal("Compra eliminado correctamente")
             }
         } catch (error) {
             console.error("Ha ocurrido un error:", error);
@@ -190,9 +173,9 @@ async function eliminarInsumo(id) {
 }
 
 async function configurarDataTable(data) {
-    if (!gridInsumos) {
-        $('#grd_Insumos thead tr').clone(true).addClass('filters').appendTo('#grd_Insumos thead');
-        gridInsumos = $('#grd_Insumos').DataTable({
+    if (!gridCompras) {
+        $('#grd_Compras thead tr').clone(true).addClass('filters').appendTo('#grd_Compras thead');
+        gridCompras = $('#grd_Compras').DataTable({
             data: data,
             language: {
                 sLengthMenu: "Mostrar MENU registros",
@@ -213,10 +196,10 @@ async function configurarDataTable(data) {
                         <i class='fa fa-ellipsis-v fa-lg text-white' aria-hidden='true'></i>
                     </button>
                     <div class="acciones-dropdown" style="display: none;">
-                        <button class='btn btn-sm btneditar' type='button' onclick='editarInsumo(${data})' title='Editar'>
+                        <button class='btn btn-sm btneditar' type='button' onclick='editarCompra(${data})' title='Editar'>
                             <i class='fa fa-pencil-square-o fa-lg text-success' aria-hidden='true'></i> Editar
                         </button>
-                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarInsumo(${data})' title='Eliminar'>
+                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarCompra(${data})' title='Eliminar'>
                             <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i> Eliminar
                         </button>
                     </div>
@@ -225,20 +208,18 @@ async function configurarDataTable(data) {
                     orderable: false,
                     searchable: false,
                 },
-                { data: 'Descripcion' },
-                { data: 'FechaActualizacion' },
-                { data: 'Sku' },
                 { data: 'UnidadNegocio' },
-                { data: 'UnidadMedida' },
-                { data: 'Categoria' },
-                { data: 'CostoUnitario' },
+                { data: 'Local' },
+                { data: 'Fecha' },
+                { data: 'NumeroOrden' },
+                { data: 'Costo' },
             ],
             dom: 'Bfrtip',
             buttons: [
                 {
                     extend: 'excelHtml5',
                     text: 'Exportar Excel',
-                    filename: 'Reporte Insumos',
+                    filename: 'Reporte Compras',
                     title: '',
                     exportOptions: {
                         columns: [0, 1, 2, 3]
@@ -248,7 +229,7 @@ async function configurarDataTable(data) {
                 {
                     extend: 'pdfHtml5',
                     text: 'Exportar PDF',
-                    filename: 'Reporte Insumos',
+                    filename: 'Reporte Compras',
                     title: '',
                     exportOptions: {
                         columns: [0, 1, 2, 3]
@@ -278,13 +259,13 @@ async function configurarDataTable(data) {
                             return moment(date, 'YYYY-MM-DD hh:mm').format('DD/MM/YYYY hh:mm'); // Formato: 'DD/MM/YYYY'
                         }
                     },
-                    "targets": [2] // Índices de las columnas de fechas
+                    "targets": [3] // Índices de las columnas de fechas
                 },
                 {
                     "render": function (data, type, row) {
                         return formatNumber(data); // Formatear números
                     },
-                    "targets": [7] // Índices de las columnas de números
+                    "targets": [5] // Índices de las columnas de números
                 },
                 
             ],
@@ -331,36 +312,57 @@ async function configurarDataTable(data) {
                 configurarOpcionesColumnas();
 
                 setTimeout(function () {
-                    gridInsumos.columns.adjust();
+                    gridCompras.columns.adjust();
                 }, 10);
 
-                $('body').on('mouseenter', '#grd_Insumos .fa-map-marker', function () {
+                // Cambiar el cursor a 'pointer' cuando pase sobre cualquier fila o columna
+                $('#grd_Compras tbody').on('mouseenter', 'tr', function () {
                     $(this).css('cursor', 'pointer');
                 });
 
-
-
-                $('body').on('click', '#grd_Insumos .fa-map-marker', function () {
-                    var locationText = $(this).parent().text().trim().replace(' ', ' '); // Obtener el texto visible
-                    var url = 'https://www.google.com/maps?q=' + encodeURIComponent(locationText);
-                    window.open(url, '_blank');
+                // Doble clic para ejecutar la función editarPedido(id)
+                $('#grd_Compras tbody').on('dblclick', 'tr', function () {
+                    var id = gridCompras.row(this).data().Id; // Obtener el ID de la fila seleccionada
+                    editarCompra(id); // Llamar a la función de editar
                 });
+
+                let filaSeleccionada = null; // Variable para almacenar la fila seleccionada
+                $('#grd_Compras tbody').on('click', 'tr', function () {
+                    // Remover la clase de la fila anteriormente seleccionada
+                    if (filaSeleccionada) {
+                        $(filaSeleccionada).removeClass('seleccionada');
+                        $('td', filaSeleccionada).removeClass('seleccionada');
+
+                    }
+
+                    // Obtener la fila actual
+                    filaSeleccionada = $(this);
+
+                    // Agregar la clase a la fila actual
+                    $(filaSeleccionada).addClass('seleccionada');
+                    $('td', filaSeleccionada).addClass('seleccionada');
+
+                });
+
+
+
+              
             },
         });
 
     } else {
-        gridInsumos.clear().rows.add(data).draw();
+        gridCompras.clear().rows.add(data).draw();
     }
 }
 
 
 function configurarOpcionesColumnas() {
-    const grid = $('#grd_Insumos').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
+    const grid = $('#grd_Compras').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
     const columnas = grid.settings().init().columns; // Obtiene la configuración de columnas
     const container = $('#configColumnasMenu'); // El contenedor del dropdown específico para configurar columnas
 
 
-    const storageKey = `Insumos_Columnas`; // Clave única para esta pantalla
+    const storageKey = `Compras_Columnas`; // Clave única para esta pantalla
 
     const savedConfig = JSON.parse(localStorage.getItem(storageKey)) || {}; // Recupera configuración guardada o inicializa vacía
 
@@ -431,8 +433,8 @@ async function listaUnidadesMedidaFilter() {
 
 }
 
-async function listaInsumosCategoriaFilter() {
-    const url = `/InsumosCategoria/Lista`;
+async function listaComprasCategoriaFilter() {
+    const url = `/ComprasCategoria/Lista`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -476,8 +478,8 @@ async function listaUnidadesMedida() {
     }
 }
 
-async function listaInsumosCategoria() {
-    const data = await listaInsumosCategoriaFilter();
+async function listaComprasCategoria() {
+    const data = await listaComprasCategoriaFilter();
 
     $('#Categorias option').remove();
 
@@ -502,6 +504,42 @@ async function listaUnidadesNegocioFiltro() {
     $('#UnidadNegocioFiltro option').remove();
 
     select = document.getElementById("UnidadNegocioFiltro");
+
+    option = document.createElement("option");
+    option.value = -1;
+    option.text = "-";
+    select.appendChild(option);
+
+    for (i = 0; i < data.length; i++) {
+        option = document.createElement("option");
+        option.value = data[i].Id;
+        option.text = data[i].Nombre;
+        select.appendChild(option);
+
+    }
+}
+
+
+async function listaLocalesFilter() {
+    let UnidadNegocio = document.getElementById("UnidadNegocioFiltro").value;
+
+    const url = `/Locales/Lista?IdUnidadNegocio=${UnidadNegocio}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    return data.map(x => ({
+        Id: x.Id,
+        Nombre: x.Nombre
+    }));
+
+}
+
+async function listaLocalesFiltro() {
+    const data = await listaLocalesFilter();
+
+    $('#LocalesFiltro option').remove();
+
+    select = document.getElementById("LocalesFiltro");
 
     option = document.createElement("option");
     option.value = -1;
