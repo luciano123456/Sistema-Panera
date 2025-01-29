@@ -3,16 +3,16 @@ using SistemaPanera.Models;
 
 namespace SistemaPanera.BLL.Service
 {
-    public class ProductosTipoService : IProductosTiposervice
+    public class RecetasTipoService : IRecetasTiposervice
     {
 
-        private readonly IProductosTipoRepository<ProductosTipo> _contactRepo;
+        private readonly IRecetasTipoRepository<RecetasTipo> _contactRepo;
 
-        public ProductosTipoService(IProductosTipoRepository<ProductosTipo> contactRepo)
+        public RecetasTipoService(IRecetasTipoRepository<RecetasTipo> contactRepo)
         {
             _contactRepo = contactRepo;
         }
-        public async Task<bool> Actualizar(ProductosTipo model)
+        public async Task<bool> Actualizar(RecetasTipo model)
         {
             return await _contactRepo.Actualizar(model);
         }
@@ -22,18 +22,18 @@ namespace SistemaPanera.BLL.Service
             return await _contactRepo.Eliminar(id);
         }
 
-        public async Task<bool> Insertar(ProductosTipo model)
+        public async Task<bool> Insertar(RecetasTipo model)
         {
             return await _contactRepo.Insertar(model);
         }
 
-        public async Task<ProductosTipo> Obtener(int id)
+        public async Task<RecetasTipo> Obtener(int id)
         {
             return await _contactRepo.Obtener(id);
         }
 
 
-        public async Task<IQueryable<ProductosTipo>> ObtenerTodos()
+        public async Task<IQueryable<RecetasTipo>> ObtenerTodos()
         {
             return await _contactRepo.ObtenerTodos();
         }

@@ -22,7 +22,10 @@
 
 
 
+
     .input-nuevo-select option {
-        background-color: white; /* Fondo del desplegable */
-        color: black; /* Texto negro en el desplegable */
+        background-color: white !important; /* Fondo del desplegable */
+        color: black !important; /* Texto negro en el desplegable */
     }
+
+

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SistemaPanera.Models;
 
-public partial class ProductosStock
+namespace SistemaPanera.Models;
+public partial class RecetasStock
 {
     public int Id { get; set; }
 
     public int IdLocal { get; set; }
 
-    public int IdProducto { get; set; }
+    public int IdReceta { get; set; }
 
     public string TipoMovimiento { get; set; } = null!;
 
@@ -18,6 +18,4 @@ public partial class ProductosStock
     public decimal Egreso { get; set; }
 
     public virtual Local IdLocalNavigation { get; set; } = null!;
-
-    public virtual Producto IdProductoNavigation { get; set; } = null!;
 }

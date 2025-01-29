@@ -1,0 +1,44 @@
+#grd_Prefabricados_wrapper {
+    overflow-x: auto;
+}
+
+#grd_Insumos_wrapper {
+    overflow-x: auto;
+}
+
+
+.selected {
+    background-color: #1fabca !important;
+}
+
+select option:disabled {
+    color: red; /* Cambiar el color de la letra a rojo */
+}
+
+.custom-checkbox {
+    appearance: none; /* Elimina el estilo predeterminado */
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+    /* Estado normal del checkbox */
+    .custom-checkbox:checked {
+        background-color: green;
+        border-color: green;
+    }
+
+        /* Personalización del label cuando el checkbox está seleccionado */
+        .custom-checkbox:checked + .form-check-label {
+            color: green;
+        }
+
+
+
+

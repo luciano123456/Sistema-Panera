@@ -11,45 +11,45 @@ using SistemaPanera.DAL.DataContext;
 
 namespace SistemaPanera.DAL.Repository
 {
-    public class ProductosTipoRepository : IProductosTipoRepository<ProductosTipo>
+    public class RecetasCategoriaRepository : IRecetasCategoriaRepository<RecetasCategoria>
     {
 
         private readonly SistemaPaneraContext _dbcontext;
 
-        public ProductosTipoRepository(SistemaPaneraContext context)
+        public RecetasCategoriaRepository(SistemaPaneraContext context)
         {
             _dbcontext = context;
         }
-        public async Task<bool> Actualizar(ProductosTipo model)
+        public async Task<bool> Actualizar(RecetasCategoria model)
         {
-            _dbcontext.ProductosTipos.Update(model);
+            _dbcontext.RecetasCategorias.Update(model);
             await _dbcontext.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> Eliminar(int id)
         {
-            ProductosTipo model = _dbcontext.ProductosTipos.First(c => c.Id == id);
-            _dbcontext.ProductosTipos.Remove(model);
+            RecetasCategoria model = _dbcontext.RecetasCategorias.First(c => c.Id == id);
+            _dbcontext.RecetasCategorias.Remove(model);
             await _dbcontext.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> Insertar(ProductosTipo model)
+        public async Task<bool> Insertar(RecetasCategoria model)
         {
-            _dbcontext.ProductosTipos.Add(model);
+            _dbcontext.RecetasCategorias.Add(model);
             await _dbcontext.SaveChangesAsync();
             return true;
         }
 
-        public async Task<ProductosTipo> Obtener(int id)
+        public async Task<RecetasCategoria> Obtener(int id)
         {
-            ProductosTipo model = await _dbcontext.ProductosTipos.FindAsync(id);
+            RecetasCategoria model = await _dbcontext.RecetasCategorias.FindAsync(id);
             return model;
         }
-        public async Task<IQueryable<ProductosTipo>> ObtenerTodos()
+        public async Task<IQueryable<RecetasCategoria>> ObtenerTodos()
         {
-            IQueryable<ProductosTipo> query = _dbcontext.ProductosTipos;
+            IQueryable<RecetasCategoria> query = _dbcontext.RecetasCategorias;
             return await Task.FromResult(query);
         }
 

@@ -50,5 +50,7 @@ namespace SistemaPanera.BLL.Service
         {
             return await _contactRepo.ObtenerInsumos(idPrefabricado);
         }
+
+
     }
 }

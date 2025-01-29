@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 
 namespace SistemaPanera.Models;
-
 public partial class Prefabricado
 {
     public int Id { get; set; }
@@ -31,4 +30,6 @@ public partial class Prefabricado
     public virtual ICollection<PrefabricadosInsumo> PrefabricadosInsumos { get; set; } = new List<PrefabricadosInsumo>();
 
     public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
+
+    public virtual ICollection<RecetasPrefabricado> RecetasPrefabricados { get; set; } = new List<RecetasPrefabricado>();
 }

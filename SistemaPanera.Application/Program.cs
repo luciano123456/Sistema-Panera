@@ -55,21 +55,20 @@ builder.Services.AddScoped<IInsumoService, InsumoService>();
 builder.Services.AddScoped<IGenericRepository<Local>, LocalRepository>();
 builder.Services.AddScoped<ILocalService, LocalService>();
 
-builder.Services.AddScoped<IProductosCategoriaRepository<ProductosCategoria>, ProductosCategoriaRepository>();
-builder.Services.AddScoped<IProductosCategoriaService, ProductosCategoriaService>();
+builder.Services.AddScoped<IRecetasCategoriaRepository<RecetasCategoria>, RecetasCategoriaRepository>();
+builder.Services.AddScoped<IRecetasCategoriaService, RecetasCategoriaService>();
 
-builder.Services.AddScoped<IProductosTipoRepository<ProductosTipo>, ProductosTipoRepository>();
-builder.Services.AddScoped<IProductosTiposervice, ProductosTipoService>();
+builder.Services.AddScoped<IRecetasTipoRepository<RecetasTipo>, RecetasTipoRepository>();
+builder.Services.AddScoped<IRecetasTiposervice, RecetasTipoService>();
 
-builder.Services.AddScoped<IProductoRepository<Producto>, ProductoRepository>();
-builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<IRecetaRepository<Receta>, RecetaRepository>();
+builder.Services.AddScoped<IRecetaService, RecetaService>();
 
 builder.Services.AddScoped<IPrefabricadosCategoriaRepository<PrefabricadosCategoria>, PrefabricadosCategoriaRepository>();
 builder.Services.AddScoped<IPrefabricadosCategoriaService, PrefabricadosCategoriaService>();
 
 builder.Services.AddScoped<IPrefabricadoRepository<Prefabricado>, PrefabricadoRepository>();
 builder.Services.AddScoped<IPrefabricadoService, PrefabricadoService>();
-
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>
