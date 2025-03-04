@@ -79,63 +79,6 @@
 </div>
 
 
-<!-- HTML para el modal de edición -->
-<div class="modal fade" id="modalEdicion" tabindex="-1" role="dialog" aria-labelledby="modalEdicionLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalEdicionLabel">Editar proveedor</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group" hidden>
-                        <label for="txtIdproveedor" class="lblNombreInput">ID</label>
-                        <input type="text" class="input-nuevomodif" id="txtId" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label id="lblDescripcion" for="txtDescripcion" class="lblNombreInput">Descripcion (*)</label>
-                        <input type="text" class="input-nuevomodif" id="txtDescripcion" required>
-                    </div>
-                    <div class="form-group">
-                        <label id="lblSku" for="txtSku" class="lblNombreInput">Sku (*)</label>
-                        <input type="text" class="input-nuevomodif" id="txtSku">
-                    </div>
-                    <div class="form-group">
-                        <label for="txtUnidadNegocio" class="lblNombreInput">Unidad de Negocio</label>
-                        <select id="UnidadesNegocio" name="select" class="input-nuevomodif select-modal-personalizado mt-2">
-                            <option value="" selected>Unidad de Negocio</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="txtUnidadMedida" class="lblNombreInput">Unidad de Medida</label>
-                        <select id="UnidadesMedida" name="select" class="input-nuevomodif select-modal-personalizado mt-2">
-                            <option value="" selected>Unidad de Medida</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="txtCategoria" class="lblNombreInput">Categoria</label>
-                        <select id="Categorias" name="select" class="input-nuevomodif select-modal-personalizado mt-2">
-                            <option value="" selected>Categoria</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label id="lblCostoUnitario" for="txtCostoUnitario" class="lblNombreInput">Costo Unitario (*)</label>
-                        <input type="number" class="input-nuevomodif" id="txtCostoUnitario">
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" id="btnGuardar" class="btn btn-primary" onclick="guardarCambios()">Registrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 
 <partial name="~/Views/Utils/Modals.cshtml" />

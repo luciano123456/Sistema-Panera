@@ -1,4 +1,4 @@
-﻿let gridInsumos = null;
+﻿let gridInsumos = null, grdProveedores;
 
 let insumos = [];
 
@@ -13,9 +13,9 @@ const columnConfig = [
 
 $(document).ready(() => {
 
-    listaUnidadesNegocio();
-    listaCategorias();
-    listaUnidadMedidas();
+    document.getElementById(`fecha`).value = moment().format('YYYY-MM-DD');
+
+    cargarListados();
     
 
     if (CompraData && CompraData > 0) {
@@ -32,13 +32,23 @@ $(document).ready(() => {
 
     
     calcularDatosCompra();
-    $('#descripcion').on('input', function () {
+    $('#Locales').on('change', function () {
         validarCampos()
     });
 
+    $('#UnidadesNegocio').on('change', async function () {
+        await listaLocales();
+        await validarCampos();
+    });
    
-    validarCampos()
+    
 })
+
+async function cargarListados() {
+    await listaUnidadesNegocio();
+    await listaLocales();
+    await validarCampos()
+}
 
 
 
@@ -83,15 +93,15 @@ async function insertarDatosCompra(datos) {
 
 
 function validarCampos() {
-    const descripcion = $("#descripcion").val();
+    const local = document.getElementById("Locales").value;
 
-    const descripcionValida = descripcion !== "";
+    const localValido = local !== "-1";
 
-    $("#lblDescripcion").css("color", descripcionValida ? "" : "red");
-    $("#descripcion").css("border-color", descripcionValida ? "" : "red");
+    $("#lblLocal").css("color", localValido ? "" : "red");
+    $("#Locales").css("border-color", localValido ? "" : "red");
 
 
-    return descripcionValida;
+    return localValido;
 }
 
 
@@ -225,63 +235,10 @@ async function listaUnidadesNegocio() {
     }
 }
 
-async function listaCategoriasFilter() {
-    const url = `/ComprasCategoria/Lista`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    return data.map(x => ({
-        Id: x.Id,
-        Nombre: x.Nombre
-    }));
-
-}
 
 
-async function listaCategorias() {
-    const data = await listaCategoriasFilter();
-
-    $('#Categorias option').remove();
-
-    select = document.getElementById("Categorias");
-
-    for (i = 0; i < data.length; i++) {
-        option = document.createElement("option");
-        option.value = data[i].Id;
-        option.text = data[i].Nombre;
-        select.appendChild(option);
-
-    }
-}
-
-async function listaUnidadMedidasFilter() {
-    const url = `/UnidadesMedida/Lista`;
-    const response = await fetch(url);
-    const data = await response.json();
-
-    return data.map(x => ({
-        Id: x.Id,
-        Nombre: x.Nombre
-    }));
-
-}
 
 
-async function listaUnidadMedidas() {
-    const data = await listaUnidadMedidasFilter();
-
-    $('#UnidadMedidas option').remove();
-
-    select = document.getElementById("UnidadMedidas");
-
-    for (i = 0; i < data.length; i++) {
-        option = document.createElement("option");
-        option.value = data[i].Id;
-        option.text = data[i].Nombre;
-        select.appendChild(option);
-
-    }
-}
 
 async function obtenerInsumosUnidadNegocio(id) {
     const url = `/Insumos/Lista?IdUnidadNegocio=${id}`;
@@ -617,4 +574,138 @@ function guardarCambios() {
     } else {
         errorModal("Debes completar los campos requeridos.")
     }
+}
+
+async function listaLocalesFilter() {
+    let UnidadNegocio = document.getElementById("UnidadesNegocio").value;
+
+    const url = `/Locales/Lista?IdUnidadNegocio=${UnidadNegocio}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    return data.map(x => ({
+        Id: x.Id,
+        Nombre: x.Nombre
+    }));
+
+}
+
+async function listaLocales() {
+    const data = await listaLocalesFilter();
+
+    $('#Locales option').remove();
+
+    select = document.getElementById("Locales");
+
+    option = document.createElement("option");
+    option.value = -1;
+    option.text = "-";
+    select.appendChild(option);
+
+    for (i = 0; i < data.length; i++) {
+        option = document.createElement("option");
+        option.value = data[i].Id;
+        option.text = data[i].Nombre;
+        select.appendChild(option);
+
+    }
+}
+
+async function abrirProveedor() {
+    const proveedores = await obtenerProveedores();
+    await cargarDataTableProveedores(proveedores);
+
+
+
+    // Configura eventos de selección
+    $('#tablaProveedores tbody').on('dblclick', 'tr', function () {
+        var data = $('#tablaProveedores').DataTable().row(this).data();
+        cargarDatosProveedor(data);
+        $('#proveedorModal').modal('hide');
+    });
+
+    $('#btnSeleccionarProveedorModal').on('click', function () {
+        var data = $('#tablaProveedores').DataTable().row('.selected').data();
+        if (data) {
+            cargarDatosProveedor(data);
+            $('#proveedorModal').modal('hide');
+        } else {
+            errorModal('Seleccione un Proveedor');
+        }
+    });
+
+    let filaSeleccionada = null; // Variable para almacenar la fila seleccionada
+
+    $('#tablaProveedores tbody').on('click', 'tr', function () {
+        // Remover la clase de la fila anteriormente seleccionada
+        if (filaSeleccionada) {
+            $(filaSeleccionada).removeClass('selected');
+            $('td', filaSeleccionada).removeClass('selected');
+
+        }
+
+        // Obtener la fila actual
+        filaSeleccionada = $(this);
+
+        // Agregar la clase a la fila actual
+        $(filaSeleccionada).addClass('selected');
+        $('td', filaSeleccionada).addClass('selected');
+    });
+
+    // Abre el modal
+    $('#proveedorModal').modal('show');
+
+}
+
+
+
+async function obtenerProveedores() {
+    const response = await fetch('/Proveedores/Lista');
+    const data = await response.json();
+    return data;
+}
+function cargarDatosProveedor(data) {
+    $('#IdProveedor').val(data.Id);
+    $('#Proveedor').val(data.Nombre);
+    // Limpiar la grilla de productos
+    var table = $('#grd_Productos').DataTable();
+    table.clear().draw();
+}
+
+async function cargarDataTableProveedores(data) {
+
+
+    if (grdProveedores) {
+        $('#tablaProveedores').DataTable().columns.adjust().draw();
+        grdProveedores.destroy();
+        grdProveedores = null; // Opcional: Limpiar la variable
+
+    }
+
+    grdProveedores = $('#tablaProveedores').DataTable({
+        data: data,
+        language: {
+            sLengthMenu: "Mostrar _MENU_ registros",
+            url: "//cdn.datatables.net/plug-ins/2.0.7/i18n/es-MX.json"
+        },
+        scrollX: true,
+        autoWidth: false,
+        columns: [
+            { data: 'Id', width: "20%", visible: false },
+            { data: 'Nombre', width: "20%" },
+            { data: 'Apodo', width: "20%" },
+            { data: 'Ubicacion', width: "20%" },
+            { data: 'Telefono', width: "20%" },
+
+        ],
+        orderCellsTop: true,
+        fixedHeader: true,
+
+        initComplete: async function () {
+            setTimeout(function () {
+                $('#tablaProveedores').DataTable().columns.adjust().draw();
+            }, 200);
+        }
+    });
+
 }
