@@ -30,19 +30,17 @@ public partial class SistemaPaneraContext : DbContext
 
     public virtual DbSet<InsumosCategoria> InsumosCategorias { get; set; }
 
+    public virtual DbSet<InsumosProveedor> InsumosProveedores { get; set; }
+
     public virtual DbSet<InsumosStock> InsumosStocks { get; set; }
+
+    public virtual DbSet<InsumosUnidadesNegocio> InsumosUnidadesNegocios { get; set; }
 
     public virtual DbSet<Local> Locales { get; set; }
 
-    public virtual DbSet<Prefabricado> Prefabricados { get; set; }
-
-    public virtual DbSet<PrefabricadosCategoria> PrefabricadosCategorias { get; set; }
-
-    public virtual DbSet<PrefabricadosInsumo> PrefabricadosInsumos { get; set; }
-
-    public virtual DbSet<PrefabricadosStock> PrefabricadosStocks { get; set; }
-
     public virtual DbSet<Proveedor> Proveedores { get; set; }
+
+    public virtual DbSet<ProveedoresInsumosLista> ProveedoresInsumosListas { get; set; }
 
     public virtual DbSet<Provincia> Provincias { get; set; }
 
@@ -52,13 +50,23 @@ public partial class SistemaPaneraContext : DbContext
 
     public virtual DbSet<RecetasInsumo> RecetasInsumos { get; set; }
 
-    public virtual DbSet<RecetasPrefabricado> RecetasPrefabricados { get; set; }
-
     public virtual DbSet<RecetasStock> RecetasStocks { get; set; }
+
+    public virtual DbSet<RecetasSubreceta> RecetasSubrecetas { get; set; }
 
     public virtual DbSet<RecetasTipo> RecetasTipos { get; set; }
 
     public virtual DbSet<Rol> Roles { get; set; }
+
+    public virtual DbSet<Subreceta> Subrecetas { get; set; }
+
+    public virtual DbSet<SubrecetasCategoria> SubrecetasCategorias { get; set; }
+
+    public virtual DbSet<SubrecetasInsumo> SubrecetasInsumos { get; set; }
+
+    public virtual DbSet<SubrecetasStock> SubrecetasStocks { get; set; }
+
+    public virtual DbSet<SubrecetasSubreceta> SubrecetasSubrecetas { get; set; }
 
     public virtual DbSet<UnidadesMedida> UnidadesMedida { get; set; }
 
@@ -68,12 +76,13 @@ public partial class SistemaPaneraContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-J2J16BG\\SQLEXPRESS; Database=Sistema_Panera; Integrated Security=true; Trusted_Connection=True; Encrypt=False");
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-3MT5F5F; Database=Sistema_Panera; Integrated Security=true; Trusted_Connection=True; Encrypt=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Compra>(entity =>
         {
+            entity.Property(e => e.Costo).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Fecha).HasColumnType("datetime");
             entity.Property(e => e.NumeroOrden)
                 .HasMaxLength(100)
@@ -85,11 +94,9 @@ public partial class SistemaPaneraContext : DbContext
                 .HasConstraintName("FK_Compras_Locales");
 
             entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Compras)
-               .HasForeignKey(d => d.IdUnidadNegocio)
-               .OnDelete(DeleteBehavior.ClientSetNull)
-               .HasConstraintName("FK_Compras_Unidades_Negocio");
-
-
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Compras_Unidades_Negocio");
         });
 
         modelBuilder.Entity<ComprasDetalle>(entity =>
@@ -99,11 +106,6 @@ public partial class SistemaPaneraContext : DbContext
             entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
-
-            entity.HasOne(d => d.IdCompraNavigation).WithMany(p => p.ComprasDetalles)
-                .HasForeignKey(d => d.IdCompra)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Compras_Detalle_Compras1");
 
             entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.ComprasDetalles)
                 .HasForeignKey(d => d.IdInsumo)
@@ -136,7 +138,6 @@ public partial class SistemaPaneraContext : DbContext
 
         modelBuilder.Entity<Insumo>(entity =>
         {
-            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(150)
                 .IsUnicode(false);
@@ -154,10 +155,6 @@ public partial class SistemaPaneraContext : DbContext
                 .HasForeignKey(d => d.IdUnidadMedida)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Insumos_Unidades_Medida");
-
-            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Insumos)
-                .HasForeignKey(d => d.IdUnidadNegocio)
-                .HasConstraintName("FK_Insumos_Unidades_Negocio");
         });
 
         modelBuilder.Entity<InsumosCategoria>(entity =>
@@ -167,6 +164,26 @@ public partial class SistemaPaneraContext : DbContext
             entity.Property(e => e.Nombre)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<InsumosProveedor>(entity =>
+        {
+            entity.ToTable("Insumos_Proveedores");
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.InsumosProveedores)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Insumos_Proveedores_Insumos");
+
+            entity.HasOne(d => d.IdListaProveedorNavigation).WithMany(p => p.InsumosProveedores)
+                .HasForeignKey(d => d.IdListaProveedor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Insumos_Proveedores_Proveedores_Insumos_Listas");
+
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.InsumosProveedores)
+                .HasForeignKey(d => d.IdProveedor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Insumos_Proveedores_Proveedores");
         });
 
         modelBuilder.Entity<InsumosStock>(entity =>
@@ -180,6 +197,21 @@ public partial class SistemaPaneraContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<InsumosUnidadesNegocio>(entity =>
+        {
+            entity.ToTable("Insumos_UnidadesNegocio");
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.InsumosUnidadesNegocios)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Insumos_UnidadesNegocio_Insumos_UnidadesNegocio");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.InsumosUnidadesNegocios)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_Insumos_UnidadesNegocio_Unidades_Negocio");
+        });
+
         modelBuilder.Entity<Local>(entity =>
         {
             entity.Property(e => e.Nombre)
@@ -189,81 +221,6 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Locales)
                 .HasForeignKey(d => d.IdUnidadNegocio)
                 .HasConstraintName("FK_Locales_Unidades_Negocio");
-        });
-
-        modelBuilder.Entity<Prefabricado>(entity =>
-        {
-            entity.Property(e => e.CostoTotal).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.Descripcion)
-                .HasMaxLength(150)
-                .IsUnicode(false);
-            entity.Property(e => e.FechaActualizacion).HasColumnType("datetime");
-            entity.Property(e => e.Sku)
-                .HasMaxLength(150)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Prefabricados)
-                .HasForeignKey(d => d.IdCategoria)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Prefabricados_Categorias");
-
-            entity.HasOne(d => d.IdUnidadMedidaNavigation).WithMany(p => p.Prefabricados)
-                .HasForeignKey(d => d.IdUnidadMedida)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Unidades_Medida");
-
-            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Prefabricados)
-                .HasForeignKey(d => d.IdUnidadNegocio)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Unidades_Negocio");
-        });
-
-        modelBuilder.Entity<PrefabricadosCategoria>(entity =>
-        {
-            entity.ToTable("Prefabricados_Categorias");
-
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(150)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<PrefabricadosInsumo>(entity =>
-        {
-            entity.ToTable("Prefabricados_Insumos");
-
-            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
-
-            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.PrefabricadosInsumos)
-                .HasForeignKey(d => d.IdInsumo)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Insumos_Insumos");
-
-            entity.HasOne(d => d.IdPrefabricadoNavigation).WithMany(p => p.PrefabricadosInsumos)
-                .HasForeignKey(d => d.IdPrefabricado)
-                .HasConstraintName("FK_Prefabricados_Insumos_Prefabricados");
-        });
-
-        modelBuilder.Entity<PrefabricadosStock>(entity =>
-        {
-            entity.ToTable("Prefabricados_Stock");
-
-            entity.Property(e => e.Egreso).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.Ingreso).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.TipoMovimiento)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.PrefabricadosStocks)
-                .HasForeignKey(d => d.IdLocal)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados_Stock");
-
-            entity.HasOne(d => d.IdPrefabricadoNavigation).WithMany(p => p.PrefabricadosStocks)
-                .HasForeignKey(d => d.IdPrefabricado)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados");
         });
 
         modelBuilder.Entity<Proveedor>(entity =>
@@ -290,6 +247,25 @@ public partial class SistemaPaneraContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<ProveedoresInsumosLista>(entity =>
+        {
+            entity.ToTable("Proveedores_Insumos_Listas");
+
+            entity.Property(e => e.Codigo)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+            entity.Property(e => e.FechaActualizacion).HasColumnType("date");
+
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.ProveedoresInsumosLista)
+                .HasForeignKey(d => d.IdProveedor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Proveedores_Insumos_Listas_Proveedores");
+        });
+
         modelBuilder.Entity<Provincia>(entity =>
         {
             entity.Property(e => e.Nombre)
@@ -302,12 +278,14 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK_Productos");
 
             entity.Property(e => e.CostoInsumos).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoPorcion).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoPrefabricados).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.CostoTotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
                 .IsUnicode(false);
             entity.Property(e => e.FechaActualizacion).HasColumnType("datetime");
+            entity.Property(e => e.Rendimiento).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Sku)
                 .HasMaxLength(150)
                 .IsUnicode(false);
@@ -358,23 +336,6 @@ public partial class SistemaPaneraContext : DbContext
                 .HasConstraintName("FK_Recetas_Insumos_Recetas");
         });
 
-        modelBuilder.Entity<RecetasPrefabricado>(entity =>
-        {
-            entity.ToTable("Recetas_Prefabricados");
-
-            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
-
-            entity.HasOne(d => d.IdPrefabricadoNavigation).WithMany(p => p.RecetasPrefabricados)
-                .HasForeignKey(d => d.IdPrefabricado)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Recetas_Prefabricados_Prefabricados");
-
-            entity.HasOne(d => d.IdRecetaNavigation).WithMany(p => p.RecetasPrefabricados)
-                .HasForeignKey(d => d.IdReceta)
-                .HasConstraintName("FK_Recetas_Prefabricados_Recetas");
-        });
-
         modelBuilder.Entity<RecetasStock>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Productos_Stock");
@@ -393,6 +354,25 @@ public partial class SistemaPaneraContext : DbContext
                 .HasConstraintName("FK_Recetas_Stock_Locales");
         });
 
+        modelBuilder.Entity<RecetasSubreceta>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Recetas_Prefabricados");
+
+            entity.ToTable("Recetas_Subrecetas");
+
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdRecetaNavigation).WithMany(p => p.RecetasSubreceta)
+                .HasForeignKey(d => d.IdReceta)
+                .HasConstraintName("FK_Recetas_Prefabricados_Recetas");
+
+            entity.HasOne(d => d.IdSubRecetaNavigation).WithMany(p => p.RecetasSubreceta)
+                .HasForeignKey(d => d.IdSubReceta)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Recetas_Prefabricados_Prefabricados");
+        });
+
         modelBuilder.Entity<RecetasTipo>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_Productos_Tipos");
@@ -409,6 +389,111 @@ public partial class SistemaPaneraContext : DbContext
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<Subreceta>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Prefabricados");
+
+            entity.Property(e => e.CosotUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoPorcion).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+            entity.Property(e => e.FechaActualizacion).HasColumnType("datetime");
+            entity.Property(e => e.Rendimiento).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Sku)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Subreceta)
+                .HasForeignKey(d => d.IdCategoria)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Prefabricados_Categorias");
+
+            entity.HasOne(d => d.IdUnidadMedidaNavigation).WithMany(p => p.Subreceta)
+                .HasForeignKey(d => d.IdUnidadMedida)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Unidades_Medida");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Subreceta)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<SubrecetasCategoria>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Prefabricados_Categorias");
+
+            entity.ToTable("Subrecetas_Categorias");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(150)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<SubrecetasInsumo>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Prefabricados_Insumos");
+
+            entity.ToTable("Subrecetas_Insumos");
+
+            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.SubrecetasInsumos)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Insumos_Insumos");
+
+            entity.HasOne(d => d.IdSubrecetaNavigation).WithMany(p => p.SubrecetasInsumos)
+                .HasForeignKey(d => d.IdSubreceta)
+                .HasConstraintName("FK_Prefabricados_Insumos_Prefabricados");
+        });
+
+        modelBuilder.Entity<SubrecetasStock>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Prefabricados_Stock");
+
+            entity.ToTable("Subrecetas_Stock");
+
+            entity.Property(e => e.Egreso).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Ingreso).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.TipoMovimiento)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.SubrecetasStocks)
+                .HasForeignKey(d => d.IdLocal)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados_Stock");
+
+            entity.HasOne(d => d.IdSubrecetaNavigation).WithMany(p => p.SubrecetasStocks)
+                .HasForeignKey(d => d.IdSubreceta)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados");
+        });
+
+        modelBuilder.Entity<SubrecetasSubreceta>(entity =>
+        {
+            entity.ToTable("Subrecetas_Subrecetas");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Subtotal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdSubRecetaHijaNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubRecetaHijaNavigations)
+                .HasForeignKey(d => d.IdSubRecetaHija)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Subrecetas_Subrecetas_Subrecetas1");
+
+            entity.HasOne(d => d.IdSubRecetaPadreNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubRecetaPadreNavigations)
+                .HasForeignKey(d => d.IdSubRecetaPadre)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Subrecetas_Subrecetas_Subrecetas");
         });
 
         modelBuilder.Entity<UnidadesMedida>(entity =>

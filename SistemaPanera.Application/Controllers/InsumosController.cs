@@ -32,15 +32,13 @@ namespace SistemaPanera.Application.Controllers
             var lista = Insumos.Select(c => new VMInsumo
             {
                 Id = c.Id,
-                CostoUnitario = c.CostoUnitario,
+                //CostoUnitario = c.CostoUnitario,
                 FechaActualizacion = c.FechaActualizacion,
                 IdCategoria = c.IdCategoria,
                 IdUnidadMedida = c.IdUnidadMedida,
-                IdUnidadNegocio = c.IdUnidadNegocio,
                 Sku = c.Sku,
                 Categoria = c.IdCategoriaNavigation.Nombre,
                 UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
-                UnidadNegocio = c.IdUnidadNegocioNavigation.Nombre,
                 Descripcion = c.Descripcion,
             }).Where(x => x.IdUnidadNegocio == IdUnidadNegocio || IdUnidadNegocio == -1).ToList();
 
@@ -56,8 +54,7 @@ namespace SistemaPanera.Application.Controllers
                 Id = model.Id,
                 IdUnidadMedida = model.IdUnidadMedida,
                 Sku = model.Sku,
-                IdUnidadNegocio = model.IdUnidadNegocio,
-                CostoUnitario = model.CostoUnitario,
+                //CostoUnitario = model.CostoUnitario,
                 FechaActualizacion = DateTime.Now,
                 IdCategoria = model.IdCategoria,
                 Descripcion = model.Descripcion,
@@ -76,8 +73,7 @@ namespace SistemaPanera.Application.Controllers
                 Id = model.Id,
                 IdUnidadMedida = model.IdUnidadMedida,
                 Sku = model.Sku,
-                IdUnidadNegocio = model.IdUnidadNegocio,
-                CostoUnitario = model.CostoUnitario,
+                //CostoUnitario = model.CostoUnitario,
                 FechaActualizacion = DateTime.Now,
                 IdCategoria = model.IdCategoria,
                 Descripcion = model.Descripcion,

@@ -14,7 +14,7 @@ public partial class Local
 
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 
-    public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
-
     public virtual ICollection<RecetasStock> RecetasStocks { get; set; } = new List<RecetasStock>();
+
+    public virtual ICollection<SubrecetasStock> SubrecetasStocks { get; set; } = new List<SubrecetasStock>();
 }

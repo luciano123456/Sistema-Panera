@@ -10,7 +10,7 @@ public partial class UnidadesMedida
 
     public virtual ICollection<Insumo> Insumos { get; set; } = new List<Insumo>();
 
-    public virtual ICollection<Prefabricado> Prefabricados { get; set; } = new List<Prefabricado>();
-
     public virtual ICollection<Receta> Receta { get; set; } = new List<Receta>();
+
+    public virtual ICollection<Subreceta> Subreceta { get; set; } = new List<Subreceta>();
 }

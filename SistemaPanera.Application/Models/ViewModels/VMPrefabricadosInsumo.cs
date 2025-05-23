@@ -21,7 +21,7 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public virtual Insumo IdInsumoNavigation { get; set; } = null!;
 
-        public virtual Prefabricado IdPrefabricadoNavigation { get; set; } = null!;
+        //public virtual Prefabricado IdPrefabricadoNavigation { get; set; } = null!;
 
 
     }

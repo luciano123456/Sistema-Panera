@@ -64,11 +64,11 @@ builder.Services.AddScoped<IRecetasTiposervice, RecetasTipoService>();
 builder.Services.AddScoped<IRecetaRepository<Receta>, RecetaRepository>();
 builder.Services.AddScoped<IRecetaService, RecetaService>();
 
-builder.Services.AddScoped<IPrefabricadosCategoriaRepository<PrefabricadosCategoria>, PrefabricadosCategoriaRepository>();
-builder.Services.AddScoped<IPrefabricadosCategoriaService, PrefabricadosCategoriaService>();
+//builder.Services.AddScoped<IPrefabricadosCategoriaRepository<PrefabricadosCategoria>, PrefabricadosCategoriaRepository>();
+//builder.Services.AddScoped<IPrefabricadosCategoriaService, PrefabricadosCategoriaService>();
 
-builder.Services.AddScoped<IPrefabricadoRepository<Prefabricado>, PrefabricadoRepository>();
-builder.Services.AddScoped<IPrefabricadoService, PrefabricadoService>();
+//builder.Services.AddScoped<IPrefabricadoRepository<Prefabricado>, PrefabricadoRepository>();
+//builder.Services.AddScoped<IPrefabricadoService, PrefabricadoService>();
 
 builder.Services.AddScoped<ICompraRepository<Compra>, CompraRepository>();
 builder.Services.AddScoped<ICompraService, CompraService>();

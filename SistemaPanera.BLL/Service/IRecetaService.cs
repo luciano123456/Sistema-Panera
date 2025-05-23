@@ -14,8 +14,8 @@ namespace SistemaPanera.BLL.Service
         Task<List<RecetasInsumo>> ObtenerInsumos(int idReceta);
         Task<bool> ActualizarInsumos(List<RecetasInsumo> insumos);
 
-        Task<bool> InsertarPrefabricados(List<RecetasPrefabricado> insumos);
-        Task<List<RecetasPrefabricado>> ObtenerPrefabricados(int idReceta);
-        Task<bool> ActualizarPrefabricados(List<RecetasPrefabricado> insumos);
+        //Task<bool> InsertarPrefabricados(List<RecetasPrefabricado> insumos);
+        //Task<List<RecetasPrefabricado>> ObtenerPrefabricados(int idReceta);
+        //Task<bool> ActualizarPrefabricados(List<RecetasPrefabricado> insumos);
     }
 }
