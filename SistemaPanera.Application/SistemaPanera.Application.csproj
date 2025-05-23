@@ -17,6 +17,7 @@
     <Content Remove="wwwroot\js\NavBarLogin.js" />
     <Content Remove="wwwroot\js\Prefabricados.js" />
     <Content Remove="wwwroot\js\PrefabricadosNuevoModif.js" />
+    <Content Remove="wwwroot\js\ProvedoresInsumos.js" />
     <Content Remove="wwwroot\js\Proveedores.js" />
     <Content Remove="wwwroot\js\Recetas.js" />
     <Content Remove="wwwroot\js\RecetasNuevoModif.js" />
@@ -29,6 +30,7 @@
     <None Include="wwwroot\Imagenes\Clientes.png" />
     <None Include="wwwroot\js\ComprasNuevoModif.js" />
     <None Include="wwwroot\js\Compras.js" />
+    <None Include="wwwroot\js\ProvedoresInsumos.js" />
     <None Include="wwwroot\js\PrefabricadosNuevoModif.js" />
     <None Include="wwwroot\js\Prefabricados.js" />
     <None Include="wwwroot\js\RecetasNuevoModif.js" />

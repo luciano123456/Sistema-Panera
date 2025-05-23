@@ -20,5 +20,5 @@ public partial class Proveedor
 
     public virtual ICollection<InsumosProveedor> InsumosProveedores { get; set; } = new List<InsumosProveedor>();
 
-    public virtual ICollection<ProveedoresInsumosLista> ProveedoresInsumosLista { get; set; } = new List<ProveedoresInsumosLista>();
+    public virtual ICollection<ProveedoresInsumos> ProveedoresInsumos { get; set; } = new List<ProveedoresInsumos>();
 }
