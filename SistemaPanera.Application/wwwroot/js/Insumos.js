@@ -6,87 +6,206 @@ const columnConfig = [
     { index: 1, filterType: 'text' },
     { index: 2, filterType: 'text' },
     { index: 3, filterType: 'text' },
-    { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesNegocioFilter },
-    { index: 5, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
-    { index: 6, filterType: 'select', fetchDataFunc: listaInsumosCategoriaFilter },
-    { index: 7, filterType: 'text' },
+    { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
+    { index: 5, filterType: 'select', fetchDataFunc: listaInsumosCategoriaFilter },
 ];
+
+
+let unidadesNegocioSeleccionados = [];
+
 
 $(document).ready(() => {
 
     listaUnidadesNegocioFiltro();
     listaInsumos(-1);
+    listaUnidadesNegocio();
 
-    $('#txtDescripcion, #txtCostoUnitario, #txtSku').on('input', function () {
-        validarCampos()
+
+
+    document.querySelectorAll("#formInsumo input, #formInsumo select, #formInsumo textarea, #btnUnidadesNegocio").forEach(el => {
+        el.setAttribute("autocomplete", "off");
+        el.addEventListener("input", () => validarCampoIndividual(el));
+        el.addEventListener("change", () => validarCampoIndividual(el));
+        el.addEventListener("blur", () => validarCampoIndividual(el));
+    });
+
+    document.querySelectorAll(".unidades-check").forEach(cb => {
+        cb.addEventListener("change", function () {
+            actualizarTextoUnidadesNegocio();
+            validarCampoIndividual(document.getElementById("btnUnidadesNegocio")); // FORZAR validación visual
+        });
+    });
+
+
+    document.getElementById("btnUnidadesNegocio").addEventListener("blur", function () {
+        validarCampoIndividual(this);
     });
 
 
 })
 
+function limpiarModal() {
+    const formulario = document.querySelector("#formInsumo");
+    if (!formulario) return;
+
+    formulario.querySelectorAll("input, select, textarea").forEach(el => {
+        if (el.tagName === "SELECT") {
+            el.selectedIndex = 0;
+        } else {
+            el.value = "";
+        }
+        el.classList.remove("is-invalid", "is-valid");
+    });
+
+    // Limpiar Unidades de Negocio
+    document.querySelectorAll('.unidades-check').forEach(cb => cb.checked = false);
+    unidadesNegocioSeleccionados = [];
+    const btnUnidades = document.getElementById("btnUnidadesNegocio");
+    if (btnUnidades) {
+        btnUnidades.textContent = "Seleccionar Unidades";
+        btnUnidades.classList.remove("is-valid", "is-invalid");
+    }
+
+    // Ocultar mensaje general de error
+    const errorMsg = document.getElementById("errorCampos");
+    if (errorMsg) errorMsg.classList.add("d-none");
+}
 
 
-function guardarCambios() {
-    if (validarCampos()) {
-        const idInsumo = $("#txtId").val();
-        const nuevoModelo = {
-            "Id": idInsumo !== "" ? idInsumo : 0,
-            "Descripcion": $("#txtDescripcion").val(),
-            "IdUnidadMedida": $("#UnidadesMedida").val(),
-            "IdUnidadNegocio": $("#UnidadesNegocio").val(),
-            "IdCategoria": $("#Categorias").val(),
-            "Sku": $("#txtSku").val(),
-            "CostoUnitario": $("#txtCostoUnitario").val(),
-        };
+function validarCampoIndividual(el) {
+    const tag = el.tagName.toLowerCase();
+    const id = el.id;
+    const valor = el.value ? el.value.trim() : ""; // Para inputs/selects
 
-        const url = idInsumo === "" ? "Insumos/Insertar" : "Insumos/Actualizar";
-        const method = idInsumo === "" ? "POST" : "PUT";
+    const feedback = el.nextElementSibling;
 
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: JSON.stringify(nuevoModelo)
-        })
-            .then(response => {
-                if (!response.ok) throw new Error(response.statusText);
-                return response.json();
-            })
-            .then(dataJson => {
-                const mensaje = idInsumo === "" ? "Insumo registrado correctamente" : "Insumo modificado correctamente";
-                $('#modalEdicion').modal('hide');
-                exitoModal(mensaje);
-                aplicarFiltros();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    } else {
-        errorModal('Debes completar los campos requeridos');
+    // Validación para inputs/selects normales
+    if (tag === "input" || tag === "select" || tag === "textarea") {
+        if (feedback && feedback.classList.contains("invalid-feedback")) {
+            feedback.textContent = "Campo obligatorio";
+        }
+
+        if (valor === "" || valor === "Seleccionar") {
+            el.classList.remove("is-valid");
+            el.classList.add("is-invalid");
+        } else {
+            el.classList.remove("is-invalid");
+            el.classList.add("is-valid");
+        }
+    }
+
+    // Validación para pseudo-select de unidades de negocio
+    if (id === "btnUnidadesNegocio") {
+        if (unidadesNegocioSeleccionados.length === 0) {
+            el.classList.remove("is-valid");
+            el.classList.add("is-invalid");
+        } else {
+            el.classList.remove("is-invalid");
+            el.classList.add("is-valid");
+        }
+    }
+
+
+    verificarErroresGenerales();
+}
+
+function verificarErroresGenerales() {
+    const errorMsg = document.getElementById("errorCampos");
+    const hayInvalidos = document.querySelectorAll("#formInsumo .is-invalid").length > 0;
+    if (!errorMsg) return;
+
+    if (!hayInvalidos) {
+        errorMsg.classList.add("d-none");
     }
 }
 
 
-function validarCampos() {
-    const descripcion = $("#txtDescripcion").val();
-    const sku = $("#txtSku").val();
-    const costoUnitario = $("#txtCostoUnitario").val();
-    const campoValidoDescripcion = descripcion !== "";
-    const campoValidoSku = sku !== "";
-    const campoValidoCostoUnitario = costoUnitario !== "";
 
-    $("#lblDescripcion").css("color", campoValidoDescripcion ? "" : "red");
-    $("#txtDescripcion").css("border-color", campoValidoDescripcion ? "" : "red");
 
-    $("#lblSku").css("color", campoValidoSku ? "" : "red");
-    $("#txtSku").css("border-color", campoValidoSku ? "" : "red");
+function guardarCambios() {
+    if (!validarCampos()) return;
 
-    $("#lblCostoUnitario").css("color", campoValidoCostoUnitario ? "" : "red");
-    $("#txtCostoUnitario").css("border-color", campoValidoCostoUnitario ? "" : "red");
+    const idInsumo = $("#txtId").val();
 
-    return campoValidoDescripcion && campoValidoSku && campoValidoCostoUnitario;
+    const nuevoModelo = {
+        Id: idInsumo !== "" ? parseInt(idInsumo) : 0,
+        Descripcion: $("#txtDescripcion").val(),
+        Sku: $("#txtSku").val(),
+        IdUnidadMedida: parseInt($("#UnidadesMedida").val()),
+        IdCategoria: parseInt($("#Categorias").val()),
+
+        InsumosUnidadesNegocios: unidadesNegocioSeleccionados.map(id => ({
+            IdUnidadNegocio: id
+        }))
+    };
+
+    const url = idInsumo === "" ? "Insumos/Insertar" : "Insumos/Actualizar";
+    const method = idInsumo === "" ? "POST" : "PUT";
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: JSON.stringify(nuevoModelo)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+        })
+        .then(dataJson => {
+            const mensaje = idInsumo === "" ? "Insumo registrado correctamente" : "Insumo modificado correctamente";
+            $('#modalEdicion').modal('hide');
+            exitoModal(mensaje);
+            aplicarFiltros();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
+
+function validarCampos() {
+    const campos = [
+        "#txtDescripcion",
+        "#txtSku",
+        "#Categorias",
+        "#UnidadesMedida",
+    ];
+
+    let valido = true;
+
+    campos.forEach(selector => {
+        const campo = document.querySelector(selector);
+        const valor = campo?.value.trim();
+        const feedback = campo?.nextElementSibling;
+
+        if (!campo || !valor || valor === "Seleccionar") {
+            campo.classList.add("is-invalid");
+            campo.classList.remove("is-valid");
+            if (feedback) feedback.textContent = "Campo obligatorio";
+            valido = false;
+        } else {
+            campo.classList.remove("is-invalid");
+            campo.classList.add("is-valid");
+        }
+    });
+
+    // Unidades de Negocio (pseudo-select)
+    const btnUnidades = document.getElementById("btnUnidadesNegocio");
+    if (unidadesNegocioSeleccionados.length === 0) {
+        btnUnidades.classList.add("is-invalid");
+        btnUnidades.classList.remove("is-valid");
+        valido = false;
+    } else {
+        btnUnidades.classList.remove("is-invalid");
+        btnUnidades.classList.add("is-valid");
+    }
+
+    document.getElementById("errorCampos").classList.toggle("d-none", valido);
+    return valido;
+}
+
+
 function nuevoInsumo() {
     limpiarModal();
     listaUnidadesNegocio();
@@ -95,44 +214,43 @@ function nuevoInsumo() {
     $('#modalEdicion').modal('show');
     $("#btnGuardar").text("Registrar");
     $("#modalEdicionLabel").text("Nuevo Insumo");
-    $('#lblNombre').css('color', 'red');
-    $('#lblDescripcion, #txtDescripcion').css('color', 'red').css('border-color', 'red');
-    $('#lblSku, #txtSku').css('color', 'red').css('border-color', 'red');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', 'red').css('border-color', 'red');
+
 }
 
 async function mostrarModal(modelo) {
-    const campos = ["Id", "Sku", "CostoUnitario", "Descripcion"];
+
+    limpiarModal();
+
+    const campos = ["Id", "Sku", "Descripcion"];
     campos.forEach(campo => {
         $(`#txt${campo}`).val(modelo[campo]);
     });
 
-    listaUnidadesNegocio();
-    listaUnidadesMedida();
-    listaInsumosCategoria();
+    await listaUnidadesNegocio();
+    await listaUnidadesMedida();
+    await listaInsumosCategoria();
+
+    document.getElementById("Categorias").value = modelo.IdCategoria;
+    document.getElementById("UnidadesMedida").value = modelo.IdUnidadMedida;
+
+    // === Marcar unidades de negocio (por ID) ===
+    const idsUnidades = modelo.InsumosUnidadesNegocios?.map(x => parseInt(x.IdUnidadNegocio)) ?? [];
+    unidadesNegocioSeleccionados = [];
+
+    document.querySelectorAll(".unidades-check").forEach(cb => {
+        const id = parseInt(cb.value);
+        const seleccionado = idsUnidades.includes(id);
+        cb.checked = seleccionado;
+        if (seleccionado) unidadesNegocioSeleccionados.push(id);
+    });
+    actualizarTextoUnidadesNegocio();
 
     $('#modalEdicion').modal('show');
     $("#btnGuardar").text("Guardar");
     $("#modalEdicionLabel").text("Editar Insumo");
-
-    $('#lblDescripcion, #txtDescripcion').css('color', '').css('border-color', '');
-    $('#lblSku, #txtSku').css('color', '').css('border-color', '');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', '').css('border-color', '');
 }
 
 
-
-
-function limpiarModal() {
-    const campos = ["Id", "Sku", "CostoUnitario", "Descripcion"];
-    campos.forEach(campo => {
-        $(`#txt${campo}`).val("");
-    });
-
-    $('#lblDescripcion, #txtDescripcion').css('color', '').css('border-color', '');
-    $('#lblSku, #txtSku').css('color', '').css('border-color', '');
-    $('#lblCostoUnitario, #txtCostoUnitario').css('color', '').css('border-color', '');
-}
 
 
 async function aplicarFiltros() {
@@ -228,10 +346,9 @@ async function configurarDataTable(data) {
                 { data: 'Descripcion' },
                 { data: 'FechaActualizacion' },
                 { data: 'Sku' },
-                { data: 'UnidadNegocio' },
                 { data: 'UnidadMedida' },
                 { data: 'Categoria' },
-                { data: 'CostoUnitario' },
+                //{ data: 'CostoUnitario' },
             ],
             dom: 'Bfrtip',
             buttons: [
@@ -278,15 +395,15 @@ async function configurarDataTable(data) {
                             return moment(date, 'YYYY-MM-DD hh:mm').format('DD/MM/YYYY hh:mm'); // Formato: 'DD/MM/YYYY'
                         }
                     },
-                    "targets": [2] // Índices de las columnas de fechas
+                    "targets": [2] // Índices de las columnas de fechas 
                 },
-                {
-                    "render": function (data, type, row) {
-                        return formatNumber(data); // Formatear números
-                    },
-                    "targets": [7] // Índices de las columnas de números
-                },
-                
+                //{
+                //    "render": function (data, type, row) {
+                //        return formatNumber(data); // Formatear números
+                //    },
+                //    "targets": [7] // Índices de las columnas de números
+                //},
+
             ],
 
             initComplete: async function () {
@@ -418,7 +535,6 @@ async function listaUnidadesNegocioFilter() {
 
 }
 
-
 async function listaUnidadesMedidaFilter() {
     const url = `/UnidadesMedida/Lista`;
     const response = await fetch(url);
@@ -443,22 +559,44 @@ async function listaInsumosCategoriaFilter() {
 
 }
 
-
 async function listaUnidadesNegocio() {
     const data = await listaUnidadesNegocioFilter();
+    const contenedor = document.getElementById("listaUnidades");
 
-    $('#UnidadesNegocio option').remove();
+    contenedor.innerHTML = `
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkTodosUnidades">
+            <label class="form-check-label" for="checkTodosUnidades">Seleccionar todos</label>
+        </div>
+        <hr class="my-2" />
+    `;
 
-    select = document.getElementById("UnidadesNegocio");
+    data.forEach(p => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "form-check";
+        wrapper.innerHTML = `
+            <input class="form-check-input unidades-check" type="checkbox" value="${p.Id}" id="unidadNegocio${p.Id}">
+            <label class="form-check-label" for="unidadNegocio${p.Id}">${p.Nombre}</label>
+        `;
+        contenedor.appendChild(wrapper);
+    });
 
-    for (i = 0; i < data.length; i++) {
-        option = document.createElement("option");
-        option.value = data[i].Id;
-        option.text = data[i].Nombre;
-        select.appendChild(option);
+    document.getElementById("checkTodosUnidades").addEventListener("change", function () {
+        document.querySelectorAll(".unidades-check").forEach(cb => cb.checked = this.checked);
+        actualizarTextoUnidadesNegocio();
+        validarCampoIndividual(document.getElementById("btnUnidadesNegocio")); // validación
+    });
 
-    }
+    document.querySelectorAll(".unidades-check").forEach(cb => {
+        cb.addEventListener("change", function () {
+            actualizarTextoUnidadesNegocio();
+            validarCampoIndividual(document.getElementById("btnUnidadesNegocio")); // validación
+        });
+    });
 }
+
+
+
 
 async function listaUnidadesMedida() {
     const data = await listaUnidadesMedidaFilter();
@@ -466,6 +604,14 @@ async function listaUnidadesMedida() {
     $('#UnidadesMedida option').remove();
 
     select = document.getElementById("UnidadesMedida");
+
+    // Opción por defecto (seleccionada y deshabilitada)
+    const optionDefault = document.createElement("option");
+    optionDefault.value = "";
+    optionDefault.text = "Seleccionar";
+    optionDefault.disabled = true;
+    optionDefault.selected = true;
+    select.appendChild(optionDefault);
 
     for (i = 0; i < data.length; i++) {
         option = document.createElement("option");
@@ -481,14 +627,22 @@ async function listaInsumosCategoria() {
 
     $('#Categorias option').remove();
 
-    select = document.getElementById("Categorias");
+    const select = document.getElementById("Categorias");
 
-    for (i = 0; i < data.length; i++) {
-        option = document.createElement("option");
+    // Opción por defecto (seleccionada y deshabilitada)
+    const optionDefault = document.createElement("option");
+    optionDefault.value = "";
+    optionDefault.text = "Seleccionar";
+    optionDefault.disabled = true;
+    optionDefault.selected = true;
+    select.appendChild(optionDefault);
+
+    // Cargar opciones dinámicas
+    for (let i = 0; i < data.length; i++) {
+        const option = document.createElement("option");
         option.value = data[i].Id;
         option.text = data[i].Nombre;
         select.appendChild(option);
-
     }
 }
 
@@ -515,4 +669,65 @@ async function listaUnidadesNegocioFiltro() {
         select.appendChild(option);
 
     }
+}
+
+
+$('#checkTodosUnidades').on('change', function () {
+    $('.unidades-check').prop('checked', this.checked);
+});
+
+function toggleUnidadesNegocio() {
+    const lista = document.getElementById("listaUnidades");
+    lista.classList.toggle("d-none");
+}
+
+// Evitar cierre al hacer clic dentro
+document.getElementById("listaUnidades").addEventListener("click", function (e) {
+    e.stopPropagation();
+});
+
+// Cerrar al hacer clic fuera
+document.addEventListener("click", function (e) {
+    const container = document.getElementById("listaUnidades");
+    const button = document.getElementById("btnUnidadesNegocio");
+    if (!container.contains(e.target) && !button.contains(e.target)) {
+        container.classList.add("d-none");
+    }
+});
+
+// Lógica de "Seleccionar todos"
+document.getElementById("checkTodosUnidades").addEventListener("change", function () {
+    const checkboxes = document.querySelectorAll(".unidad-check");
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+
+function actualizarTextoUnidadesNegocio() {
+    const checks = document.querySelectorAll('.unidades-check:checked');
+    const label = document.getElementById("btnUnidadesNegocio");
+
+    if (checks.length === 0) {
+        label.textContent = "Seleccionar Unidades";
+    } else {
+        label.textContent = armarResumenChecks(checks);
+    }
+
+    unidadesNegocioSeleccionados = Array.from(checks).map(cb => parseInt(cb.value));
+}
+
+
+function armarResumenChecks(checks, maxItems = 3, maxLength = 100) {
+    const nombres = Array.from(checks).map(cb => cb.nextElementSibling.textContent.trim());
+    let resumen = "";
+
+    if (nombres.length <= maxItems) {
+        resumen = nombres.join(", ");
+    } else {
+        resumen = nombres.join(", ");
+        if (resumen.length > maxLength) {
+            resumen = resumen.substring(0, maxLength).trim() + "...";
+        }
+    }
+
+    return resumen;
 }

@@ -27,23 +27,36 @@ namespace SistemaPanera.Application.Controllers
         [HttpGet]
         public async Task<IActionResult> Lista(int IdUnidadNegocio)
         {
-            var Insumos = await _InsumosService.ObtenerTodos();
+            var insumos = await _InsumosService.ObtenerTodos();
 
-            var lista = Insumos.Select(c => new VMInsumo
-            {
-                Id = c.Id,
-                //CostoUnitario = c.CostoUnitario,
-                FechaActualizacion = c.FechaActualizacion,
-                IdCategoria = c.IdCategoria,
-                IdUnidadMedida = c.IdUnidadMedida,
-                Sku = c.Sku,
-                Categoria = c.IdCategoriaNavigation.Nombre,
-                UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
-                Descripcion = c.Descripcion,
-            }).Where(x => x.IdUnidadNegocio == IdUnidadNegocio || IdUnidadNegocio == -1).ToList();
+            var lista = insumos
+                .Where(c => IdUnidadNegocio == -1 || c.InsumosUnidadesNegocios.Any(u => u.IdUnidadNegocio == IdUnidadNegocio))
+                .Select(c => new VMInsumo
+                {
+                    Id = c.Id,
+                    Descripcion = c.Descripcion,
+                    Sku = c.Sku,
+                    IdCategoria = c.IdCategoria,
+                    IdUnidadMedida = c.IdUnidadMedida,
+                    FechaActualizacion = c.FechaActualizacion,
+                    Categoria = c.IdCategoriaNavigation.Nombre,
+                    UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
+
+                    // NUEVO: lista de nombres de unidades de negocio
+                    UnidadesNegocio = c.InsumosUnidadesNegocios
+                        .Select(u => u.IdUnidadNegocioNavigation.Nombre)
+                        .ToList(),
+
+                    // NUEVO: lista de nombres de proveedores
+                    Proveedores = c.InsumosProveedores
+                        .Select(p => p.IdProveedorNavigation.Nombre)
+                        .ToList()
+                })
+                .ToList();
 
             return Ok(lista);
         }
+
 
 
         [HttpPost]
@@ -54,10 +67,11 @@ namespace SistemaPanera.Application.Controllers
                 Id = model.Id,
                 IdUnidadMedida = model.IdUnidadMedida,
                 Sku = model.Sku,
-                //CostoUnitario = model.CostoUnitario,
                 FechaActualizacion = DateTime.Now,
                 IdCategoria = model.IdCategoria,
                 Descripcion = model.Descripcion,
+                InsumosProveedores = model.InsumosProveedores,
+                InsumosUnidadesNegocios = model.InsumosUnidadesNegocios
             };
 
             bool respuesta = await _InsumosService.Insertar(Insumos);
@@ -73,10 +87,10 @@ namespace SistemaPanera.Application.Controllers
                 Id = model.Id,
                 IdUnidadMedida = model.IdUnidadMedida,
                 Sku = model.Sku,
-                //CostoUnitario = model.CostoUnitario,
                 FechaActualizacion = DateTime.Now,
                 IdCategoria = model.IdCategoria,
                 Descripcion = model.Descripcion,
+                InsumosUnidadesNegocios = model.InsumosUnidadesNegocios
             };
 
             bool respuesta = await _InsumosService.Actualizar(Insumos);
@@ -95,17 +109,30 @@ namespace SistemaPanera.Application.Controllers
         [HttpGet]
         public async Task<IActionResult> EditarInfo(int id)
         {
-            var EstadosUsuario = await _InsumosService.Obtener(id);
+            var insumo = await _InsumosService.Obtener(id);
+            if (insumo == null) return NotFound();
 
-            if (EstadosUsuario != null)
+            var vm = new VMInsumo
             {
-                return StatusCode(StatusCodes.Status200OK, EstadosUsuario);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status404NotFound);
-            }
+                Id = insumo.Id,
+                Sku = insumo.Sku,
+                Descripcion = insumo.Descripcion,
+                IdCategoria = insumo.IdCategoria,
+                IdUnidadMedida = insumo.IdUnidadMedida,
+                FechaActualizacion = insumo.FechaActualizacion,
+                InsumosProveedores = insumo.InsumosProveedores.Select(p => new InsumosProveedor
+                {
+                    IdProveedor = p.IdProveedor
+                }).ToList(),
+                InsumosUnidadesNegocios = insumo.InsumosUnidadesNegocios.Select(u => new InsumosUnidadesNegocio
+                {
+                    IdUnidadNegocio = u.IdUnidadNegocio
+                }).ToList()
+            };
+
+            return Ok(vm);
         }
+
         public IActionResult Privacy()
         {
             return View();
