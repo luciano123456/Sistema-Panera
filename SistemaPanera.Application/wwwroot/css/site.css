@@ -585,3 +585,17 @@ select option:disabled {
     color: red; /* Cambiar el color de la letra a rojo */
 }
 
+.select-checklist {
+    position: absolute;
+    width: 96%;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    z-index: 1000;
+}
+
+    .select-checklist .form-check-label {
+        color: black;
+    }

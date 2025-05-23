@@ -33,6 +33,8 @@ namespace SistemaPanera.BLL.Service
             return await _contactRepo.Obtener(id);
         }
 
+
+
         //public async Task<Insumo> ObtenerPorNombre(string nombre)
         //{
         //    IQueryable<Insumo> queryInsumoSQL = await _contactRepo.ObtenerTodos();
