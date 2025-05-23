@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
-public partial class PrefabricadosStock
+public partial class SubrecetasStock
 {
     public int Id { get; set; }
 
     public int IdLocal { get; set; }
 
-    public int IdPrefabricado { get; set; }
+    public int IdSubreceta { get; set; }
 
     public string TipoMovimiento { get; set; } = null!;
 
@@ -18,5 +18,5 @@ public partial class PrefabricadosStock
 
     public virtual Local IdLocalNavigation { get; set; } = null!;
 
-    public virtual Prefabricado IdPrefabricadoNavigation { get; set; } = null!;
+    public virtual Subreceta IdSubrecetaNavigation { get; set; } = null!;
 }

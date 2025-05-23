@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace SistemaPanera.Models;
 public partial class Receta
 {
@@ -21,7 +20,11 @@ public partial class Receta
 
     public decimal CostoInsumos { get; set; }
 
-    public decimal CostoTotal { get; set; }
+    public decimal CostoPorcion { get; set; }
+
+    public decimal? Rendimiento { get; set; }
+
+    public decimal? CostoUnitario { get; set; }
 
     public DateTime FechaActualizacion { get; set; }
 
@@ -33,5 +36,5 @@ public partial class Receta
 
     public virtual ICollection<RecetasInsumo> RecetasInsumos { get; set; } = new List<RecetasInsumo>();
 
-    public virtual ICollection<RecetasPrefabricado> RecetasPrefabricados { get; set; } = new List<RecetasPrefabricado>();
+    public virtual ICollection<RecetasSubreceta> RecetasSubreceta { get; set; } = new List<RecetasSubreceta>();
 }

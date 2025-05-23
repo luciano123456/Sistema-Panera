@@ -44,10 +44,10 @@ namespace SistemaPanera.DAL.Repository
 
         public async Task<Models.Compra> Obtener(int id)
         {
-            Models.Compra model = await _dbcontext.Compras
-                .Include(p => p.ComprasDetalles)
-                .FirstOrDefaultAsync(p => p.Id == id);
-            return model;
+            //Models.Compra model = await _dbcontext.Compras
+            //    .Include(p => p.ComprasDetalle)
+            //    .FirstOrDefaultAsync(p => p.Id == id);
+            return null;
         }
 
         public async Task<IQueryable<Models.Compra>> ObtenerTodos()
@@ -118,7 +118,7 @@ namespace SistemaPanera.DAL.Repository
             {
 
                 List<ComprasDetalle> productos = _dbcontext.ComprasDetalles
-                    .Include(c => c.IdCompraNavigation)
+                    //.Include(c => c.IdCompraNavigation)
                     .Include(c => c.IdInsumoNavigation)
                     .Where(c => c.IdCompra == idCompra).ToList();
                 return productos;

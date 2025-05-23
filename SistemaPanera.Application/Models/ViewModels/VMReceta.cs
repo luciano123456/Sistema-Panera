@@ -36,7 +36,7 @@ namespace SistemaPanera.Application.Models.ViewModels
         public virtual ICollection<RecetasInsumo> RecetasInsumos { get; set; } = new List<RecetasInsumo>();
 
         public virtual ICollection<RecetasStock> RecetasStocks { get; set; } = new List<RecetasStock>();
-        public virtual ICollection<RecetasPrefabricado> RecetasPrefabricados { get; set; } = new List<RecetasPrefabricado>();
+        //public virtual ICollection<RecetasPrefabricado> RecetasPrefabricados { get; set; } = new List<RecetasPrefabricado>();
 
     }
 }

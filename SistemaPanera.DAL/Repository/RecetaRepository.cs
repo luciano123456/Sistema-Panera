@@ -137,89 +137,89 @@ namespace SistemaPanera.DAL.Repository
             }
         }
 
-        public async Task<bool> InsertarPrefabricados(List<RecetasPrefabricado> Prefabricados)
-        {
-            try
-            {
-                foreach (RecetasPrefabricado p in Prefabricados)
-                {
-                    // Verificar si el Prefabricado ya existe, por ejemplo, por IdPrefabricado y IdPedido
-                    var PrefabricadoExistente = await _dbcontext.RecetasPrefabricados
-                                                             .FirstOrDefaultAsync(x => x.IdReceta == p.IdReceta && x.IdPrefabricado == p.IdPrefabricado);
+        //public async Task<bool> InsertarPrefabricados(List<RecetasPrefabricado> Prefabricados)
+        //{
+        //    try
+        //    {
+        //        foreach (RecetasPrefabricado p in Prefabricados)
+        //        {
+        //            // Verificar si el Prefabricado ya existe, por ejemplo, por IdPrefabricado y IdPedido
+        //            var PrefabricadoExistente = await _dbcontext.RecetasPrefabricados
+        //                                                     .FirstOrDefaultAsync(x => x.IdReceta == p.IdReceta && x.IdPrefabricado == p.IdPrefabricado);
 
-                    if (PrefabricadoExistente != null)
-                    {
-                        // Si el Prefabricado existe, actualizamos sus propiedades
-                        PrefabricadoExistente.CostoUnitario = p.CostoUnitario;
-                        PrefabricadoExistente.SubTotal = p.SubTotal;
-                        PrefabricadoExistente.Cantidad = p.Cantidad;
-                    }
-                    else
-                    {
-                        // Si el Prefabricado no existe, lo agregamos a la base de datos
-                        _dbcontext.RecetasPrefabricados.Add(p);
-                    }
-                }
-
-
-                var PrefabricadosIdsModelo = Prefabricados.Select(p => p.IdReceta).Distinct().ToList();
-                var PrefabricadosAEliminar = await _dbcontext.RecetasPrefabricados
-                                                          .Where(x => PrefabricadosIdsModelo.Contains(x.IdReceta)
-                                                                  && !Prefabricados.Select(p => p.IdPrefabricado).Contains(x.IdPrefabricado)
-                                                                  && x.Id != 0)
-                                                          .ToListAsync();
+        //            if (PrefabricadoExistente != null)
+        //            {
+        //                // Si el Prefabricado existe, actualizamos sus propiedades
+        //                PrefabricadoExistente.CostoUnitario = p.CostoUnitario;
+        //                PrefabricadoExistente.SubTotal = p.SubTotal;
+        //                PrefabricadoExistente.Cantidad = p.Cantidad;
+        //            }
+        //            else
+        //            {
+        //                // Si el Prefabricado no existe, lo agregamos a la base de datos
+        //                _dbcontext.RecetasPrefabricados.Add(p);
+        //            }
+        //        }
 
 
-                foreach (var Prefabricado in PrefabricadosAEliminar)
-                {
-                    _dbcontext.RecetasPrefabricados.Remove(Prefabricado);
-                }
+        //        var PrefabricadosIdsModelo = Prefabricados.Select(p => p.IdReceta).Distinct().ToList();
+        //        var PrefabricadosAEliminar = await _dbcontext.RecetasPrefabricados
+        //                                                  .Where(x => PrefabricadosIdsModelo.Contains(x.IdReceta)
+        //                                                          && !Prefabricados.Select(p => p.IdPrefabricado).Contains(x.IdPrefabricado)
+        //                                                          && x.Id != 0)
+        //                                                  .ToListAsync();
 
-                await _dbcontext.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-        public async Task<bool> ActualizarPrefabricados(List<RecetasPrefabricado> Prefabricados)
-        {
-            try
-            {
-                foreach (RecetasPrefabricado p in Prefabricados)
-                {
-                    _dbcontext.RecetasPrefabricados.Update(p);
-                }
 
-                await _dbcontext.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
+        //        foreach (var Prefabricado in PrefabricadosAEliminar)
+        //        {
+        //            _dbcontext.RecetasPrefabricados.Remove(Prefabricado);
+        //        }
 
-        }
+        //        await _dbcontext.SaveChangesAsync();
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return false;
+        //    }
+        //}
+        //public async Task<bool> ActualizarPrefabricados(List<RecetasPrefabricado> Prefabricados)
+        //{
+        //    try
+        //    {
+        //        foreach (RecetasPrefabricado p in Prefabricados)
+        //        {
+        //            _dbcontext.RecetasPrefabricados.Update(p);
+        //        }
 
-        public async Task<List<RecetasPrefabricado>> ObtenerPrefabricados(int idReceta)
-        {
-            try
-            {
+        //        await _dbcontext.SaveChangesAsync();
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return false;
+        //    }
 
-                List<RecetasPrefabricado> productos = _dbcontext.RecetasPrefabricados
-                    .Include(c => c.IdRecetaNavigation)
-                    .Include(c => c.IdPrefabricadoNavigation)
-                    .Where(c => c.IdReceta == idReceta).ToList();
-                return productos;
+        //}
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return null;
-            }
-        }
+        //public async Task<List<RecetasPrefabricado>> ObtenerPrefabricados(int idReceta)
+        //{
+        //    try
+        //    {
+
+        //        List<RecetasPrefabricado> productos = _dbcontext.RecetasPrefabricados
+        //            .Include(c => c.IdRecetaNavigation)
+        //            .Include(c => c.IdPrefabricadoNavigation)
+        //            .Where(c => c.IdReceta == idReceta).ToList();
+        //        return productos;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex);
+        //        return null;
+        //    }
+        //}
 
     }
 }

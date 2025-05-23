@@ -18,7 +18,7 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public string Nombre { get; set; }
 
-        public virtual Prefabricado IdPrefabricadoNavigation { get; set; } = null!;
+        //public virtual Prefabricado IdPrefabricadoNavigation { get; set; } = null!;
 
         public virtual Receta IdRecetaNavigation { get; set; } = null!;
     }

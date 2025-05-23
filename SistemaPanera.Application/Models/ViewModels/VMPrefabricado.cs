@@ -24,15 +24,15 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public DateTime FechaActualizacion { get; set; }
 
-        public virtual PrefabricadosCategoria IdCategoriaNavigation { get; set; } = null!;
+        //public virtual PrefabricadosCategoria IdCategoriaNavigation { get; set; } = null!;
 
         public virtual UnidadesMedida IdUnidadMedidaNavigation { get; set; } = null!;
 
         public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
 
-        public virtual ICollection<PrefabricadosInsumo> PrefabricadosInsumos { get; set; } = new List<PrefabricadosInsumo>();
+        //public virtual ICollection<PrefabricadosInsumo> PrefabricadosInsumos { get; set; } = new List<PrefabricadosInsumo>();
 
-        public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
+        //public virtual ICollection<PrefabricadosStock> PrefabricadosStocks { get; set; } = new List<PrefabricadosStock>();
 
     }
 }

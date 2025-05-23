@@ -17,4 +17,8 @@ public partial class Proveedor
     public string? Cbu { get; set; }
 
     public string? Cuit { get; set; }
+
+    public virtual ICollection<InsumosProveedor> InsumosProveedores { get; set; } = new List<InsumosProveedor>();
+
+    public virtual ICollection<ProveedoresInsumosLista> ProveedoresInsumosLista { get; set; } = new List<ProveedoresInsumosLista>();
 }
