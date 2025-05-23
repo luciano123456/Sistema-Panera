@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
-public partial class ProveedoresInsumosLista
+public partial class ProveedoresInsumos
 {
     public int Id { get; set; }
 

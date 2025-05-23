@@ -64,6 +64,9 @@ builder.Services.AddScoped<IRecetasTiposervice, RecetasTipoService>();
 builder.Services.AddScoped<IRecetaRepository<Receta>, RecetaRepository>();
 builder.Services.AddScoped<IRecetaService, RecetaService>();
 
+builder.Services.AddScoped<IProveedoresInsumosRepository<ProveedoresInsumos>, ProveedoresInsumosRepository>();
+builder.Services.AddScoped<IProveedoresInsumoservice, ProveedoresInsumoservice>();
+
 //builder.Services.AddScoped<IPrefabricadosCategoriaRepository<PrefabricadosCategoria>, PrefabricadosCategoriaRepository>();
 //builder.Services.AddScoped<IPrefabricadosCategoriaService, PrefabricadosCategoriaService>();
 

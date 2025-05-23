@@ -40,7 +40,7 @@ public partial class SistemaPaneraContext : DbContext
 
     public virtual DbSet<Proveedor> Proveedores { get; set; }
 
-    public virtual DbSet<ProveedoresInsumosLista> ProveedoresInsumosListas { get; set; }
+    public virtual DbSet<ProveedoresInsumos> ProveedoresInsumos { get; set; }
 
     public virtual DbSet<Provincia> Provincias { get; set; }
 
@@ -247,7 +247,7 @@ public partial class SistemaPaneraContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<ProveedoresInsumosLista>(entity =>
+        modelBuilder.Entity<ProveedoresInsumos>(entity =>
         {
             entity.ToTable("Proveedores_Insumos_Listas");
 
@@ -258,9 +258,9 @@ public partial class SistemaPaneraContext : DbContext
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(150)
                 .IsUnicode(false);
-            entity.Property(e => e.FechaActualizacion).HasColumnType("date");
+            entity.Property(e => e.FechaActualizacion).HasColumnType("datetime");
 
-            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.ProveedoresInsumosLista)
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.ProveedoresInsumos)
                 .HasForeignKey(d => d.IdProveedor)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Proveedores_Insumos_Listas_Proveedores");
