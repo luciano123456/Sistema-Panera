@@ -44,81 +44,6 @@ $(document).ready(() => {
 
 })
 
-function limpiarModal() {
-    const formulario = document.querySelector("#formInsumo");
-    if (!formulario) return;
-
-    formulario.querySelectorAll("input, select, textarea").forEach(el => {
-        if (el.tagName === "SELECT") {
-            el.selectedIndex = 0;
-        } else {
-            el.value = "";
-        }
-        el.classList.remove("is-invalid", "is-valid");
-    });
-
-    // Limpiar Unidades de Negocio
-    document.querySelectorAll('.unidades-check').forEach(cb => cb.checked = false);
-    unidadesNegocioSeleccionados = [];
-    const btnUnidades = document.getElementById("btnUnidadesNegocio");
-    if (btnUnidades) {
-        btnUnidades.textContent = "Seleccionar Unidades";
-        btnUnidades.classList.remove("is-valid", "is-invalid");
-    }
-
-    // Ocultar mensaje general de error
-    const errorMsg = document.getElementById("errorCampos");
-    if (errorMsg) errorMsg.classList.add("d-none");
-}
-
-
-function validarCampoIndividual(el) {
-    const tag = el.tagName.toLowerCase();
-    const id = el.id;
-    const valor = el.value ? el.value.trim() : ""; // Para inputs/selects
-
-    const feedback = el.nextElementSibling;
-
-    // Validación para inputs/selects normales
-    if (tag === "input" || tag === "select" || tag === "textarea") {
-        if (feedback && feedback.classList.contains("invalid-feedback")) {
-            feedback.textContent = "Campo obligatorio";
-        }
-
-        if (valor === "" || valor === "Seleccionar") {
-            el.classList.remove("is-valid");
-            el.classList.add("is-invalid");
-        } else {
-            el.classList.remove("is-invalid");
-            el.classList.add("is-valid");
-        }
-    }
-
-    // Validación para pseudo-select de unidades de negocio
-    if (id === "btnUnidadesNegocio") {
-        if (unidadesNegocioSeleccionados.length === 0) {
-            el.classList.remove("is-valid");
-            el.classList.add("is-invalid");
-        } else {
-            el.classList.remove("is-invalid");
-            el.classList.add("is-valid");
-        }
-    }
-
-
-    verificarErroresGenerales();
-}
-
-function verificarErroresGenerales() {
-    const errorMsg = document.getElementById("errorCampos");
-    const hayInvalidos = document.querySelectorAll("#formInsumo .is-invalid").length > 0;
-    if (!errorMsg) return;
-
-    if (!hayInvalidos) {
-        errorMsg.classList.add("d-none");
-    }
-}
-
 
 
 
@@ -164,46 +89,6 @@ function guardarCambios() {
         });
 }
 
-function validarCampos() {
-    const campos = [
-        "#txtDescripcion",
-        "#txtSku",
-        "#Categorias",
-        "#UnidadesMedida",
-    ];
-
-    let valido = true;
-
-    campos.forEach(selector => {
-        const campo = document.querySelector(selector);
-        const valor = campo?.value.trim();
-        const feedback = campo?.nextElementSibling;
-
-        if (!campo || !valor || valor === "Seleccionar") {
-            campo.classList.add("is-invalid");
-            campo.classList.remove("is-valid");
-            if (feedback) feedback.textContent = "Campo obligatorio";
-            valido = false;
-        } else {
-            campo.classList.remove("is-invalid");
-            campo.classList.add("is-valid");
-        }
-    });
-
-    // Unidades de Negocio (pseudo-select)
-    const btnUnidades = document.getElementById("btnUnidadesNegocio");
-    if (unidadesNegocioSeleccionados.length === 0) {
-        btnUnidades.classList.add("is-invalid");
-        btnUnidades.classList.remove("is-valid");
-        valido = false;
-    } else {
-        btnUnidades.classList.remove("is-invalid");
-        btnUnidades.classList.add("is-valid");
-    }
-
-    document.getElementById("errorCampos").classList.toggle("d-none", valido);
-    return valido;
-}
 
 
 function nuevoInsumo() {
@@ -730,4 +615,121 @@ function armarResumenChecks(checks, maxItems = 3, maxLength = 100) {
     }
 
     return resumen;
+}
+
+
+function limpiarModal() {
+    const formulario = document.querySelector("#formInsumo");
+    if (!formulario) return;
+
+    formulario.querySelectorAll("input, select, textarea").forEach(el => {
+        if (el.tagName === "SELECT") {
+            el.selectedIndex = 0;
+        } else {
+            el.value = "";
+        }
+        el.classList.remove("is-invalid", "is-valid");
+    });
+
+    // Limpiar Unidades de Negocio
+    document.querySelectorAll('.unidades-check').forEach(cb => cb.checked = false);
+    unidadesNegocioSeleccionados = [];
+    const btnUnidades = document.getElementById("btnUnidadesNegocio");
+    if (btnUnidades) {
+        btnUnidades.textContent = "Seleccionar Unidades";
+        btnUnidades.classList.remove("is-valid", "is-invalid");
+    }
+
+    // Ocultar mensaje general de error
+    const errorMsg = document.getElementById("errorCampos");
+    if (errorMsg) errorMsg.classList.add("d-none");
+}
+
+
+function validarCampoIndividual(el) {
+    const tag = el.tagName.toLowerCase();
+    const id = el.id;
+    const valor = el.value ? el.value.trim() : ""; // Para inputs/selects
+
+    const feedback = el.nextElementSibling;
+
+    // Validación para inputs/selects normales
+    if (tag === "input" || tag === "select" || tag === "textarea") {
+        if (feedback && feedback.classList.contains("invalid-feedback")) {
+            feedback.textContent = "Campo obligatorio";
+        }
+
+        if (valor === "" || valor === "Seleccionar") {
+            el.classList.remove("is-valid");
+            el.classList.add("is-invalid");
+        } else {
+            el.classList.remove("is-invalid");
+            el.classList.add("is-valid");
+        }
+    }
+
+    // Validación para pseudo-select de unidades de negocio
+    if (id === "btnUnidadesNegocio") {
+        if (unidadesNegocioSeleccionados.length === 0) {
+            el.classList.remove("is-valid");
+            el.classList.add("is-invalid");
+        } else {
+            el.classList.remove("is-invalid");
+            el.classList.add("is-valid");
+        }
+    }
+
+
+    verificarErroresGenerales();
+}
+
+function verificarErroresGenerales() {
+    const errorMsg = document.getElementById("errorCampos");
+    const hayInvalidos = document.querySelectorAll("#formInsumo .is-invalid").length > 0;
+    if (!errorMsg) return;
+
+    if (!hayInvalidos) {
+        errorMsg.classList.add("d-none");
+    }
+}
+
+function validarCampos() {
+    const campos = [
+        "#txtDescripcion",
+        "#txtSku",
+        "#Categorias",
+        "#UnidadesMedida",
+    ];
+
+    let valido = true;
+
+    campos.forEach(selector => {
+        const campo = document.querySelector(selector);
+        const valor = campo?.value.trim();
+        const feedback = campo?.nextElementSibling;
+
+        if (!campo || !valor || valor === "Seleccionar") {
+            campo.classList.add("is-invalid");
+            campo.classList.remove("is-valid");
+            if (feedback) feedback.textContent = "Campo obligatorio";
+            valido = false;
+        } else {
+            campo.classList.remove("is-invalid");
+            campo.classList.add("is-valid");
+        }
+    });
+
+    // Unidades de Negocio (pseudo-select)
+    const btnUnidades = document.getElementById("btnUnidadesNegocio");
+    if (unidadesNegocioSeleccionados.length === 0) {
+        btnUnidades.classList.add("is-invalid");
+        btnUnidades.classList.remove("is-valid");
+        valido = false;
+    } else {
+        btnUnidades.classList.remove("is-invalid");
+        btnUnidades.classList.add("is-valid");
+    }
+
+    document.getElementById("errorCampos").classList.toggle("d-none", valido);
+    return valido;
 }

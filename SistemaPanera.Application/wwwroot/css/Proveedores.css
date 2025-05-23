@@ -1,0 +1,10 @@
+.modal-edicion {
+    max-width: 60%; /* o lo que necesites */
+}
+
+
+@media (max-width: 1000px) {
+    .modal-edicion {
+        max-width: 70%; /* o lo que necesites */
+    }
+}
