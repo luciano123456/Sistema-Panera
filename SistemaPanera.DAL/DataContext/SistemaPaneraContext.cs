@@ -76,7 +76,7 @@ public partial class SistemaPaneraContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-3MT5F5F; Database=Sistema_Panera; Integrated Security=true; Trusted_Connection=True; Encrypt=False");
+        => optionsBuilder.UseSqlServer("Server=200.73.140.119; Database=Sistema_Panera; User Id=PcJuan; Password=juan; Encrypt=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -172,18 +172,11 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.InsumosProveedores)
                 .HasForeignKey(d => d.IdInsumo)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Insumos_Proveedores_Insumos");
 
             entity.HasOne(d => d.IdListaProveedorNavigation).WithMany(p => p.InsumosProveedores)
                 .HasForeignKey(d => d.IdListaProveedor)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Insumos_Proveedores_Proveedores_Insumos_Listas");
-
-            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.InsumosProveedores)
-                .HasForeignKey(d => d.IdProveedor)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Insumos_Proveedores_Proveedores");
         });
 
         modelBuilder.Entity<InsumosStock>(entity =>
@@ -262,7 +255,6 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.ProveedoresInsumos)
                 .HasForeignKey(d => d.IdProveedor)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Proveedores_Insumos_Listas_Proveedores");
         });
 

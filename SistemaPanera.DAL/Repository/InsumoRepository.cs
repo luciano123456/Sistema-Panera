@@ -20,34 +20,41 @@ namespace SistemaPanera.DAL.Repository
         {
             _dbcontext = context;
         }
-       
 
         public async Task<bool> Insertar(Models.Insumo model)
         {
             using var transaction = await _dbcontext.Database.BeginTransactionAsync();
             try
             {
+                // Extraer relaciones antes de agregar el Insumo
+                var unidadesNegocio = model.InsumosUnidadesNegocios ?? new List<InsumosUnidadesNegocio>();
+                var proveedores = model.InsumosProveedores?
+                    .GroupBy(p => new { p.IdProveedor, p.IdListaProveedor })
+                    .Select(g => g.First()) // eliminar duplicados
+                    .ToList() ?? new List<InsumosProveedor>();
+
+                // Evitar que EF intente insertar automáticamente las relaciones
+                model.InsumosUnidadesNegocios = null;
+                model.InsumosProveedores = null;
+
+                // Insertar Insumo base
                 _dbcontext.Insumos.Add(model);
                 await _dbcontext.SaveChangesAsync();
 
-                // Guardar relaciones de unidades de negocio
-                if (model.InsumosUnidadesNegocios != null)
+                // Insertar Unidades de Negocio
+                foreach (var unidad in unidadesNegocio)
                 {
-                    foreach (var unidad in model.InsumosUnidadesNegocios)
-                    {
-                        unidad.IdInsumo = model.Id;
-                        _dbcontext.InsumosUnidadesNegocios.Add(unidad);
-                    }
+                    unidad.Id = 0;
+                    unidad.IdInsumo = model.Id;
+                    _dbcontext.InsumosUnidadesNegocios.Add(unidad);
                 }
 
-                // Guardar relaciones de proveedores
-                if (model.InsumosProveedores != null)
+                // Insertar Proveedores asignados
+                foreach (var proveedor in proveedores)
                 {
-                    foreach (var proveedor in model.InsumosProveedores)
-                    {
-                        proveedor.IdInsumo = model.Id;
-                        _dbcontext.InsumosProveedores.Add(proveedor);
-                    }
+                    proveedor.Id = 0;
+                    proveedor.IdInsumo = model.Id;
+                    _dbcontext.InsumosProveedores.Add(proveedor);
                 }
 
                 await _dbcontext.SaveChangesAsync();
@@ -60,6 +67,7 @@ namespace SistemaPanera.DAL.Repository
                 throw;
             }
         }
+
 
         public async Task<bool> Actualizar(Insumo model)
         {
@@ -94,7 +102,25 @@ namespace SistemaPanera.DAL.Repository
                     }
                 }
 
-              
+                // === PROVEEDORES ASIGNADOS ===
+                var nuevosProveedores = model.InsumosProveedores ?? new List<InsumosProveedor>();
+                var idsListaNuevos = nuevosProveedores.Select(x => x.IdListaProveedor).ToHashSet();
+
+                var proveedoresAEliminar = insumoExistente.InsumosProveedores
+                    .Where(x => !idsListaNuevos.Contains(x.IdListaProveedor))
+                    .ToList();
+                _dbcontext.InsumosProveedores.RemoveRange(proveedoresAEliminar);
+
+                foreach (var proveedor in nuevosProveedores)
+                {
+                    if (!insumoExistente.InsumosProveedores.Any(x => x.IdListaProveedor == proveedor.IdListaProveedor))
+                    {
+                        proveedor.IdListaProveedor = proveedor.IdListaProveedor;
+                        proveedor.IdProveedor = proveedor.IdProveedor;
+                        proveedor.IdInsumo = model.Id;
+                        _dbcontext.InsumosProveedores.Add(proveedor);
+                    }
+                }
 
                 await _dbcontext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -116,15 +142,16 @@ namespace SistemaPanera.DAL.Repository
             return true;
         }
 
-
         public async Task<Models.Insumo> Obtener(int id)
         {
             return await _dbcontext.Insumos
                 .Include(x => x.InsumosProveedores)
+                    .ThenInclude(p => p.IdListaProveedorNavigation) // <-- FALTABA ESTO
+                        .ThenInclude(lp => lp.IdProveedorNavigation) // <-- OPCIONAL si querés también el nombre del proveedor
                 .Include(x => x.InsumosUnidadesNegocios)
-                .ThenInclude(x => x.IdUnidadNegocioNavigation)
-                .Include(x => x.InsumosProveedores)
-                .ThenInclude(x => x.IdProveedorNavigation)
+                    .ThenInclude(x => x.IdUnidadNegocioNavigation)
+                .Include(x => x.IdCategoriaNavigation)
+                .Include(x => x.IdUnidadMedidaNavigation)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
@@ -132,7 +159,14 @@ namespace SistemaPanera.DAL.Repository
         public async Task<IQueryable<Models.Insumo>> ObtenerTodos()
         {
 
-            IQueryable<Models.Insumo> query = _dbcontext.Insumos;
+            IQueryable<Models.Insumo> query = _dbcontext.Insumos
+                 .Include(x => x.InsumosProveedores)
+                    .ThenInclude(p => p.IdListaProveedorNavigation) // <-- FALTABA ESTO
+                        .ThenInclude(lp => lp.IdProveedorNavigation) // <-- OPCIONAL si querés también el nombre del proveedor
+                .Include(x => x.InsumosUnidadesNegocios)
+                    .ThenInclude(x => x.IdUnidadNegocioNavigation)
+                .Include(x => x.IdCategoriaNavigation)
+                .Include(x => x.IdUnidadMedidaNavigation);
             return await Task.FromResult(query);
         }
 
