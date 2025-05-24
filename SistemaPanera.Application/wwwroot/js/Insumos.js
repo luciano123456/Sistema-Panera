@@ -8,10 +8,13 @@ const columnConfig = [
     { index: 3, filterType: 'text' },
     { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
     { index: 5, filterType: 'select', fetchDataFunc: listaInsumosCategoriaFilter },
+    { index: 6, filterType: 'text' },
+    { index: 7, filterType: 'text' },
 ];
 
 
 let unidadesNegocioSeleccionados = [];
+let proveedoresAsignados = [];
 
 
 $(document).ready(() => {
@@ -61,6 +64,11 @@ function guardarCambios() {
 
         InsumosUnidadesNegocios: unidadesNegocioSeleccionados.map(id => ({
             IdUnidadNegocio: id
+        })),
+
+        InsumosProveedores: proveedoresAsignados.map(p => ({
+            IdProveedor: p.IdProveedor,
+            IdListaProveedor: p.IdListaProveedor
         }))
     };
 
@@ -74,17 +82,16 @@ function guardarCambios() {
         },
         body: JSON.stringify(nuevoModelo)
     })
-        .then(response => {
-            if (!response.ok) throw new Error(response.statusText);
-            return response.json();
-        })
-        .then(dataJson => {
-            const mensaje = idInsumo === "" ? "Insumo registrado correctamente" : "Insumo modificado correctamente";
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.mensaje || 'Error inesperado');
+
             $('#modalEdicion').modal('hide');
-            exitoModal(mensaje);
+            exitoModal(data.mensaje || "Insumo guardado correctamente");
             aplicarFiltros();
         })
         .catch(error => {
+            errorModal(error.message);
             console.error('Error:', error);
         });
 }
@@ -103,7 +110,6 @@ function nuevoInsumo() {
 }
 
 async function mostrarModal(modelo) {
-
     limpiarModal();
 
     const campos = ["Id", "Sku", "Descripcion"];
@@ -118,7 +124,6 @@ async function mostrarModal(modelo) {
     document.getElementById("Categorias").value = modelo.IdCategoria;
     document.getElementById("UnidadesMedida").value = modelo.IdUnidadMedida;
 
-    // === Marcar unidades de negocio (por ID) ===
     const idsUnidades = modelo.InsumosUnidadesNegocios?.map(x => parseInt(x.IdUnidadNegocio)) ?? [];
     unidadesNegocioSeleccionados = [];
 
@@ -128,13 +133,20 @@ async function mostrarModal(modelo) {
         cb.checked = seleccionado;
         if (seleccionado) unidadesNegocioSeleccionados.push(id);
     });
+
     actualizarTextoUnidadesNegocio();
+
+    // <<< Cargar asociaciones proveedor–producto
+    proveedoresAsignados = modelo.InsumosProveedores?.map(x => ({
+        IdInsumo: x.IdInsumo,
+        IdProveedor: x.IdProveedor,
+        IdListaProveedor: x.IdListaProveedor
+    })) ?? [];
 
     $('#modalEdicion').modal('show');
     $("#btnGuardar").text("Guardar");
     $("#modalEdicionLabel").text("Editar Insumo");
 }
-
 
 
 
@@ -233,7 +245,9 @@ async function configurarDataTable(data) {
                 { data: 'Sku' },
                 { data: 'UnidadMedida' },
                 { data: 'Categoria' },
-                //{ data: 'CostoUnitario' },
+                { data: 'ProveedorDestacado'},
+                { data: 'CostoUnitario'},
+
             ],
             dom: 'Bfrtip',
             buttons: [
@@ -282,12 +296,12 @@ async function configurarDataTable(data) {
                     },
                     "targets": [2] // Índices de las columnas de fechas 
                 },
-                //{
-                //    "render": function (data, type, row) {
-                //        return formatNumber(data); // Formatear números
-                //    },
-                //    "targets": [7] // Índices de las columnas de números
-                //},
+                {
+                    "render": function (data, type, row) {
+                        return formatNumber(data); // Formatear números
+                    },
+                    "targets": [7] // Índices de las columnas de números
+                },
 
             ],
 
@@ -732,4 +746,80 @@ function validarCampos() {
 
     document.getElementById("errorCampos").classList.toggle("d-none", valido);
     return valido;
+}
+
+function abrirModalProveedoresAsignados() {
+    const idInsumo = $("#txtId").val();
+
+    fetch(`/ProveedoresInsumos/Lista?idProveedor=-1`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.querySelector("#tablaProveedoresAsignados tbody");
+            tbody.innerHTML = "";
+
+            data.forEach(item => {
+                const isChecked = proveedoresAsignados.some(x =>
+                    x.IdInsumo === parseInt(idInsumo) &&
+                    x.IdProveedor === parseInt(item.IdProveedor) &&
+                    x.IdListaProveedor === parseInt(item.Id)
+                );
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${item.Proveedor}</td>
+                    <td>${item.Descripcion}</td>
+                    <td>${item.Codigo}</td>
+                    <td>
+                        <input type="checkbox" class="chk-asignacion" data-idproveedor="${item.IdProveedor}" data-idlistaproveedor="${item.Id}" ${isChecked ? "checked" : ""}>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            $('#modalProveedoresAsignados')
+                .appendTo('body')
+                .modal({
+                    backdrop: false,
+                    keyboard: false
+                })
+                .modal('show');
+        });
+}
+
+function guardarAsignacionesProveedores() {
+    const checks = document.querySelectorAll(".chk-asignacion");
+    proveedoresAsignados = []; // <- Este reset es correcto
+
+    checks.forEach(cb => {
+        if (cb.checked) {
+            const idProveedor = parseInt(cb.dataset.idproveedor);
+            const idListaProveedor = parseInt(cb.dataset.idlistaproveedor);
+
+            proveedoresAsignados.push({
+                IdProveedor: idProveedor,
+                IdListaProveedor: idListaProveedor
+            });
+        }
+    });
+
+    $('#modalProveedoresAsignados').modal('hide');
+}
+
+function filtrarTablaProveedor() {
+    const descripcion = document.getElementById("filtroDescripcionProveedor").value.toLowerCase();
+    const codigo = document.getElementById("filtroCodigoProveedor").value.toLowerCase();
+    const proveedor = document.getElementById("filtroProveedor").value.toLowerCase();
+
+    document.querySelectorAll("#tablaProveedoresAsignados tbody tr").forEach(row => {
+        const colProveedor = row.children[0]?.textContent.toLowerCase();    // ✅ proveedor
+        const colDescripcion = row.children[1]?.textContent.toLowerCase();  // ✅ descripción
+        const colCodigo = row.children[2]?.textContent.toLowerCase();       // ✅ código
+
+        const coincide =
+            colDescripcion.includes(descripcion) &&
+            colCodigo.includes(codigo) &&
+            colProveedor.includes(proveedor);
+
+        row.style.display = coincide ? "" : "none";
+    });
 }

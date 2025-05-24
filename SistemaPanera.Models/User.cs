@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
-
 public partial class User
 {
     public int Id { get; set; }

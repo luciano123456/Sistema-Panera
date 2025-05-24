@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SistemaPanera.Models  ;
+namespace SistemaPanera.Models;
 
 public partial class UnidadesNegocio
 {

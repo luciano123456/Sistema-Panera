@@ -150,7 +150,7 @@ async function eliminarInsumo(id) {
 
     if (resultado) {
         try {
-            const response = await fetch("Insumos/Eliminar?id=" + id, {
+            const response = await fetch("ProveedoresInsumos/Eliminar?id=" + id, {
                 method: "DELETE"
             });
 

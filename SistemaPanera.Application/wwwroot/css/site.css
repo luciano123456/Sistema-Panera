@@ -652,3 +652,20 @@ select option:disabled {
     background-position: right 0.75rem center;
     background-size: 1rem 1rem;
 }
+
+
+.colorEncabezado {
+    background: linear-gradient(to right, #005bea, #418bf9, #7baaf7);
+    color: white;
+    border: none !important
+}
+
+#modalEdicion .modal-content {
+    background-color: #323844 !important;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: none;
+}
+
+#lblDescripcion {
+    color: white !important;
+}

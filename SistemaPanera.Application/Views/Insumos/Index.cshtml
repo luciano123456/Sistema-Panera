@@ -15,7 +15,7 @@
     <link href="https://cdn.datatables.net/fixedheader/3.2.2/css/fixedHeader.dataTables.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="~/css/insumos.css" rel="stylesheet" />
+    <link href="~/css/insumos.css?v=1.0" rel="stylesheet" />
 
 }
 
@@ -59,7 +59,8 @@
                                 <th>Sku</th>
                                 <th>Unidad Medida</th>
                                 <th>Categoria</th>
-                                @* <th>Costo Unitario</th> *@
+                                <th>Proveedor Destacado</th>
+                                <th>Costo Unitario</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,11 +79,57 @@
 </div>
 
 
+<div class="modal fade" id="modalProveedoresAsignados" tabindex="-1" aria-labelledby="modalProveedoresAsignadosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header colorEncabezado">
+        <h5 class="modal-title text-white" id="modalProveedoresAsignadosLabel">Proveedores Asignados</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label text-white">Filtro de descripción</label>
+                        <input type="text" class="form-control" id="filtroDescripcionProveedor" onkeyup="filtrarTablaProveedor()">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-white">Filtro de código</label>
+                        <input type="text" class="form-control" id="filtroCodigoProveedor" onkeyup="filtrarTablaProveedor()">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label text-white">Filtro de proveedor</label>
+                        <input type="text" class="form-control" id="filtroProveedor" onkeyup="filtrarTablaProveedor()">
+                    </div>
+                </div>
+
+        <table class="table table-bordered table-striped" id="tablaProveedoresAsignados">
+          <thead>
+            <tr>
+              <th>Proveedor</th>
+              <th>Descripcion</th>
+              <th>Código</th>
+              <th>Asignado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- contenido dinámico -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="guardarAsignacionesProveedores()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal fade" id="modalEdicion" tabindex="-1" role="dialog" aria-labelledby="modalEdicionLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-edicion" role="document">
         <div class="modal-content">
 
-            <div class="modal-header bg-warning">
+            <div class="modal-header colorEncabezado">
                 <h5 class="modal-title fw-bold" id="modalEdicionLabel">Nuevo Insumo</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -91,7 +138,6 @@
                 <form id="formInsumo" class="row g-3">
 
                     <input type="text" class="input-nuevomodif" id="txtId" readonly hidden>
-
                     <!-- Fila 1 -->
                     <div class="col-md-8">
                         <label id="lblDescripcion" for="txtDescripcion" class="form-label text-black">Descripcion</label>
@@ -106,7 +152,7 @@
                     </div>
 
                     <div class="col-md-2">
-                        <label for="UnidadesMedida" class="form-label text-black">Unidad de Medida</label>
+                        <label for="UnidadesMedida" class="form-label lblDescripcion">Unidad de Medida</label>
                         <select id="UnidadesMedida" class="form-select">
                             <option selected disabled>Seleccionar</option>
                         </select>
@@ -116,7 +162,7 @@
 
 
                     <div class="col-md-5 position-relative">
-                        <label class="form-label text-black">Unidades de Negocio Asociadas</label>
+                        <label class="form-label lblDescripcion">Unidades de Negocio Asociadas</label>
                         <div id="btnUnidadesNegocio" class="form-select text-truncate" style="cursor: pointer;" tabindex="0" onclick="toggleUnidadesNegocio()">
                             Seleccionar Unidades
                         </div>
@@ -136,7 +182,7 @@
 
 
                     <div class="col-md-5">
-                        <label for="Categorias" class="form-label text-black">Categoria</label>
+                        <label for="Categorias" class="form-label lblDescripcion">Categoria</label>
                         <select id="Categorias" class="form-select">
                             <option value="-1" selected disabled>Seleccionar</option>
                         </select>
@@ -160,6 +206,9 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fa fa-arrow-left"></i> Volver
+                </button>
+                <button type="button" class="btn btn-outline-primary" onclick="abrirModalProveedoresAsignados()">
+                    <i class="fa fa-link"></i> Vincular
                 </button>
                 <button type="button" id="btnGuardar" class="btn btn-primary" onclick="guardarCambios()">
                     <i class="fa fa-check"></i> Registrar
@@ -204,7 +253,7 @@
 
         <script src="~/js/utils/moment.js"></script>
 
-    <script src="~/js/Insumos.js"></script>
+    <script src="~/js/Insumos.js?v=1.1"></script>
 
   
 

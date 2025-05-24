@@ -27,42 +27,56 @@ namespace SistemaPanera.Application.Controllers
         [HttpGet]
         public async Task<IActionResult> Lista(int IdUnidadNegocio)
         {
-            var insumos = await _InsumosService.ObtenerTodos();
+            try
+            {
+                var insumos = await _InsumosService.ObtenerTodos();
 
-            var lista = insumos
-                .Where(c => IdUnidadNegocio == -1 || c.InsumosUnidadesNegocios.Any(u => u.IdUnidadNegocio == IdUnidadNegocio))
-                .Select(c => new VMInsumo
-                {
-                    Id = c.Id,
-                    Descripcion = c.Descripcion,
-                    Sku = c.Sku,
-                    IdCategoria = c.IdCategoria,
-                    IdUnidadMedida = c.IdUnidadMedida,
-                    FechaActualizacion = c.FechaActualizacion,
-                    Categoria = c.IdCategoriaNavigation.Nombre,
-                    UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
+                var lista = insumos
+                    .Where(c => IdUnidadNegocio == -1 || c.InsumosUnidadesNegocios.Any(u => u.IdUnidadNegocio == IdUnidadNegocio))
+                    .ToList()
+                    .Select(c =>
+                    {
+                        var proveedorMasBarato = c.InsumosProveedores
+                            .Where(p => p.IdListaProveedorNavigation != null && p.IdListaProveedorNavigation.IdProveedorNavigation != null)
+                            .OrderBy(p => p.IdListaProveedorNavigation.CostoUnitario)
+                            .FirstOrDefault();
 
-                    // NUEVO: lista de nombres de unidades de negocio
-                    UnidadesNegocio = c.InsumosUnidadesNegocios
-                        .Select(u => u.IdUnidadNegocioNavigation.Nombre)
-                        .ToList(),
+                        return new VMInsumo
+                        {
+                            Id = c.Id,
+                            Descripcion = c.Descripcion,
+                            Sku = c.Sku,
+                            IdCategoria = c.IdCategoria,
+                            IdUnidadMedida = c.IdUnidadMedida,
+                            FechaActualizacion = c.FechaActualizacion,
+                            Categoria = c.IdCategoriaNavigation?.Nombre ?? "",
+                            UnidadMedida = c.IdUnidadMedidaNavigation?.Nombre ?? "",
+                            UnidadesNegocio = c.InsumosUnidadesNegocios
+                                .Select(u => u.IdUnidadNegocioNavigation?.Nombre ?? "")
+                                .ToList(),
+                            ProveedorDestacado = proveedorMasBarato?.IdListaProveedorNavigation?.IdProveedorNavigation?.Nombre ?? "",
+                            CostoUnitario = proveedorMasBarato?.IdListaProveedorNavigation?.CostoUnitario ?? 0
+                        };
+                    })
+                    .ToList();
 
-                    // NUEVO: lista de nombres de proveedores
-                    Proveedores = c.InsumosProveedores
-                        .Select(p => p.IdProveedorNavigation.Nombre)
-                        .ToList()
-                })
-                .ToList();
-
-            return Ok(lista);
+                return Ok(lista);
+            } catch ( Exception ex)
+            {
+                return Ok(null);
+            }
         }
+
+
+
+
 
 
 
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] VMInsumo model)
         {
-            var Insumos = new Insumo
+            var insumo = new Insumo
             {
                 Id = model.Id,
                 IdUnidadMedida = model.IdUnidadMedida,
@@ -70,14 +84,31 @@ namespace SistemaPanera.Application.Controllers
                 FechaActualizacion = DateTime.Now,
                 IdCategoria = model.IdCategoria,
                 Descripcion = model.Descripcion,
-                InsumosProveedores = model.InsumosProveedores,
-                InsumosUnidadesNegocios = model.InsumosUnidadesNegocios
+
+                InsumosUnidadesNegocios = model.InsumosUnidadesNegocios?.Select(u => new InsumosUnidadesNegocio
+                {
+                    IdUnidadNegocio = u.IdUnidadNegocio
+                }).ToList(),
+
+                InsumosProveedores = model.InsumosProveedores?
+                    .GroupBy(p => new { p.IdProveedor, p.IdListaProveedor }) // evita duplicados
+                    .Select(g => new InsumosProveedor
+                    {
+                        IdProveedor = g.Key.IdProveedor,
+                        IdListaProveedor = g.Key.IdListaProveedor
+                        // IdInsumo se asigna en el Insertar
+                    }).ToList()
             };
 
-            bool respuesta = await _InsumosService.Insertar(Insumos);
+            var respuesta = await _InsumosService.Insertar(insumo);
 
-            return Ok(new { valor = respuesta });
+            return Ok(new
+            {
+                valor = respuesta,
+                mensaje = respuesta ? "Insumo registrado correctamente" : "Error al registrar"
+            });
         }
+
 
         [HttpPut]
         public async Task<IActionResult> Actualizar([FromBody] VMInsumo model)
@@ -90,6 +121,7 @@ namespace SistemaPanera.Application.Controllers
                 FechaActualizacion = DateTime.Now,
                 IdCategoria = model.IdCategoria,
                 Descripcion = model.Descripcion,
+                InsumosProveedores = model.InsumosProveedores,
                 InsumosUnidadesNegocios = model.InsumosUnidadesNegocios
             };
 
@@ -122,7 +154,10 @@ namespace SistemaPanera.Application.Controllers
                 FechaActualizacion = insumo.FechaActualizacion,
                 InsumosProveedores = insumo.InsumosProveedores.Select(p => new InsumosProveedor
                 {
-                    IdProveedor = p.IdProveedor
+                    Id = p.Id,
+                    IdProveedor = p.IdProveedor,
+                    IdInsumo = p.IdInsumo,
+                    IdListaProveedor = p.IdListaProveedor
                 }).ToList(),
                 InsumosUnidadesNegocios = insumo.InsumosUnidadesNegocios.Select(u => new InsumosUnidadesNegocio
                 {

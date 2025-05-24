@@ -1,10 +1,17 @@
+
 .modal-edicion {
     max-width: 60%; /* o lo que necesites */
 }
 
 
-@media (max-width: 1000px) {
+@media (max-width: 1300px) {
     .modal-edicion {
-        max-width: 70%; /* o lo que necesites */
+        max-width: 80%; /* o lo que necesites */
+    }
+}
+
+@media (max-width: 900px) {
+    .modal-edicion {
+        max-width: 98%; /* o lo que necesites */
     }
 }
