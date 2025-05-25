@@ -137,42 +137,42 @@ namespace SistemaPanera.DAL.Repository
             }
         }
 
-        //public async Task<bool> InsertarPrefabricados(List<RecetasPrefabricado> Prefabricados)
+        //public async Task<bool> InsertarSubrecetas(List<RecetasSubreceta> Subrecetas)
         //{
         //    try
         //    {
-        //        foreach (RecetasPrefabricado p in Prefabricados)
+        //        foreach (RecetasSubreceta p in Subrecetas)
         //        {
-        //            // Verificar si el Prefabricado ya existe, por ejemplo, por IdPrefabricado y IdPedido
-        //            var PrefabricadoExistente = await _dbcontext.RecetasPrefabricados
-        //                                                     .FirstOrDefaultAsync(x => x.IdReceta == p.IdReceta && x.IdPrefabricado == p.IdPrefabricado);
+        //            // Verificar si el Subreceta ya existe, por ejemplo, por IdSubreceta y IdPedido
+        //            var SubrecetaExistente = await _dbcontext.RecetasSubrecetas
+        //                                                     .FirstOrDefaultAsync(x => x.IdReceta == p.IdReceta && x.IdSubreceta == p.IdSubreceta);
 
-        //            if (PrefabricadoExistente != null)
+        //            if (SubrecetaExistente != null)
         //            {
-        //                // Si el Prefabricado existe, actualizamos sus propiedades
-        //                PrefabricadoExistente.CostoUnitario = p.CostoUnitario;
-        //                PrefabricadoExistente.SubTotal = p.SubTotal;
-        //                PrefabricadoExistente.Cantidad = p.Cantidad;
+        //                // Si el Subreceta existe, actualizamos sus propiedades
+        //                SubrecetaExistente.CostoUnitario = p.CostoUnitario;
+        //                SubrecetaExistente.SubTotal = p.SubTotal;
+        //                SubrecetaExistente.Cantidad = p.Cantidad;
         //            }
         //            else
         //            {
-        //                // Si el Prefabricado no existe, lo agregamos a la base de datos
-        //                _dbcontext.RecetasPrefabricados.Add(p);
+        //                // Si el Subreceta no existe, lo agregamos a la base de datos
+        //                _dbcontext.RecetasSubrecetas.Add(p);
         //            }
         //        }
 
 
-        //        var PrefabricadosIdsModelo = Prefabricados.Select(p => p.IdReceta).Distinct().ToList();
-        //        var PrefabricadosAEliminar = await _dbcontext.RecetasPrefabricados
-        //                                                  .Where(x => PrefabricadosIdsModelo.Contains(x.IdReceta)
-        //                                                          && !Prefabricados.Select(p => p.IdPrefabricado).Contains(x.IdPrefabricado)
+        //        var SubrecetasIdsModelo = Subrecetas.Select(p => p.IdReceta).Distinct().ToList();
+        //        var SubrecetasAEliminar = await _dbcontext.RecetasSubrecetas
+        //                                                  .Where(x => SubrecetasIdsModelo.Contains(x.IdReceta)
+        //                                                          && !Subrecetas.Select(p => p.IdSubreceta).Contains(x.IdSubreceta)
         //                                                          && x.Id != 0)
         //                                                  .ToListAsync();
 
 
-        //        foreach (var Prefabricado in PrefabricadosAEliminar)
+        //        foreach (var Subreceta in SubrecetasAEliminar)
         //        {
-        //            _dbcontext.RecetasPrefabricados.Remove(Prefabricado);
+        //            _dbcontext.RecetasSubrecetas.Remove(Subreceta);
         //        }
 
         //        await _dbcontext.SaveChangesAsync();
@@ -183,13 +183,13 @@ namespace SistemaPanera.DAL.Repository
         //        return false;
         //    }
         //}
-        //public async Task<bool> ActualizarPrefabricados(List<RecetasPrefabricado> Prefabricados)
+        //public async Task<bool> ActualizarSubrecetas(List<RecetasSubreceta> Subrecetas)
         //{
         //    try
         //    {
-        //        foreach (RecetasPrefabricado p in Prefabricados)
+        //        foreach (RecetasSubreceta p in Subrecetas)
         //        {
-        //            _dbcontext.RecetasPrefabricados.Update(p);
+        //            _dbcontext.RecetasSubrecetas.Update(p);
         //        }
 
         //        await _dbcontext.SaveChangesAsync();
@@ -202,14 +202,14 @@ namespace SistemaPanera.DAL.Repository
 
         //}
 
-        //public async Task<List<RecetasPrefabricado>> ObtenerPrefabricados(int idReceta)
+        //public async Task<List<RecetasSubreceta>> ObtenerSubrecetas(int idReceta)
         //{
         //    try
         //    {
 
-        //        List<RecetasPrefabricado> productos = _dbcontext.RecetasPrefabricados
+        //        List<RecetasSubreceta> productos = _dbcontext.RecetasSubrecetas
         //            .Include(c => c.IdRecetaNavigation)
-        //            .Include(c => c.IdPrefabricadoNavigation)
+        //            .Include(c => c.IdSubrecetaNavigation)
         //            .Where(c => c.IdReceta == idReceta).ToList();
         //        return productos;
 

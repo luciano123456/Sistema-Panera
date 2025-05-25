@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SistemaPanera.Models;
 
 namespace SistemaPanera.DAL.DataContext;
 
 public partial class SistemaPaneraContext : DbContext
 {
+
+    private readonly IConfiguration _configuration;
+
+
     public SistemaPaneraContext()
     {
     }
@@ -15,6 +20,16 @@ public partial class SistemaPaneraContext : DbContext
         : base(options)
     {
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connectionString = _configuration.GetConnectionString("SistemaDB");
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
+
 
     public virtual DbSet<Compra> Compras { get; set; }
 
@@ -73,10 +88,6 @@ public partial class SistemaPaneraContext : DbContext
     public virtual DbSet<UnidadesNegocio> UnidadesNegocios { get; set; }
 
     public virtual DbSet<User> Usuarios { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=200.73.140.119; Database=Sistema_Panera; User Id=PcJuan; Password=juan; Encrypt=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -271,7 +282,7 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.Property(e => e.CostoInsumos).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoPorcion).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.CostoPrefabricados).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoSubrecetas).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(255)
@@ -348,7 +359,7 @@ public partial class SistemaPaneraContext : DbContext
 
         modelBuilder.Entity<RecetasSubreceta>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_Recetas_Prefabricados");
+            entity.HasKey(e => e.Id).HasName("PK_Recetas_Subrecetas");
 
             entity.ToTable("Recetas_Subrecetas");
 
@@ -357,12 +368,12 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.HasOne(d => d.IdRecetaNavigation).WithMany(p => p.RecetasSubreceta)
                 .HasForeignKey(d => d.IdReceta)
-                .HasConstraintName("FK_Recetas_Prefabricados_Recetas");
+                .HasConstraintName("FK_Recetas_Subrecetas_Recetas");
 
-            entity.HasOne(d => d.IdSubRecetaNavigation).WithMany(p => p.RecetasSubreceta)
-                .HasForeignKey(d => d.IdSubReceta)
+            entity.HasOne(d => d.IdSubrecetaNavigation).WithMany(p => p.RecetasSubreceta)
+                .HasForeignKey(d => d.IdSubreceta)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Recetas_Prefabricados_Prefabricados");
+                .HasConstraintName("FK_Recetas_Subrecetas_Subrecetas");
         });
 
         modelBuilder.Entity<RecetasTipo>(entity =>
@@ -385,9 +396,9 @@ public partial class SistemaPaneraContext : DbContext
 
         modelBuilder.Entity<Subreceta>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_Prefabricados");
+            entity.HasKey(e => e.Id).HasName("PK_Subrecetas");
 
-            entity.Property(e => e.CosotUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoPorcion).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(150)
@@ -401,22 +412,22 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Subreceta)
                 .HasForeignKey(d => d.IdCategoria)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Prefabricados_Categorias");
+                .HasConstraintName("FK_Subrecetas_Subrecetas_Categorias");
 
             entity.HasOne(d => d.IdUnidadMedidaNavigation).WithMany(p => p.Subreceta)
                 .HasForeignKey(d => d.IdUnidadMedida)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Unidades_Medida");
+                .HasConstraintName("FK_Subrecetas_Unidades_Medida");
 
             entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Subreceta)
                 .HasForeignKey(d => d.IdUnidadNegocio)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Unidades_Negocio");
+                .HasConstraintName("FK_Subrecetas_Unidades_Negocio");
         });
 
         modelBuilder.Entity<SubrecetasCategoria>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_Prefabricados_Categorias");
+            entity.HasKey(e => e.Id).HasName("PK_Subrecetas_Categorias");
 
             entity.ToTable("Subrecetas_Categorias");
 
@@ -427,7 +438,7 @@ public partial class SistemaPaneraContext : DbContext
 
         modelBuilder.Entity<SubrecetasInsumo>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_Prefabricados_Insumos");
+            entity.HasKey(e => e.Id).HasName("PK_Subrecetas_Insumos");
 
             entity.ToTable("Subrecetas_Insumos");
 
@@ -438,16 +449,16 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.SubrecetasInsumos)
                 .HasForeignKey(d => d.IdInsumo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Insumos_Insumos");
+                .HasConstraintName("FK_Subrecetas_Insumos_Insumos");
 
             entity.HasOne(d => d.IdSubrecetaNavigation).WithMany(p => p.SubrecetasInsumos)
                 .HasForeignKey(d => d.IdSubreceta)
-                .HasConstraintName("FK_Prefabricados_Insumos_Prefabricados");
+                .HasConstraintName("FK_Subrecetas_Insumos_Subrecetas");
         });
 
         modelBuilder.Entity<SubrecetasStock>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK_Prefabricados_Stock");
+            entity.HasKey(e => e.Id).HasName("PK_Subrecetas_Stock");
 
             entity.ToTable("Subrecetas_Stock");
 
@@ -460,12 +471,12 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.SubrecetasStocks)
                 .HasForeignKey(d => d.IdLocal)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados_Stock");
+                .HasConstraintName("FK_Subrecetas_Stock_Subrecetas_Stock");
 
             entity.HasOne(d => d.IdSubrecetaNavigation).WithMany(p => p.SubrecetasStocks)
                 .HasForeignKey(d => d.IdSubreceta)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Prefabricados_Stock_Prefabricados");
+                .HasConstraintName("FK_Subrecetas_Stock_Subrecetas");
         });
 
         modelBuilder.Entity<SubrecetasSubreceta>(entity =>
@@ -477,13 +488,13 @@ public partial class SistemaPaneraContext : DbContext
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.Subtotal).HasColumnType("decimal(20, 2)");
 
-            entity.HasOne(d => d.IdSubRecetaHijaNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubRecetaHijaNavigations)
-                .HasForeignKey(d => d.IdSubRecetaHija)
+            entity.HasOne(d => d.IdSubrecetaHijaNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubrecetaHijaNavigations)
+                .HasForeignKey(d => d.IdSubrecetaHija)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Subrecetas_Subrecetas_Subrecetas1");
 
-            entity.HasOne(d => d.IdSubRecetaPadreNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubRecetaPadreNavigations)
-                .HasForeignKey(d => d.IdSubRecetaPadre)
+            entity.HasOne(d => d.IdSubrecetaPadreNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubrecetaPadreNavigations)
+                .HasForeignKey(d => d.IdSubrecetaPadre)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Subrecetas_Subrecetas_Subrecetas");
         });

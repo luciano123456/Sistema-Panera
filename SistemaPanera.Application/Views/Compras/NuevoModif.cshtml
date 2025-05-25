@@ -11,19 +11,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <link href="~/css/PrefabricadosNuevoModif.css" rel="stylesheet" />
+    <link href="~/css/SubrecetasNuevoModif.css" rel="stylesheet" />
 }
 
 
 <div class="container-fluid mt-5" style="width: 80vw; margin: 0; padding: 0; position: relative; left: 50%; transform: translateX(-50%);">
-    <!-- Datos del Prefabricado -->
+    <!-- Datos del Subreceta -->
     <div class="card w-100" style="border: none;">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Datos del Prefabricado</h5>
+            <h5 class="mb-0">Datos del Subreceta</h5>
         </div>
         <div class="card-body">
             <div class="row g-3">
-                <input type="text" class="form-control" id="IdPrefabricado" hidden>
+                <input type="text" class="form-control" id="IdSubreceta" hidden>
                 <div class="col-12 col-md-3">
                     <label for="unidadNegocio" class="form-label">Unidad de Negocio</label>
                     <select class="input-nuevo-select" id="UnidadesNegocio">
@@ -163,10 +163,10 @@
 
     <script src="~/js/utils/moment.js"></script>
 
-    <script src="~/js/PrefabricadosNuevoModif.js"></script>
+    <script src="~/js/SubrecetasNuevoModif.js"></script>
 
     <script>
-        var prefabricadoData = @Html.Raw(Json.Serialize(ViewBag.Data ?? new { }));
+        var SubrecetaData = @Html.Raw(Json.Serialize(ViewBag.Data ?? new { }));
     </script>
 
 }

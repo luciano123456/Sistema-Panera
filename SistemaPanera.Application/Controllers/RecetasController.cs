@@ -53,7 +53,7 @@ namespace SistemaPanera.Application.Controllers
     //            UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
     //            UnidadNegocio = c.IdUnidadNegocioNavigation.Nombre,
     //            Descripcion = c.Descripcion,
-    //            CostoPrefabricados = c.CostoPrefabricados,
+    //            CostoSubrecetas = c.CostoSubrecetas,
     //            CostoInsumos = c.CostoInsumos,
     //            CostoTotal = c.CostoTotal,
     //        }).Where(x => x.IdUnidadNegocio == IdUnidadNegocio || IdUnidadNegocio == -1).ToList();
@@ -71,7 +71,7 @@ namespace SistemaPanera.Application.Controllers
     //            IdUnidadMedida = model.IdUnidadMedida,
     //            Sku = model.Sku,
     //            IdUnidadNegocio = model.IdUnidadNegocio,
-    //            CostoPrefabricados = model.CostoPrefabricados,
+    //            CostoSubrecetas = model.CostoSubrecetas,
     //            FechaActualizacion = DateTime.Now,
     //            IdCategoria = model.IdCategoria,
     //            Descripcion = model.Descripcion,
@@ -102,28 +102,28 @@ namespace SistemaPanera.Application.Controllers
 
     //        bool respInsumos = await _RecetasService.InsertarInsumos(recetaInsumo);
 
-    //        List<RecetasPrefabricado> recetaPrefabricado = new List<RecetasPrefabricado>();
+    //        List<RecetasSubreceta> recetaSubreceta = new List<RecetasSubreceta>();
 
     //        // Agregar los pagos de clientes
-    //        if (model != null && model.RecetasPrefabricados.Any())
+    //        if (model != null && model.RecetasSubrecetas.Any())
     //        {
-    //            foreach (var prefabricado in model.RecetasPrefabricados)
+    //            foreach (var Subreceta in model.RecetasSubrecetas)
     //            {
-    //                var nuevoPrefabricado = new RecetasPrefabricado
+    //                var nuevoSubreceta = new RecetasSubreceta
     //                {
     //                    IdReceta = Recetas.Id,
-    //                    IdPrefabricado = prefabricado.IdPrefabricado,
-    //                    CostoUnitario = prefabricado.CostoUnitario,
-    //                    SubTotal = prefabricado.SubTotal,
-    //                    Cantidad = prefabricado.Cantidad,
+    //                    IdSubreceta = Subreceta.IdSubreceta,
+    //                    CostoUnitario = Subreceta.CostoUnitario,
+    //                    SubTotal = Subreceta.SubTotal,
+    //                    Cantidad = Subreceta.Cantidad,
     //                };
-    //                recetaPrefabricado.Add(nuevoPrefabricado);
+    //                recetaSubreceta.Add(nuevoSubreceta);
     //            }
     //        }
 
-    //        bool respPrefabricados = await _RecetasService.InsertarPrefabricados(recetaPrefabricado);
+    //        bool respSubrecetas = await _RecetasService.InsertarSubrecetas(recetaSubreceta);
 
-            
+
 
 
     //        return Ok(new { valor = respuesta });
@@ -138,7 +138,7 @@ namespace SistemaPanera.Application.Controllers
     //            IdUnidadMedida = model.IdUnidadMedida,
     //            Sku = model.Sku,
     //            IdUnidadNegocio = model.IdUnidadNegocio,
-    //            CostoPrefabricados = model.CostoPrefabricados,
+    //            CostoSubrecetas = model.CostoSubrecetas,
     //            FechaActualizacion = DateTime.Now,
     //            IdCategoria = model.IdCategoria,
     //            Descripcion = model.Descripcion,
@@ -168,26 +168,26 @@ namespace SistemaPanera.Application.Controllers
 
     //        bool respInsumos = await _RecetasService.InsertarInsumos(recetaInsumo);
 
-    //        List<RecetasPrefabricado> recetaPrefabricado = new List<RecetasPrefabricado>();
+    //        List<RecetasSubreceta> recetaSubreceta = new List<RecetasSubreceta>();
 
     //        // Agregar los pagos de clientes
-    //        if (model != null && model.RecetasPrefabricados.Any())
+    //        if (model != null && model.RecetasSubrecetas.Any())
     //        {
-    //            foreach (var prefabricado in model.RecetasPrefabricados)
+    //            foreach (var Subreceta in model.RecetasSubrecetas)
     //            {
-    //                var nuevoPrefabricado = new RecetasPrefabricado
+    //                var nuevoSubreceta = new RecetasSubreceta
     //                {
     //                    IdReceta = Recetas.Id,
-    //                    IdPrefabricado = prefabricado.IdPrefabricado,
-    //                    CostoUnitario = prefabricado.CostoUnitario,
-    //                    SubTotal = prefabricado.SubTotal,
-    //                    Cantidad = prefabricado.Cantidad,
+    //                    IdSubreceta = Subreceta.IdSubreceta,
+    //                    CostoUnitario = Subreceta.CostoUnitario,
+    //                    SubTotal = Subreceta.SubTotal,
+    //                    Cantidad = Subreceta.Cantidad,
     //                };
-    //                recetaPrefabricado.Add(nuevoPrefabricado);
+    //                recetaSubreceta.Add(nuevoSubreceta);
     //            }
     //        }
 
-    //        bool respPrefabricados = await _RecetasService.InsertarPrefabricados(recetaPrefabricado);
+    //        bool respSubrecetas = await _RecetasService.InsertarSubrecetas(recetaSubreceta);
 
 
 
@@ -220,7 +220,7 @@ namespace SistemaPanera.Application.Controllers
     //                IdUnidadMedida = model.IdUnidadMedida,
     //                Sku = model.Sku,
     //                IdUnidadNegocio = model.IdUnidadNegocio,
-    //                CostoPrefabricados = model.CostoPrefabricados,
+    //                CostoSubrecetas = model.CostoSubrecetas,
     //                FechaActualizacion = DateTime.Now,
     //                IdCategoria = model.IdCategoria,
     //                Descripcion = model.Descripcion,
@@ -244,24 +244,24 @@ namespace SistemaPanera.Application.Controllers
     //                SubTotal = p.SubTotal,
     //            }).ToList();
 
-    //            var Prefabricados = await _RecetasService.ObtenerPrefabricados(id);
+    //            var Subrecetas = await _RecetasService.ObtenerSubrecetas(id);
 
 
-    //            var prefabricadosJson = Prefabricados.Select(p => new VMRecetaPrefabricado
+    //            var SubrecetasJson = Subrecetas.Select(p => new VMRecetaSubreceta
     //            {
     //                Id = p.Id,
 
     //                Cantidad = p.Cantidad,
     //                CostoUnitario = p.CostoUnitario,
-    //                IdPrefabricado = p.IdPrefabricado,
-    //                Nombre = p.IdPrefabricadoNavigation.Descripcion.ToString(),
+    //                IdSubreceta = p.IdSubreceta,
+    //                Nombre = p.IdSubrecetaNavigation.Descripcion.ToString(),
     //                IdReceta = p.IdReceta,
     //                SubTotal = p.SubTotal,
     //            }).ToList();
 
     //            result.Add("Receta", receta);
     //            result.Add("Insumos", insumosJson);
-    //            result.Add("Prefabricados", prefabricadosJson);
+    //            result.Add("Subrecetas", SubrecetasJson);
 
     //            // Serialize with ReferenceHandler.Preserve to handle circular references
     //            var jsonOptions = new JsonSerializerOptions

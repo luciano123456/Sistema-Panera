@@ -102,13 +102,12 @@ async function llenarConfiguraciones() {
     }
 }
 
-
 async function eliminarConfiguracion(id) {
     let resultado = window.confirm("¿Desea eliminar la " + nombreConfiguracion + "?");
 
     if (resultado) {
         try {
-            const response = await fetch(controllerConfiguracion + "/Eliminar?id=" + id, {
+            const response = await fetch("/" + controllerConfiguracion + "/Eliminar?id=" + id, {
                 method: "DELETE"
             });
 
@@ -131,7 +130,7 @@ async function eliminarConfiguracion(id) {
 
 
 const editarConfiguracion = id => {
-    fetch(controllerConfiguracion + "/EditarInfo?id=" + id)
+    fetch("/" + controllerConfiguracion + "/EditarInfo?id=" + id)
         .then(response => {
             if (!response.ok) throw new Error("Ha ocurrido un error.");
             return response.json();
@@ -171,7 +170,7 @@ function guardarCambiosConfiguracion() {
             "Nombre": $("#txtNombreConfiguracion").val(),
         };
 
-        const url = idConfiguracion === "" ? controllerConfiguracion + "/Insertar" : controllerConfiguracion + "/Actualizar";
+        const url = idConfiguracion === "" ? "/" + controllerConfiguracion + "/Insertar" : "/" + controllerConfiguracion + "/Actualizar";
         const method = idConfiguracion === "" ? "POST" : "PUT";
 
         fetch(url, {
@@ -200,6 +199,10 @@ function guardarCambiosConfiguracion() {
 }
 
 
+
+
+
+
 function cancelarModificarConfiguracion() {
     document.getElementById("txtNombreConfiguracion").value = "";
     document.getElementById("txtIdConfiguracion").value = "";
@@ -224,7 +227,7 @@ function agregarConfiguracion() {
 
     $('#lblNombreConfiguracion').css('color', 'red');
     $('#txtNombreConfiguracion').css('border-color', 'red');
-} 
+}
 
 
 async function listaConfiguracion() {
@@ -238,6 +241,7 @@ async function listaConfiguracion() {
     }));
 
 }
+
 
     document.querySelectorAll('.nav-item.dropdown').forEach(dropdown => {
         dropdown.addEventListener('mouseenter', function () {
