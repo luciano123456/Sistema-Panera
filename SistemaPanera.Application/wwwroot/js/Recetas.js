@@ -214,7 +214,7 @@ async function configurarDataTable(data) {
                 { data: 'UnidadNegocio' },
                 { data: 'UnidadMedida' },
                 { data: 'Categoria' },
-                { data: 'CostoPrefabricados' },
+                { data: 'CostoSubrecetas' },
                 { data: 'CostoInsumos' },
                 { data: 'CostoTotal' },
             ],

@@ -2,7 +2,7 @@
 
 namespace SistemaPanera.Application.Models.ViewModels
 {
-    public class VMPrefabricadosCategoria
+    public class VMSubrecetasCategoria
     {
         public int Id { get; set; }
 

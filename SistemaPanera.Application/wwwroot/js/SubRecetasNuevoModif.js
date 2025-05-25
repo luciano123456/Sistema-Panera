@@ -18,8 +18,8 @@ $(document).ready(() => {
     listaUnidadMedidas();
     
 
-    if (prefabricadoData && prefabricadoData > 0) {
-        cargarDatosPrefabricado()
+    if (SubrecetaData && SubrecetaData > 0) {
+        cargarDatosSubreceta()
     } else {
         configurarDataTable(null);
     }
@@ -27,11 +27,11 @@ $(document).ready(() => {
     $('#UnidadesNegocio').on('change', function () {
         // Limpiar el DataTable
         gridInsumos.clear().draw();
-        calcularDatosPrefabricado();
+        calcularDatosSubreceta();
     });
 
     
-    calcularDatosPrefabricado();
+    calcularDatosSubreceta();
     $('#descripcion').on('input', function () {
         validarCampos()
     });
@@ -42,28 +42,28 @@ $(document).ready(() => {
 
 
 
-async function cargarDatosPrefabricado() {
-    if (prefabricadoData && prefabricadoData > 0) {
+async function cargarDatosSubreceta() {
+    if (SubrecetaData && SubrecetaData > 0) {
 
-        const datosPrefabricado = await ObtenerDatosPrefabricado(prefabricadoData);
-        await configurarDataTable(datosPrefabricado.Insumos);
-        await insertarDatosPrefabricado(datosPrefabricado.prefabricado);
+        const datosSubreceta = await ObtenerDatosSubreceta(SubrecetaData);
+        await configurarDataTable(datosSubreceta.Insumos);
+        await insertarDatosSubreceta(datosSubreceta.Subreceta);
 
         validarCampos();
     }
 }
 
 
-async function ObtenerDatosPrefabricado(id) {
-    const url = `/Prefabricados/EditarInfo?id=${id}`;
+async function ObtenerDatosSubreceta(id) {
+    const url = `/Subrecetas/EditarInfo?id=${id}`;
     const response = await fetch(url);
     const data = await response.json();
     return data;
 }
 
-async function insertarDatosPrefabricado(datos) {
+async function insertarDatosSubreceta(datos) {
 
-    document.getElementById("IdPrefabricado").value = datos.Id;
+    document.getElementById("IdSubreceta").value = datos.Id;
    
 
     //Cargamos Datos del Cliente
@@ -78,7 +78,7 @@ async function insertarDatosPrefabricado(datos) {
   
     document.getElementById("btnNuevoModificar").textContent = "Guardar";
 
-    await calcularDatosPrefabricado ();
+    await calcularDatosSubreceta ();
 }
 
 
@@ -97,7 +97,7 @@ function validarCampos() {
 
 async function configurarDataTable(data) {
     if (!gridInsumos) {
-        $('#grd_Insumos thead tr').clone(true).addClass('filters').appendTo('#grd_Prefabricados thead');
+        $('#grd_Insumos thead tr').clone(true).addClass('filters').appendTo('#grd_Subrecetas thead');
         gridInsumos = $('#grd_Insumos').DataTable({
             data: data != null ? data.$values : data,
             language: {
@@ -183,7 +183,7 @@ async function configurarDataTable(data) {
                     gridInsumos.columns.adjust();
                 }, 10);
 
-                $('body').on('mouseenter', '#grd_Prefabricados .fa-map-marker', function () {
+                $('body').on('mouseenter', '#grd_Subrecetas .fa-map-marker', function () {
                     $(this).css('cursor', 'pointer');
                 });
 
@@ -226,7 +226,7 @@ async function listaUnidadesNegocio() {
 }
 
 async function listaCategoriasFilter() {
-    const url = `/PrefabricadosCategoria/Lista`;
+    const url = `/SubrecetasCategoria/Lista`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -382,7 +382,7 @@ async function guardarInsumo() {
     const totalInput = parseFloat(convertirMonedaAFloat(document.getElementById('totalInput').value));
     const cantidadInput = parseInt(document.getElementById('cantidadInput').value) || 1; // Obtener cantidad, por defecto 1 si no es válida
     const InsumoId = insumoSelect.value;
-    const PrefabricadoNombre = insumoSelect.options[insumoSelect.selectedIndex]?.text || '';
+    const SubrecetaNombre = insumoSelect.options[insumoSelect.selectedIndex]?.text || '';
 
 
     let i = 0;
@@ -394,15 +394,15 @@ async function guardarInsumo() {
 
     const selectedProduct = insumos.find(p => p.IdInsumo === parseInt(InsumoId));
 
-    // Verificar si el Prefabricado ya existe en la tabla
-    let PrefabricadoExistente = false;
+    // Verificar si el Subreceta ya existe en la tabla
+    let SubrecetaExistente = false;
 
     if (isEditing) {
         // Si estamos editando, solo actualizamos la fila correspondiente
         gridInsumos.rows().every(function () {
             const data = this.data();
             if (data.IdInsumo == editId) {
-                data.Nombre = PrefabricadoNombre;
+                data.Nombre = SubrecetaNombre;
                 data.CostoUnitario = precioManual; // Guardar PrecioVenta
                 data.Cantidad = cantidadInput; // Usar la cantidad del input
                 data.SubTotal = totalInput; // Recalcular el total con formato de moneda
@@ -410,25 +410,25 @@ async function guardarInsumo() {
             }
         });
     } else {
-        // Buscar si el Prefabricado ya existe en la tabla
+        // Buscar si el Subreceta ya existe en la tabla
         gridInsumos.rows().every(function () {
             const data = this.data();
             if (data.IdInsumo == InsumoId) {
-                // Prefabricado existe, sumamos las cantidades y recalculamos el total
+                // Subreceta existe, sumamos las cantidades y recalculamos el total
                 data.Cantidad = cantidadInput; // Sumar la cantidad proporcionada
                 data.CostoUnitario = precioManual; // Guardar PrecioVenta
                 data.SubTotal = precioManual * data.Cantidad; // Recalcular el total con formato de moneda
                 this.data(data).draw();
-                PrefabricadoExistente = true;
+                SubrecetaExistente = true;
             }
         });
 
-        if (!PrefabricadoExistente) {
-            // Si no existe, agregar un nuevo Prefabricado
+        if (!SubrecetaExistente) {
+            // Si no existe, agregar un nuevo Subreceta
             gridInsumos.row.add({
                 IdInsumo: InsumoId,
                 Id: 0,
-                Nombre: PrefabricadoNombre,
+                Nombre: SubrecetaNombre,
                 CostoUnitario: precioManual, // Agregar PrecioVenta
                 Cantidad: cantidadInput, // Usar la cantidad proporcionada
                 SubTotal: totalInput // Recalcular el total con formato de moneda
@@ -439,7 +439,7 @@ async function guardarInsumo() {
     // Limpiar y cerrar el modal
     modal.modal('hide');
 
-    calcularDatosPrefabricado();
+    calcularDatosSubreceta();
 
 }
 
@@ -512,7 +512,7 @@ function eliminarInsumo(id) {
             gridInsumos.row(rowIdx).remove().draw();
         }
     });
-    calcularDatosPrefabricado();
+    calcularDatosSubreceta();
 }
 
 $(document).on('click', function (e) {
@@ -522,7 +522,7 @@ $(document).on('click', function (e) {
     }
 });
 
-async function calcularDatosPrefabricado() {
+async function calcularDatosSubreceta() {
     let InsumoTotal = 0;
 
     if (gridInsumos != null && gridInsumos.rows().count() > 0) {
@@ -543,7 +543,7 @@ async function calcularDatosPrefabricado() {
 
 
 function guardarCambios() {
-    const idPrefabricado = $("#IdPrefabricado").val();
+    const idSubreceta = $("#IdSubreceta").val();
 
     if (validarCampos()) {
 
@@ -552,7 +552,7 @@ function guardarCambios() {
             grd.rows().every(function () {
                 const insumo = this.data();
                 const insumoJson = {
-                    "IdPrefabricado": idPrefabricado != "" ? idPrefabricado : 0,
+                    "IdSubreceta": idSubreceta != "" ? idSubreceta : 0,
                     "IdInsumo": parseInt(insumo.IdInsumo),
                     "Id": insumo.Id != "" ? insumo.Id : 0,
                     "Nombre": insumo.Nombre,
@@ -575,19 +575,19 @@ function guardarCambios() {
 
         // Construcción del objeto para el modelo
         const nuevoModelo = {
-            "Id": idPrefabricado !== "" ? parseInt(idPrefabricado) : 0,
+            "Id": idSubreceta !== "" ? parseInt(idSubreceta) : 0,
             "IdUnidadNegocio": parseInt($("#UnidadesNegocio").val()),
             "Descripcion": $("#descripcion").val(),
             "Sku": $("#sku").val(),
             "IdCategoria": parseInt($("#Categorias").val()),
             "IdUnidadMedida": parseInt($("#UnidadMedidas").val()),
             "CostoTotal": parseFloat(convertirMonedaAFloat($("#costoTotal").val())),
-            "PrefabricadosInsumos": insumos
+            "SubrecetasInsumos": insumos
         };
 
         // Definir la URL y el método para el envío
-        const url = idPrefabricado === "" ? "/Prefabricados/Insertar" : "/Prefabricados/Actualizar";
-        const method = idPrefabricado === "" ? "POST" : "PUT";
+        const url = idSubreceta === "" ? "/Subrecetas/Insertar" : "/Subrecetas/Actualizar";
+        const method = idSubreceta === "" ? "POST" : "PUT";
 
         console.log(JSON.stringify(nuevoModelo))
 
@@ -606,9 +606,9 @@ function guardarCambios() {
             })
             .then(dataJson => {
                 console.log("Respuesta del servidor:", dataJson);
-                const mensaje = idPrefabricado === "" ? "Prefabricado registrado correctamente" : "Pedido modificado correctamente";
+                const mensaje = idSubreceta === "" ? "Subreceta registrado correctamente" : "Pedido modificado correctamente";
                 exitoModal(mensaje);
-                window.location.href = "/Prefabricados/Index";
+                window.location.href = "/Subrecetas/Index";
 
             })
             .catch(error => {

@@ -79,8 +79,8 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="costoUnitario">Costo Prefabricados</label>
-                            <input type="text" class="input-nuevo" id="costoPrefabricados" name="costoPrefabricados">
+                            <label for="costoUnitario">Costo Subrecetas</label>
+                            <input type="text" class="input-nuevo" id="costoSubrecetas" name="costoSubrecetas">
                         </div>
                         <div class="form-group">
                             <label for="costoInsumos">Costo Insumos</label>
@@ -98,7 +98,7 @@
         <!-- Pestañas -->
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="prefabricados-tab" data-bs-toggle="tab" href="#prefabricados" role="tab" aria-controls="prefabricados" aria-selected="true">Prefabricados</a>
+                <a class="nav-link active" id="Subrecetas-tab" data-bs-toggle="tab" href="#Subrecetas" role="tab" aria-controls="Subrecetas" aria-selected="true">Subrecetas</a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="insumos-tab" data-bs-toggle="tab" href="#insumos" role="tab" aria-controls="insumos" aria-selected="false">Insumos</a>
@@ -107,12 +107,12 @@
 
         <!-- Contenido de las pestañas -->
         <div class="tab-content mt-4" id="myTabContent">
-            <!-- Prefabricados -->
-            <div class="tab-pane fade show active" id="prefabricados" role="tabpanel" aria-labelledby="prefabricados-tab">
+            <!-- Subrecetas -->
+            <div class="tab-pane fade show active" id="Subrecetas" role="tabpanel" aria-labelledby="Subrecetas-tab">
                 <div class="card mb-12">
                     <div class="card-body">
-                        <h3 class="card-title">Prefabricados</h3>
-                        <table class="display nowrap" id="grd_Prefabricados" style="width:100%">
+                        <h3 class="card-title">Subrecetas</h3>
+                        <table class="display nowrap" id="grd_Subrecetas" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -123,12 +123,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Aquí va el contenido de tu DataTable de Prefabricados -->
+                                <!-- Aquí va el contenido de tu DataTable de Subrecetas -->
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-end mt-3">
                             <div class="btn-group" role="group">
-                                <button type="button" class="btn btn-success" onclick="anadirPrefabricado()">
+                                <button type="button" class="btn btn-success" onclick="anadirSubreceta()">
                                     <i class="fa fa-plus"></i> Añadir
                                 </button>
                             </div>
@@ -216,35 +216,35 @@
             </div>
         </div>
 
-        <div class="modal fade" id="PrefabricadosModal" tabindex="-1" role="dialog" aria-labelledby="PrefabricadosModalLabel" aria-hidden="true" data-editing="false">
+        <div class="modal fade" id="SubrecetasModal" tabindex="-1" role="dialog" aria-labelledby="SubrecetasModalLabel" aria-hidden="true" data-editing="false">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="PrefabricadosModalLabel">Seleccionar Prefabricado</h5>
+                        <h5 class="modal-title" id="SubrecetasModalLabel">Seleccionar Subreceta</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="PrefabricadoSelect" class="text-black">Prefabricado</label>
-                            <select id="PrefabricadoSelect" class="form-control"></select>
+                            <label for="SubrecetaSelect" class="text-black">Subreceta</label>
+                            <select id="SubrecetaSelect" class="form-control"></select>
                         </div>
                         <div class="form-group">
-                            <label for="precioPrefabricadoInput" class="text-black">Precio</label>
-                            <input type="text" id="precioPrefabricadoInput" class="form-control" placeholder="Ingrese precio manual" step="0.01">
+                            <label for="precioSubrecetaInput" class="text-black">Precio</label>
+                            <input type="text" id="precioSubrecetaInput" class="form-control" placeholder="Ingrese precio manual" step="0.01">
                         </div>
                         <div class="form-group">
-                            <label for="cantidadPrefabricadoInput" class="text-black">Cantidad</label>
-                            <input type="number" id="cantidadPrefabricadoInput" class="form-control" placeholder="Ingrese cantidad">
+                            <label for="cantidadSubrecetaInput" class="text-black">Cantidad</label>
+                            <input type="number" id="cantidadSubrecetaInput" class="form-control" placeholder="Ingrese cantidad">
                         </div>
                         <div class="form-group">
-                            <label for="totalPrefabricadoInput" class="text-black">Total</label>
-                            <input type="text" id="totalPrefabricadoInput" class="form-control" disabled>
+                            <label for="totalSubrecetaInput" class="text-black">Total</label>
+                            <input type="text" id="totalSubrecetaInput" class="form-control" disabled>
                         </div>
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" id="btnGuardarPrefabricado" class="btn btn-primary" onclick="guardarPrefabricado()">Añadir</button>
+                        <button type="button" id="btnGuardarSubreceta" class="btn btn-primary" onclick="guardarSubreceta()">Añadir</button>
                     </div>
                 </div>
             </div>

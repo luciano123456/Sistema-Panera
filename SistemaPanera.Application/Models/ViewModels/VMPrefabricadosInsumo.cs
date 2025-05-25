@@ -2,12 +2,12 @@
 
 namespace SistemaPanera.Application.Models.ViewModels
 {
-    public class VMPrefabricadosInsumo
+    public class VMSubrecetasInsumo
 
     {
         public int Id { get; set; }
 
-        public int IdPrefabricado { get; set; }
+        public int IdSubreceta { get; set; }
 
         public int IdInsumo { get; set; }
         public string Nombre { get; set; }
@@ -21,7 +21,7 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public virtual Insumo IdInsumoNavigation { get; set; } = null!;
 
-        //public virtual Prefabricado IdPrefabricadoNavigation { get; set; } = null!;
+        //public virtual Subreceta IdSubrecetaNavigation { get; set; } = null!;
 
 
     }

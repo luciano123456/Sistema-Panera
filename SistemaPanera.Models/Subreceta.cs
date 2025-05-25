@@ -20,7 +20,7 @@ public partial class Subreceta
 
     public decimal? Rendimiento { get; set; }
 
-    public decimal? CosotUnitario { get; set; }
+    public decimal? CostoUnitario { get; set; }
 
     public DateTime FechaActualizacion { get; set; }
 
@@ -36,7 +36,7 @@ public partial class Subreceta
 
     public virtual ICollection<SubrecetasStock> SubrecetasStocks { get; set; } = new List<SubrecetasStock>();
 
-    public virtual ICollection<SubrecetasSubreceta> SubrecetasSubrecetaIdSubRecetaHijaNavigations { get; set; } = new List<SubrecetasSubreceta>();
+    public virtual ICollection<SubrecetasSubreceta> SubrecetasSubrecetaIdSubrecetaHijaNavigations { get; set; } = new List<SubrecetasSubreceta>();
 
-    public virtual ICollection<SubrecetasSubreceta> SubrecetasSubrecetaIdSubRecetaPadreNavigations { get; set; } = new List<SubrecetasSubreceta>();
+    public virtual ICollection<SubrecetasSubreceta> SubrecetasSubrecetaIdSubrecetaPadreNavigations { get; set; } = new List<SubrecetasSubreceta>();
 }

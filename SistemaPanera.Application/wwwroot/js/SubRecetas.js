@@ -1,4 +1,4 @@
-﻿let gridPrefabricados;
+﻿let gridSubrecetas;
 let isEditing = false;
 
 
@@ -8,14 +8,14 @@ const columnConfig = [
     { index: 3, filterType: 'text' },
     { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesNegocioFilter },
     { index: 5, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
-    { index: 6, filterType: 'select', fetchDataFunc: listaPrefabricadosCategoriaFilter },
+    { index: 6, filterType: 'select', fetchDataFunc: listaSubrecetasCategoriaFilter },
     { index: 7, filterType: 'text' },
 ];
 
 $(document).ready(() => {
 
     listaUnidadesNegocioFiltro();
-    listaPrefabricados(-1);
+    listaSubrecetas(-1);
 
     $('#txtDescripcion, #txtCostoUnitario, #txtSku').on('input', function () {
         validarCampos()
@@ -28,9 +28,9 @@ $(document).ready(() => {
 
 function guardarCambios() {
     if (validarCampos()) {
-        const idPrefabricado = $("#txtId").val();
+        const idSubreceta = $("#txtId").val();
         const nuevoModelo = {
-            "Id": idPrefabricado !== "" ? idPrefabricado : 0,
+            "Id": idSubreceta !== "" ? idSubreceta : 0,
             "Descripcion": $("#txtDescripcion").val(),
             "IdUnidadMedida": $("#UnidadesMedida").val(),
             "IdUnidadNegocio": $("#UnidadesNegocio").val(),
@@ -39,8 +39,8 @@ function guardarCambios() {
             "CostoUnitario": $("#txtCostoUnitario").val(),
         };
 
-        const url = idPrefabricado === "" ? "Prefabricados/Insertar" : "Prefabricados/Actualizar";
-        const method = idPrefabricado === "" ? "POST" : "PUT";
+        const url = idSubreceta === "" ? "Subrecetas/Insertar" : "Subrecetas/Actualizar";
+        const method = idSubreceta === "" ? "POST" : "PUT";
 
         fetch(url, {
             method: method,
@@ -54,7 +54,7 @@ function guardarCambios() {
                 return response.json();
             })
             .then(dataJson => {
-                const mensaje = idPrefabricado === "" ? "Prefabricado registrado correctamente" : "Prefabricado modificado correctamente";
+                const mensaje = idSubreceta === "" ? "Subreceta registrado correctamente" : "Subreceta modificado correctamente";
                 $('#modalEdicion').modal('hide');
                 exitoModal(mensaje);
                 aplicarFiltros();
@@ -88,8 +88,8 @@ function validarCampos() {
     return campoValidoDescripcion && campoValidoSku && campoValidoCostoUnitario;
 }
 
-function nuevoPrefabricado() {
-    window.location.href = '/Prefabricados/NuevoModif';
+function nuevoSubreceta() {
+    window.location.href = '/Subrecetas/NuevoModif';
 }
 
 async function mostrarModal(modelo) {
@@ -100,11 +100,11 @@ async function mostrarModal(modelo) {
 
     listaUnidadesNegocio();
     listaUnidadesMedida();
-    listaPrefabricadosCategoria();
+    listaSubrecetasCategoria();
 
     $('#modalEdicion').modal('show');
     $("#btnGuardar").text("Guardar");
-    $("#modalEdicionLabel").text("Editar Prefabricado");
+    $("#modalEdicionLabel").text("Editar Subreceta");
 
     $('#lblDescripcion, #txtDescripcion').css('color', '').css('border-color', '');
     $('#lblSku, #txtSku').css('color', '').css('border-color', '');
@@ -127,40 +127,40 @@ function limpiarModal() {
 
 
 async function aplicarFiltros() {
-    listaPrefabricados(document.getElementById("UnidadNegocioFiltro").value)
+    listaSubrecetas(document.getElementById("UnidadNegocioFiltro").value)
 }
 
 
-async function listaPrefabricados(UnidadNegocio) {
-    const url = `/Prefabricados/Lista?IdUnidadNegocio=${UnidadNegocio}`;
+async function listaSubrecetas(UnidadNegocio) {
+    const url = `/Subrecetas/Lista?IdUnidadNegocio=${UnidadNegocio}`;
     const response = await fetch(url);
     const data = await response.json();
     await configurarDataTable(data);
 }
 
-function editarPrefabricado(id) {
+function editarSubreceta(id) {
     // Redirige a la vista 'PedidoNuevoModif' con el parámetro id
-    window.location.href = '/Prefabricados/NuevoModif/' + id;
+    window.location.href = '/Subrecetas/NuevoModif/' + id;
 }
 
-async function eliminarPrefabricado(id) {
-    let resultado = window.confirm("¿Desea eliminar el Prefabricado?");
+async function eliminarSubreceta(id) {
+    let resultado = window.confirm("¿Desea eliminar el Subreceta?");
 
     if (resultado) {
         try {
-            const response = await fetch("Prefabricados/Eliminar?id=" + id, {
+            const response = await fetch("Subrecetas/Eliminar?id=" + id, {
                 method: "DELETE"
             });
 
             if (!response.ok) {
-                throw new Error("Error al eliminar el Prefabricado.");
+                throw new Error("Error al eliminar el Subreceta.");
             }
 
             const dataJson = await response.json();
 
             if (dataJson.valor) {
                 aplicarFiltros();
-                exitoModal("Prefabricado eliminado correctamente")
+                exitoModal("Subreceta eliminado correctamente")
             }
         } catch (error) {
             console.error("Ha ocurrido un error:", error);
@@ -169,9 +169,9 @@ async function eliminarPrefabricado(id) {
 }
 
 async function configurarDataTable(data) {
-    if (!gridPrefabricados) {
-        $('#grd_Prefabricados thead tr').clone(true).addClass('filters').appendTo('#grd_Prefabricados thead');
-        gridPrefabricados = $('#grd_Prefabricados').DataTable({
+    if (!gridSubrecetas) {
+        $('#grd_Subrecetas thead tr').clone(true).addClass('filters').appendTo('#grd_Subrecetas thead');
+        gridSubrecetas = $('#grd_Subrecetas').DataTable({
             data: data,
             language: {
                 sLengthMenu: "Mostrar MENU registros",
@@ -192,10 +192,10 @@ async function configurarDataTable(data) {
                         <i class='fa fa-ellipsis-v fa-lg text-white' aria-hidden='true'></i>
                     </button>
                     <div class="acciones-dropdown" style="display: none;">
-                        <button class='btn btn-sm btneditar' type='button' onclick='editarPrefabricado(${data})' title='Editar'>
+                        <button class='btn btn-sm btneditar' type='button' onclick='editarSubreceta(${data})' title='Editar'>
                             <i class='fa fa-pencil-square-o fa-lg text-success' aria-hidden='true'></i> Editar
                         </button>
-                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarPrefabricado(${data})' title='Eliminar'>
+                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarSubreceta(${data})' title='Eliminar'>
                             <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i> Eliminar
                         </button>
                     </div>
@@ -217,7 +217,7 @@ async function configurarDataTable(data) {
                 {
                     extend: 'excelHtml5',
                     text: 'Exportar Excel',
-                    filename: 'Reporte Prefabricados',
+                    filename: 'Reporte Subrecetas',
                     title: '',
                     exportOptions: {
                         columns: [0, 1, 2, 3]
@@ -227,7 +227,7 @@ async function configurarDataTable(data) {
                 {
                     extend: 'pdfHtml5',
                     text: 'Exportar PDF',
-                    filename: 'Reporte Prefabricados',
+                    filename: 'Reporte Subrecetas',
                     title: '',
                     exportOptions: {
                         columns: [0, 1, 2, 3]
@@ -310,22 +310,22 @@ async function configurarDataTable(data) {
                 configurarOpcionesColumnas();
 
                 setTimeout(function () {
-                    gridPrefabricados.columns.adjust();
+                    gridSubrecetas.columns.adjust();
                 }, 10);
 
                 // Cambiar el cursor a 'pointer' cuando pase sobre cualquier fila o columna
-                $('#grd_Prefabricados tbody').on('mouseenter', 'tr', function () {
+                $('#grd_Subrecetas tbody').on('mouseenter', 'tr', function () {
                     $(this).css('cursor', 'pointer');
                 });
 
                 // Doble clic para ejecutar la función editarPedido(id)
-                $('#grd_Prefabricados tbody').on('dblclick', 'tr', function () {
-                    var id = gridPrefabricados.row(this).data().Id; // Obtener el ID de la fila seleccionada
-                    editarPrefabricado(id); // Llamar a la función de editar
+                $('#grd_Subrecetas tbody').on('dblclick', 'tr', function () {
+                    var id = gridSubrecetas.row(this).data().Id; // Obtener el ID de la fila seleccionada
+                    editarSubreceta(id); // Llamar a la función de editar
                 });
 
                 let filaSeleccionada = null; // Variable para almacenar la fila seleccionada
-                $('#grd_Prefabricados tbody').on('click', 'tr', function () {
+                $('#grd_Subrecetas tbody').on('click', 'tr', function () {
                     // Remover la clase de la fila anteriormente seleccionada
                     if (filaSeleccionada) {
                         $(filaSeleccionada).removeClass('seleccionada');
@@ -349,18 +349,18 @@ async function configurarDataTable(data) {
         });
 
     } else {
-        gridPrefabricados.clear().rows.add(data).draw();
+        gridSubrecetas.clear().rows.add(data).draw();
     }
 }
 
 
 function configurarOpcionesColumnas() {
-    const grid = $('#grd_Prefabricados').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
+    const grid = $('#grd_Subrecetas').DataTable(); // Accede al objeto DataTable utilizando el id de la tabla
     const columnas = grid.settings().init().columns; // Obtiene la configuración de columnas
     const container = $('#configColumnasMenu'); // El contenedor del dropdown específico para configurar columnas
 
 
-    const storageKey = `Prefabricados_Columnas`; // Clave única para esta pantalla
+    const storageKey = `Subrecetas_Columnas`; // Clave única para esta pantalla
 
     const savedConfig = JSON.parse(localStorage.getItem(storageKey)) || {}; // Recupera configuración guardada o inicializa vacía
 
@@ -431,8 +431,8 @@ async function listaUnidadesMedidaFilter() {
 
 }
 
-async function listaPrefabricadosCategoriaFilter() {
-    const url = `/PrefabricadosCategoria/Lista`;
+async function listaSubrecetasCategoriaFilter() {
+    const url = `/SubrecetasCategoria/Lista`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -476,8 +476,8 @@ async function listaUnidadesMedida() {
     }
 }
 
-async function listaPrefabricadosCategoria() {
-    const data = await listaPrefabricadosCategoriaFilter();
+async function listaSubrecetasCategoria() {
+    const data = await listaSubrecetasCategoriaFilter();
 
     $('#Categorias option').remove();
 

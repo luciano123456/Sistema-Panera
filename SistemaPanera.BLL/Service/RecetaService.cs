@@ -61,19 +61,19 @@ namespace SistemaPanera.BLL.Service
             return await _contactRepo.ObtenerInsumos(idReceta);
         }
 
-        //public async Task<bool> InsertarPrefabricados(List<RecetasPrefabricado> Prefabricados)
+        //public async Task<bool> InsertarSubrecetas(List<RecetasSubreceta> Subrecetas)
         //{
-        //    return await _contactRepo.InsertarPrefabricados(Prefabricados);
+        //    return await _contactRepo.InsertarSubrecetas(Subrecetas);
         //}
 
-        //public async Task<bool> ActualizarPrefabricados(List<RecetasPrefabricado> productos)
+        //public async Task<bool> ActualizarSubrecetas(List<RecetasSubreceta> productos)
         //{
-        //    return await _contactRepo.ActualizarPrefabricados(productos);
+        //    return await _contactRepo.ActualizarSubrecetas(productos);
         //}
 
-        //public async Task<List<RecetasPrefabricado>> ObtenerPrefabricados(int idReceta)
+        //public async Task<List<RecetasSubreceta>> ObtenerSubrecetas(int idReceta)
         //{
-        //    return await _contactRepo.ObtenerPrefabricados(idReceta);
+        //    return await _contactRepo.ObtenerSubrecetas(idReceta);
         //}
 
     }

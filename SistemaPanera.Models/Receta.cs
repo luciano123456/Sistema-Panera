@@ -17,7 +17,7 @@ public partial class Receta
 
     public int IdUnidadMedida { get; set; }
 
-    public decimal CostoPrefabricados { get; set; }
+    public decimal CostoSubrecetas { get; set; }
 
     public decimal CostoInsumos { get; set; }
 

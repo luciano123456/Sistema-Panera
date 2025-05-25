@@ -12,11 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Configurar la conexión a la base de datos
+
 builder.Services.AddDbContext<SistemaPaneraContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("cadenaSQL"));
-});
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SistemaDB")));
+
 
 // Agregar Razor Pages
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
@@ -67,11 +66,11 @@ builder.Services.AddScoped<IRecetaService, RecetaService>();
 builder.Services.AddScoped<IProveedoresInsumosRepository<ProveedoresInsumos>, ProveedoresInsumosRepository>();
 builder.Services.AddScoped<IProveedoresInsumoservice, ProveedoresInsumoservice>();
 
-//builder.Services.AddScoped<IPrefabricadosCategoriaRepository<PrefabricadosCategoria>, PrefabricadosCategoriaRepository>();
-//builder.Services.AddScoped<IPrefabricadosCategoriaService, PrefabricadosCategoriaService>();
+builder.Services.AddScoped<ISubRecetasCategoriaRepository<SubrecetasCategoria>, SubrecetasCategoriaRepository>();
+builder.Services.AddScoped<ISubRecetasCategoriaService, SubrecetasCategoriaService>();
 
-//builder.Services.AddScoped<IPrefabricadoRepository<Prefabricado>, PrefabricadoRepository>();
-//builder.Services.AddScoped<IPrefabricadoService, PrefabricadoService>();
+builder.Services.AddScoped<ISubrecetaRepository<Subreceta>, SubrecetaRepository>();
+builder.Services.AddScoped<ISubrecetaService, SubrecetaService>();
 
 builder.Services.AddScoped<ICompraRepository<Compra>, CompraRepository>();
 builder.Services.AddScoped<ICompraService, CompraService>();
