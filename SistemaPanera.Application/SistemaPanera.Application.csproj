@@ -19,6 +19,8 @@
     <Content Remove="wwwroot\js\Proveedores.js" />
     <Content Remove="wwwroot\js\Recetas.js" />
     <Content Remove="wwwroot\js\RecetasNuevoModif.js" />
+    <Content Remove="wwwroot\js\SubRecetas.js" />
+    <Content Remove="wwwroot\js\SubRecetasNuevoModif.js" />
     <Content Remove="wwwroot\js\Usuarios.js" />
     <Content Remove="wwwroot\js\UsuariosConfiguracion.js" />
     <Content Remove="wwwroot\js\Utils\moment.js" />
@@ -29,6 +31,8 @@
     <None Include="wwwroot\js\ComprasNuevoModif.js" />
     <None Include="wwwroot\js\Compras.js" />
     <None Include="wwwroot\js\ProvedoresInsumos.js" />
+    <None Include="wwwroot\js\SubRecetasNuevoModif.js" />
+    <None Include="wwwroot\js\SubRecetas.js" />
     <None Include="wwwroot\js\RecetasNuevoModif.js" />
     <None Include="wwwroot\js\Recetas.js" />
     <None Include="wwwroot\js\Login.js" />
