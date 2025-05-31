@@ -26,10 +26,25 @@ $(document).ready(() => {
     });
 
     $('#descripcion').on('input', function () {
-        validarCampos()
+        validarCampos();
     });
 
-    validarCampos()
+    validarCampos();
+
+    $("#SubRecetaSelect").select2({
+        dropdownParent: $("#SubRecetasModalLabel"), // Asegura que el dropdown se muestre dentro del modal
+        width: "100%",
+        placeholder: "Selecciona una opción",
+        allowClear: false
+    });
+
+    $("#insumoSelect").select2({
+        dropdownParent: $("#insumosModalLabel"), // Asegura que el dropdown se muestre dentro del modal
+        width: "100%",
+        placeholder: "Selecciona una opción",
+        allowClear: false
+    });
+
 
 })
 
@@ -255,10 +270,13 @@ async function cargarInsumosModal(IdUnidadNegocio, insumosEnTabla, insumoSelecci
     let primerHabilitadoId = null;
 
     insumos.forEach(insumo => {
+        // Si ya está en la tabla y no es el que estamos editando, no lo mostramos
+        if (insumosEnTabla.includes(insumo.Id) && insumo.Id !== insumoSeleccionado) return;
+
         const option = $(`<option value="${insumo.Id}">${insumo.Descripcion}</option>`);
 
-        if (insumosEnTabla.includes(insumo.Id)) {
-            option.prop('disabled', true);
+        if (insumo.Id === insumoSeleccionado) {
+            option.prop("selected", true).prop("disabled", true);
         } else if (primerHabilitadoId === null) {
             primerHabilitadoId = insumo.Id;
         }
@@ -266,10 +284,8 @@ async function cargarInsumosModal(IdUnidadNegocio, insumosEnTabla, insumoSelecci
         insumoSelect.append(option);
     });
 
-
-    if (insumoSeleccionado !== null) {
-        insumoSelect.val(insumoSeleccionado).prop("disabled", true);
-    } else if (primerHabilitadoId !== null) {
+    // Si no se está editando, seleccionar el primer habilitado
+    if (insumoSeleccionado === null && primerHabilitadoId !== null) {
         insumoSelect.val(primerHabilitadoId).prop("disabled", false);
     }
 
@@ -393,7 +409,7 @@ async function anadirSubReceta() {
 
     gridSubRecetas.rows().every(function () {
         const data = this.data();
-        SubRecetasEnTabla.push(Number(data.IdSubReceta));
+        SubRecetasEnTabla.push(Number(data.IdSubRecetaHija));
     });
 
     SubRecetas = await cargarSubRecetasModal(IdUnidadNegocio, SubRecetasEnTabla);
@@ -440,10 +456,13 @@ async function cargarSubRecetasModal(IdUnidadNegocio, SubRecetasEnTabla, SubRece
     let primerHabilitadoId = null;
 
     SubRecetas.forEach(SubReceta => {
+        // Si estoy editando, permito que se muestre solo la subreceta seleccionada
+        if (SubRecetasEnTabla.includes(SubReceta.Id) && SubReceta.Id !== SubRecetaSeleccionado) return;
+
         const option = $(`<option value="${SubReceta.Id}">${SubReceta.Descripcion}</option>`);
 
-        if (SubRecetasEnTabla.includes(SubReceta.Id)) {
-            option.prop('disabled', true);
+        if (SubReceta.Id === SubRecetaSeleccionado) {
+            option.prop("selected", true).prop("disabled", true);
         } else if (primerHabilitadoId === null) {
             primerHabilitadoId = SubReceta.Id;
         }
@@ -451,14 +470,12 @@ async function cargarSubRecetasModal(IdUnidadNegocio, SubRecetasEnTabla, SubRece
         SubRecetaSelect.append(option);
     });
 
-
-    if (SubRecetaSeleccionado !== null) {
-        SubRecetaSelect.val(SubRecetaSeleccionado).prop("disabled", true);
-    } else if (primerHabilitadoId !== null) {
+    // Si no estoy editando, selecciono el primero habilitado
+    if (SubRecetaSeleccionado === null && primerHabilitadoId !== null) {
         SubRecetaSelect.val(primerHabilitadoId).prop("disabled", false);
     }
 
-    return SubRecetas; // Devolver los SubRecetas cargados para su uso posterior
+    return SubRecetas;
 }
 
 async function guardarSubReceta() {
