@@ -1,173 +1,349 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewBag.Title = "Nueva SubReceta";
 }
 
+<title>@ViewBag.Title</title>
 
 @section Estilos {
-    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet">
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <link href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+    @*ESTILOS DE BOTONES*@
+    <link href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css" rel="stylesheet" />
+
+    @*filter columns*@
+    <link href="https://cdn.datatables.net/fixedheader/3.2.2/css/fixedHeader.dataTables.min.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-    <link href="~/css/SubrecetasNuevoModif.css" rel="stylesheet" />
+    <link href="~/css/Recetas.css" rel="stylesheet" />
+    <link href="~/css/SubRecetasNuevoModif.css" rel="stylesheet" />
 }
 
-
-<div class="container-fluid mt-5" style="width: 80vw; margin: 0; padding: 0; position: relative; left: 50%; transform: translateX(-50%);">
-    <!-- Datos del Subreceta -->
-    <div class="card w-100" style="border: none;">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">Datos de la Subreceta</h5>
-        </div>
-        <div class="card-body">
-            <div class="row g-3">
-                <input type="text" class="form-control" id="IdSubreceta" hidden>
-                <div class="col-12 col-md-3">
-                    <label for="unidadNegocio" class="form-label">Unidad de Negocio</label>
-                    <select class="input-nuevo-select" id="UnidadesNegocio">
-                    </select>
-                </div>
-                <div class="col-12 col-md-3">
-                    <label for="descripcion" id="lblDescripcion" class="form-label">Descripción (*)</label>
-                    <input type="text" class="input-nuevo" id="descripcion" placeholder="Descripción">
-                </div>
-                <div class="col-12 col-md-3">
-                    <label for="sku" class="form-label">SKU</label>
-                    <input type="text" class="input-nuevo" id="sku" placeholder="Código SKU">
-                </div>
-                <div class="col-12 col-md-3">
-                    <label for="categoria" class="form-label">Categoría</label>
-                    <select class="input-nuevo-select" id="Categorias">
-                    </select>
-                </div>
-                <div class="col-12 col-md-3">
-                    <label for="unidadMedida" class="form-label">Unidad de Medida</label>
-                    <select class="input-nuevo-select" id="UnidadMedidas">
-                    </select>
-                </div>
-                <div class="col-12 col-md-3">
-                    <label for="costoTotal" class="form-label">Costo Total</label>
-                    <input type="text" class="input-nuevo" id="costoTotal" placeholder="Costo Total" disabled>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="bg-gradient-primary rounded-top px-3 py-2 mt-5 mb-4">
+    <h2 class="mb-0 text-white fw-bold text-center">
+        <i class="fa fa-plus-circle me-2"></i><span id="titulosubReceta"></span>
+    </h2>
 </div>
 
 
-<div class="container-fluid mt-5">
-    <div class="row">
-        <div class="col-lg-10">
-            <div class="card" style="width: 80%; position: absolute; left: 9.7vw; border: none;">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Insumos</span>
 
-                    <div class="dropdown">
-                    </div>
-                </div>
-                <div class="card-body">
-                    <table class="display nowrap" id="grd_Insumos" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Costo Unitario</th>
-                                <th>Cantidad</th>
-                                <th>SubTotal</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Aquí va el contenido de tu datatable -->
-                        </tbody>
-                    </table>
-                    <div class="d-flex justify-content-end mt-3">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-success" onclick="anadirInsumo()">
-                                <i class="fa fa-plus"></i> Añadir
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end mt-2 mb-4">
-                    <a class="btn btn-primary btnnuevo" id="btnNuevoModificar" onclick="guardarCambios()">Registrar</a>
-                </div>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<div class="modal fade" id="insumosModal" tabindex="-1" role="dialog" aria-labelledby="insumosModalLabel" aria-hidden="true" data-editing="false">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="insumosModalLabel">Seleccionar Insumo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="insumoSelect" class="text-black">Insumo</label>
-                    <select id="insumoSelect" class="form-control"></select>
-                </div>
-                <div class="form-group">
-                    <label for="precioInput" class="text-black">Precio</label>
-                    <input type="text" id="precioInput" class="form-control" placeholder="Ingrese precio manual" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="cantidadInput" class="text-black">Cantidad</label>
-                    <input type="number" id="cantidadInput" class="form-control" placeholder="Ingrese cantidad">
-                </div>
-                <div class="form-group">
-                    <label for="totalInput" class="text-black">Total</label>
-                    <input type="text" id="totalInput" class="form-control" disabled>
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" id="btnGuardarInsumo" class="btn btn-primary" onclick="guardarInsumo()">Añadir</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <partial name="~/Views/Utils/Modals.cshtml" />
 
-@section Scripts {
 
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<div class="container-fluid mt-5">
 
-    @*SCRIPTS DE BOTONES*@
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js">
 
-    </script><script src="~/js/site.js"></script>
 
-    @*excel*@
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <!-- Pestañas -->
+    <ul class="nav nav-tabs pestaniasDatos" id="myTab" role="tablist">
 
-    @*pdf*@
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
-    @*imprimir*@
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+        <li class="nav-item lg-12" role="presentation">
+            <a class="nav-link active" id="SubReceta-tab" data-bs-toggle="tab" href="#SubReceta" role="tab" aria-controls="SubReceta" aria-selected="false">Datos de la Subreceta</a>
+        </li>
+    </ul>
 
-    @*filter columns*@
-    <script src="https://cdn.datatables.net/fixedheader/3.2.2/js/dataTables.fixedHeader.min.js"></script>
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content mt-4" id="myTabContent">
+        <div class="tab-pane fade show active" id="SubReceta" role="tabpanel" aria-labelledby="SubReceta-tab">
+            <div class="card">
+                <div class="card-header bg-gradient border-bottom border-primary">
+                    <h5 class="fw-bold mb-0"><i class="fa fa-utensils me-2"></i>Datos de la Subreceta</h5>
+                </div>
+                <div class="card-body">
+                    <input type="hidden" id="idSubReceta" name="idSubReceta" />
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="UnidadesNegocio" class="form-label">Unidad de Negocio</label>
+                            <select id="UnidadesNegocio" class="form-select bg-white text-black border-primary">
+                                <option value="" disabled selected>Seleccionar...</option>
+                            </select>
+                        </div>
 
-    <script src="~/js/utils/moment.js"></script>
+                        <div class="col-md-3">
+                            <label for="sku" class="form-label">SKU</label>
+                            <input type="text" id="sku" class="form-control bg-white text-black border-primary" />
+                        </div>
 
-    <script src="~/js/SubrecetasNuevoModif.js"></script>
+                        <div class="col-md-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" id="descripcion" class="form-control bg-white text-black border-primary" />
+                        </div>
 
-    <script>
-        var SubrecetaData = @Html.Raw(Json.Serialize(ViewBag.Data ?? new { }));
-    </script>
+                        <div class="col-md-3">
+                            <label for="Categorias" class="form-label">Categoría</label>
+                            <select id="Categorias" class="form-select bg-white text-black border-primary">
+                                <option value="" disabled selected>Seleccionar...</option>
+                            </select>
+                        </div>
 
-}
+                        <div class="col-md-2">
+                            <label for="UnidadMedidas" class="form-label">Unidad de Medida</label>
+                            <select id="UnidadMedidas" class="form-select bg-white text-black border-primary">
+                                <option value="" disabled selected>Seleccionar...</option>
+                            </select>
+                        </div>
 
+                          <div class="col-md-2">
+                            <label for="CostoPorcion" class="form-label">Costo Porcion</label>
+                            <input type="text" id="CostoPorcion" class="form-control bg-white text-black border-primary" readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="Rendimiento" class="form-label">Rendimiento</label>
+                            <input type="text" id="Rendimiento" class="form-control bg-white text-black border-primary" />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="costoSubRecetas" class="form-label">Costo Subrecetas</label>
+                            <input type="text" id="costoSubRecetas" class="form-control bg-white text-black border-primary" readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="costoInsumos" class="form-label">Costo Insumos</label>
+                            <input type="text" id="costoInsumos" class="form-control bg-white text-black border-primary" readonly />
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="CostoUnitario" class="form-label">Costo Unitario</label>
+                            <input type="text" id="CostoUnitario" class="form-control bg-white text-black border-primary" readonly />
+                        </div>
+
+                      
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pestañas -->
+        <ul class="nav nav-tabs mt-5" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="SubRecetas-tab" data-bs-toggle="tab" href="#SubRecetas" role="tab" aria-controls="SubRecetas" aria-selected="true">Subrecetas</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="insumos-tab" data-bs-toggle="tab" href="#insumos" role="tab" aria-controls="insumos" aria-selected="false">Insumos</a>
+            </li>
+        </ul>
+
+        <!-- Contenido de las pestañas -->
+        <div class="tab-content mt-4" id="myTabContent">
+            <!-- SubRecetas -->
+            <div class="tab-pane fade show active" id="SubRecetas" role="tabpanel" aria-labelledby="SubRecetas-tab">
+                <div class="card mb-12">
+                    <div class="card-body">
+                        <h3 class="card-title">Subrecetas</h3>
+                        <table class="display nowrap" id="grd_SubRecetas" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Costo Unitario</th>
+                                    <th>Cantidad</th>
+                                    <th>SubTotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Aquí va el contenido de tu DataTable de SubRecetas -->
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-success" onclick="anadirSubReceta()">
+                                    <i class="fa fa-plus"></i> Añadir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insumos -->
+            <div class="tab-pane fade" id="insumos" role="tabpanel" aria-labelledby="insumos-tab">
+                <div class="card mb-12">
+                    <div class="card-body">
+                        <h3 class="card-title">Insumos</h3>
+                        <table class="display nowrap" id="grd_Insumos" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Costo Unitario</th>
+                                    <th>Cantidad</th>
+                                    <th>SubTotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Aquí va el contenido de tu DataTable de Insumos -->
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-success" onclick="anadirInsumo()">
+                                    <i class="fa fa-plus"></i> Añadir
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
+        </div>
+
+
+
+
+
+        <button type="submit" id="btnNuevoModificar" class="btn btn-primary mt-3" onclick="guardarCambios()">Registrar</button>
+
+        <div class="modal fade" id="insumosModal" tabindex="-1" role="dialog" aria-labelledby="insumosModalLabel" aria-hidden="true" data-editing="false">
+            <div class="modal-dialog modal-dialog-centered modal-edicion" role="document">
+                <div class="modal-content">
+
+                    <!-- Encabezado con gradiente -->
+                    <div class="modal-header colorEncabezado">
+                        <h5 class="modal-title fw-bold text-white" id="insumosModalLabel">Seleccionar Insumo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body">
+                        <form id="formInsumo" class="row g-3">
+
+                            <div class="col-md-12">
+                                <label for="insumoSelect" class="form-label">Insumo</label>
+                                <select id="insumoSelect" class="form-select">
+                                    <option selected disabled>Seleccionar un Insumo</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="precioInput" class="form-label">Precio</label>
+                                <input type="text" id="precioInput" class="form-control" placeholder="Ingrese precio manual" step="0.01" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="cantidadInput" class="form-label">Cantidad</label>
+                                <input type="number" id="cantidadInput" class="form-control" placeholder="Ingrese cantidad" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="totalInput" class="form-label">Total</label>
+                                <input type="text" id="totalInput" class="form-control" disabled>
+                            </div>
+
+                            <div id="errorCamposInsumo" class="alert alert-danger d-none">
+                                Debes completar los campos obligatorios.
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fa fa-arrow-left"></i> Volver
+                        </button>
+                        <button type="button" id="btnGuardarInsumo" class="btn btn-primary" onclick="guardarInsumo()">
+                            <i class="fa fa-check"></i> Añadir
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="SubRecetasModal" tabindex="-1" role="dialog" aria-labelledby="SubRecetasModalLabel" aria-hidden="true" data-editing="false">
+            <div class="modal-dialog modal-dialog-centered modal-edicion" role="document">
+                <div class="modal-content">
+
+                    <!-- Encabezado con gradiente -->
+                    <div class="modal-header colorEncabezado">
+                        <h5 class="modal-title fw-bold" id="SubRecetasModalLabel">Seleccionar Subreceta</h5>
+                        <button type="button" class="btn-close" i data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body">
+                        <form id="formSubReceta" class="row g-3">
+
+                            <div class="col-md-12">
+                                <label for="SubRecetaSelect" class="form-label">SubReceta</label>
+                                <select id="SubRecetaSelect" class="form-select">
+                                    <option selected disabled>Seleccionar una SubReceta</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="precioSubRecetaInput" class="form-label">Precio</label>
+                                <input type="text" id="precioSubRecetaInput" class="form-control" placeholder="Ingrese precio manual" step="0.01" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="cantidadSubRecetaInput" class="form-label">Cantidad</label>
+                                <input type="number" id="cantidadSubRecetaInput" class="form-control" placeholder="Ingrese cantidad" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="totalSubRecetaInput" class="form-label">Total</label>
+                                <input type="text" id="totalSubRecetaInput" class="form-control" disabled>
+                            </div>
+
+                            <div id="errorCamposSub" class="alert alert-danger d-none">
+                                Debes completar los campos obligatorios.
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fa fa-arrow-left"></i> Volver
+                        </button>
+                        <button type="button" id="btnGuardarSubReceta" class="btn btn-primary" onclick="guardarSubReceta()">
+                            <i class="fa fa-check"></i> Añadir
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <partial name="~/Views/Utils/Modals.cshtml" />
+
+        @section Scripts {
+
+        <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+            @*SCRIPTS DE BOTONES*@
+        <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js">
+
+
+        <script src="~/js/utils/moment.js"></script>
+        <script src="~/js/SubRecetasNuevoModif.js?v=1.1">
+
+            <script src="~/js/site.js"></script>
+
+        <script>
+            var SubRecetaData = @Html.Raw(Json.Serialize(ViewBag.Data ?? new { }));
+        </script>
+
+        }

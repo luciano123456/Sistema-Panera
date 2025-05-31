@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
+
 public partial class RecetasCategoria
 {
     public int Id { get; set; }

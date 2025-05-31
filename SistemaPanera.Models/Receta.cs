@@ -13,11 +13,11 @@ public partial class Receta
 
     public string Descripcion { get; set; } = null!;
 
-    public int IdCategoria { get; set; }
-
     public int IdUnidadMedida { get; set; }
 
-    public decimal CostoSubrecetas { get; set; }
+    public int IdCategoria { get; set; }
+
+    public decimal? CostoSubRecetas { get; set; }
 
     public decimal CostoInsumos { get; set; }
 

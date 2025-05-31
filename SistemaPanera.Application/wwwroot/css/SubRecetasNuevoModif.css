@@ -1,31 +1,27 @@
-.input-nuevo {
-    border: none;
-    border-bottom: 2px solid blue;
-    width: 100%;
-    color: black;
-    max-width: 3000px !important;
-    text-align: center !important;
-    font-size: 0.7vw;
-    background: transparent !important;
-    color: white !important;
+.form-control:focus, .form-select:focus {
+    border-color: #4dabf7;
+    box-shadow: 0 0 0 0.1rem rgba(77, 171, 247, 0.5);
 }
 
-.input-nuevo-select {
-    border: none;
-    border-bottom: 2px solid blue;
-    width: 100% !important;
-    color: white; /* Texto blanco cuando no está desplegado */
-    text-align: center !important;
-    font-size: 0.8vw;
-    background: transparent !important;
+.card-header.bg-gradient {
+    background: linear-gradient(to right, #2c3e50, #34495e);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+    border-color: #4dabf7 #4dabf7 #1a1a1a;
 }
 
 
+.bg-gradient-primary {
+    background: linear-gradient(90deg, #1366f2, #6aaefc);
+    border-radius: 0.4rem;
+}
 
-
-    .input-nuevo-select option {
-        background-color: white !important; /* Fondo del desplegable */
-        color: black !important; /* Texto negro en el desplegable */
-    }
-
+.modal-content {
+    background-color: #323844 !important;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: none;
+}
 

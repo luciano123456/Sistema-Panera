@@ -11,7 +11,6 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public int IdInsumo { get; set; }
         public string Nombre { get; set; }
-        
 
         public decimal Cantidad { get; set; }
 
@@ -21,7 +20,7 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public virtual Insumo IdInsumoNavigation { get; set; } = null!;
 
-        //public virtual Subreceta IdSubrecetaNavigation { get; set; } = null!;
+        public virtual Subreceta IdSubrecetaNavigation { get; set; } = null!;
 
 
     }

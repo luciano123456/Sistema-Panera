@@ -32,115 +32,123 @@ namespace SistemaPanera.Application.Controllers
         {
             try
             {
-                var Subrecetas = await _SubrecetasService.ObtenerTodos();
+                var subrecetas = await _SubrecetasService.ObtenerTodos();
 
-                var lista = Subrecetas.Select(c => new VMSubreceta
-                {
-                    Id = c.Id,
-                    FechaActualizacion = c.FechaActualizacion,
-                    IdCategoria = c.IdCategoria,
-                    IdUnidadMedida = c.IdUnidadMedida,
-                    IdUnidadNegocio = c.IdUnidadNegocio,
-                    Sku = c.Sku,
-                    Categoria = c.IdCategoriaNavigation.Nombre,
-                    UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
-                    UnidadNegocio = c.IdUnidadNegocioNavigation.Nombre,
-                    Descripcion = c.Descripcion,
-                    CostoUnitario = c.CostoUnitario,
-                }).Where(x => x.IdUnidadNegocio == IdUnidadNegocio || IdUnidadNegocio == -1).ToList();
+                var lista = subrecetas
+                    .Where(x => IdUnidadNegocio == -1 || x.IdUnidadNegocio == IdUnidadNegocio)
+                    .Select(c => new VMSubreceta
+                    {
+                        Id = c.Id,
+                        FechaActualizacion = c.FechaActualizacion,
+                        IdCategoria = c.IdCategoria,
+                        IdUnidadMedida = c.IdUnidadMedida,
+                        IdUnidadNegocio = c.IdUnidadNegocio,
+                        Sku = c.Sku,
+                        Categoria = c.IdCategoriaNavigation.Nombre,
+                        UnidadMedida = c.IdUnidadMedidaNavigation.Nombre,
+                        UnidadNegocio = c.IdUnidadNegocioNavigation.Nombre,
+                        Descripcion = c.Descripcion,
+                        CostoSubRecetas = c.CostoSubRecetas,
+                        CostoInsumos = c.CostoInsumos,
+                        CostoPorcion = c.CostoPorcion,
+                        Rendimiento = c.Rendimiento,
+                        CostoUnitario = c.CostoUnitario
+                    })
+                    .ToList();
 
                 return Ok(lista);
-
-            } catch (Exception ex)
-            {
-                return null;
             }
-           
+            catch (Exception ex)
+            {
+                // Idealmente, loguear el error con un logger
+                return StatusCode(500, new { error = "Error al obtener las subrecetas." });
+            }
         }
-
 
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] VMSubreceta model)
         {
-            var Subrecetas = new Subreceta
+            var subreceta = new Subreceta
             {
-                Id = model.Id,
-                IdUnidadMedida = model.IdUnidadMedida,
-                Sku = model.Sku,
                 IdUnidadNegocio = model.IdUnidadNegocio,
-                FechaActualizacion = DateTime.Now,
-                IdCategoria = model.IdCategoria,
+                Sku = model.Sku,
                 Descripcion = model.Descripcion,
+                IdUnidadMedida = model.IdUnidadMedida,
+                IdCategoria = model.IdCategoria,
+                CostoSubRecetas = model.CostoSubRecetas,
+                CostoInsumos = model.CostoInsumos,
+                CostoPorcion = (decimal)model.CostoPorcion,
                 CostoUnitario = model.CostoUnitario,
+                Rendimiento = model.Rendimiento,
+                FechaActualizacion = DateTime.Now,
+
+                SubrecetasInsumos = model.SubrecetasInsumos?.Select(i => new SubrecetasInsumo
+                {
+                    IdInsumo = i.IdInsumo,
+                    Cantidad = i.Cantidad,
+                    CostoUnitario = i.CostoUnitario,
+                    SubTotal = i.SubTotal
+                }).ToList(),
+
+                SubrecetasSubrecetaIdSubRecetaHijaNavigations = model.SubrecetasSubrecetaIdSubRecetaPadreNavigations?.Select(s => new SubrecetasSubreceta
+                {
+                    IdSubRecetaHija = s.IdSubRecetaHija,
+                    Cantidad = s.Cantidad,
+                    CostoUnitario = s.CostoUnitario,
+                    SubTotal = s.SubTotal
+                }).ToList()
             };
 
-            bool respuesta = await _SubrecetasService.Insertar(Subrecetas);
-
-            List<SubrecetasInsumo> pedidosInsumo = new List<SubrecetasInsumo>();
-
-            // Agregar los pagos de clientes
-            if (model.SubrecetasInsumos != null && model.SubrecetasInsumos.Any())
-            {
-                foreach (var insumo in model.SubrecetasInsumos)
-                {
-                    var nuevoInsumo = new SubrecetasInsumo
-                    {
-                        IdSubreceta = Subrecetas.Id,
-                        IdInsumo = insumo.IdInsumo,
-                        CostoUnitario = insumo.CostoUnitario,
-                        SubTotal = insumo.SubTotal,
-                        Cantidad = insumo.Cantidad,
-                    };
-                    pedidosInsumo.Add(nuevoInsumo);
-                }
-            }
-
-            bool respInsumos = await _SubrecetasService.InsertarInsumos(pedidosInsumo);
-
-            return Ok(new { valor = respuesta });
+            var resultado = await _SubrecetasService.Insertar(subreceta);
+            return Ok(new { valor = resultado });
         }
+
+
 
         [HttpPut]
         public async Task<IActionResult> Actualizar([FromBody] VMSubreceta model)
         {
-            var Subrecetas = new Subreceta
+            var subreceta = new Subreceta
             {
                 Id = model.Id,
-                IdUnidadMedida = model.IdUnidadMedida,
-                Sku = model.Sku,
                 IdUnidadNegocio = model.IdUnidadNegocio,
-                FechaActualizacion = DateTime.Now,
-                IdCategoria = model.IdCategoria,
+                Sku = model.Sku,
                 Descripcion = model.Descripcion,
+                IdUnidadMedida = model.IdUnidadMedida,
+                IdCategoria = model.IdCategoria,
+                CostoSubRecetas = model.CostoSubRecetas,
+                CostoInsumos = model.CostoInsumos,
+                CostoPorcion = (decimal)model.CostoPorcion,
                 CostoUnitario = model.CostoUnitario,
+                Rendimiento = model.Rendimiento,
+                FechaActualizacion = DateTime.Now,
+
+                SubrecetasInsumos = model.SubrecetasInsumos?.Select(i => new SubrecetasInsumo
+                {
+                    IdInsumo = i.IdInsumo,
+                    Cantidad = i.Cantidad,
+                    CostoUnitario = i.CostoUnitario,
+                    SubTotal = i.SubTotal
+                }).ToList(),
+
+                SubrecetasSubrecetaIdSubRecetaPadreNavigations = model.SubrecetasSubrecetaIdSubRecetaPadreNavigations?.Select(s => new SubrecetasSubreceta
+                {
+                    IdSubRecetaPadre = model.Id,
+                    IdSubRecetaHija = s.IdSubRecetaHija,
+                    Cantidad = s.Cantidad,
+                    CostoUnitario = s.CostoUnitario,
+                    SubTotal = s.SubTotal
+                }).ToList()
+
 
             };
 
-            bool respuesta = await _SubrecetasService.Actualizar(Subrecetas);
-
-            List<SubrecetasInsumo> SubrecetasInsumo = new List<SubrecetasInsumo>();
-
-            // Agregar los pagos de clientes
-            if (model.SubrecetasInsumos != null && model.SubrecetasInsumos.Any())
-            {
-                foreach (var insumo in model.SubrecetasInsumos)
-                {
-                    var nuevoInsumo = new SubrecetasInsumo
-                    {
-                        Cantidad = insumo.Cantidad,
-                        CostoUnitario = insumo.CostoUnitario,
-                        IdInsumo = insumo.IdInsumo,
-                        IdSubreceta = insumo.IdSubreceta,
-                        SubTotal = insumo.SubTotal,
-                    };
-                    SubrecetasInsumo.Add(nuevoInsumo);
-                }
-            }
-
-            bool respproductos = await _SubrecetasService.InsertarInsumos(SubrecetasInsumo);
-
-            return Ok(new { valor = respuesta });
+            var resultado = await _SubrecetasService.Actualizar(subreceta);
+            return Ok(new { valor = resultado });
         }
+
+
+
 
         [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)
@@ -148,63 +156,70 @@ namespace SistemaPanera.Application.Controllers
             bool respuesta = await _SubrecetasService.Eliminar(id);
 
             return StatusCode(StatusCodes.Status200OK, new { valor = respuesta });
-        }
+         }
 
         [HttpGet]
         public async Task<IActionResult> EditarInfo(int id)
         {
-            Dictionary<string, object> result = new Dictionary<string, object>();
+            if (id <= 0)
+                return Ok(new { });
 
-            if (id > 0)
+            var model = await _SubrecetasService.Obtener(id);
+
+            var subreceta = new VMSubreceta
             {
+                Id = model.Id,
+                IdUnidadMedida = model.IdUnidadMedida,
+                Sku = model.Sku,
+                IdUnidadNegocio = model.IdUnidadNegocio,
+                FechaActualizacion = model.FechaActualizacion,
+                IdCategoria = model.IdCategoria,
+                Descripcion = model.Descripcion,
+                CostoUnitario = model.CostoUnitario,
+                CostoInsumos = model.CostoInsumos,
+                CostoSubRecetas = model.CostoSubRecetas,
+                Rendimiento = model.Rendimiento,
+            };
 
-                var model = await _SubrecetasService.Obtener(id);
+            var insumos = model.SubrecetasInsumos.Select(p => new VMSubrecetasInsumo
+            {
+                Id = p.Id,
+                IdSubreceta = p.IdSubreceta,
+                IdInsumo = p.IdInsumo,
+                Nombre = p.IdInsumoNavigation.Descripcion,
+                Cantidad = p.Cantidad,
+                CostoUnitario = p.CostoUnitario,
+                SubTotal = p.SubTotal
+            }).ToList();
 
-                var Subreceta = new VMSubreceta
-                {
-                    Id = model.Id,
-                    IdUnidadMedida = model.IdUnidadMedida,
-                    Sku = model.Sku,
-                    IdUnidadNegocio = model.IdUnidadNegocio,
-                    FechaActualizacion = DateTime.Now,
-                    IdCategoria = model.IdCategoria,
-                    Descripcion = model.Descripcion,
-                    CostoUnitario = model.CostoUnitario,
-                };
-
-                var SubrecetasInsumos = await _SubrecetasService.ObtenerInsumos(id);
-
-
-                var insumosJson = SubrecetasInsumos.Select(p => new VMSubrecetasInsumo
-                {
-                    Id = p.Id,
-
-                    Cantidad = p.Cantidad,
-                    CostoUnitario = p.CostoUnitario,
-                    IdInsumo = p.IdInsumo,
-                    Nombre = p.IdInsumoNavigation.Descripcion.ToString(),
-                    IdSubreceta = p.IdSubreceta,
-                    SubTotal = p.SubTotal,
-                }).ToList();
+            var subrecetas = model.SubrecetasSubrecetaIdSubRecetaPadreNavigations.Select(p => new VMSubrecetasSubreceta
+            {
+                Id = p.Id,
+                IdSubRecetaPadre = p.IdSubRecetaPadre,
+                IdSubRecetaHija = p.IdSubRecetaHija,
+                Cantidad = p.Cantidad,
+                CostoUnitario = p.CostoUnitario,
+                SubTotal = p.SubTotal,
+                Nombre = p.IdSubRecetaHijaNavigation?.Descripcion,
+                IdSubRecetaHijaNavigation = p.IdSubRecetaHijaNavigation,
+                IdSubRecetaPadreNavigation = p.IdSubRecetaPadreNavigation
+            }).ToList();
 
 
+            var result = new Dictionary<string, object>
+            {
+                ["Subreceta"] = subreceta,
+                ["Insumos"] = insumos,
+                ["SubRecetas"] = subrecetas
+            };
 
-                result.Add("Subreceta", Subreceta);
-                result.Add("Insumos", insumosJson);
+            var jsonOptions = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve
+            };
 
-                // Serialize with ReferenceHandler.Preserve to handle circular references
-                var jsonOptions = new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve
-                };
-
-                return Ok(System.Text.Json.JsonSerializer.Serialize(result, jsonOptions));
-            }
-
-            return Ok(new { });
+            return Ok(System.Text.Json.JsonSerializer.Serialize(result, jsonOptions));
         }
-
-
 
 
 
