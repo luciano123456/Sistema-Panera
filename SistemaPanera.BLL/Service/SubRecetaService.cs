@@ -17,7 +17,7 @@ namespace SistemaPanera.BLL.Service
             return await _contactRepo.Actualizar(model);
         }
 
-        public async Task<bool> Eliminar(int id)
+        public async Task<(bool eliminado, string mensaje)> Eliminar(int id)
         {
             return await _contactRepo.Eliminar(id);
         }

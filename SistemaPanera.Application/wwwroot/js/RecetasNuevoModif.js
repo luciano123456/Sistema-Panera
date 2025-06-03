@@ -1,4 +1,4 @@
-﻿let gridInsumos = null, gridSubrecetas = null;
+﻿let gridInsumos = null, gridRecetas = null;
 $(document).ready(() => {
 
 
@@ -6,11 +6,12 @@ $(document).ready(() => {
     listaCategorias();
     listaUnidadMedidas();
 
-    if (recetaData && recetaData > 0) {
+    if (RecetaData && RecetaData > 0) {
         cargarDatosReceta();
     } else {
         configurarDataTableInsumos(null);
         configurarDataTableSubrecetas(null);
+        $("#tituloReceta").text("Nueva Receta");
     }
 
     
@@ -20,15 +21,30 @@ $(document).ready(() => {
     $('#UnidadesNegocio').on('change', function () {
         // Limpiar el DataTable
         gridInsumos.clear().draw();
-        gridSubrecetas.clear().draw();
+        gridRecetas.clear().draw();
         calcularDatosReceta();
     });
 
     $('#descripcion').on('input', function () {
-        validarCampos()
+        validarCampos();
     });
 
-    validarCampos()
+    validarCampos();
+
+    $("#RecetaSelect").select2({
+        dropdownParent: $("#RecetasModalLabel"), // Asegura que el dropdown se muestre dentro del modal
+        width: "100%",
+        placeholder: "Selecciona una opción",
+        allowClear: false
+    });
+
+    $("#insumoSelect").select2({
+        dropdownParent: $("#insumosModalLabel"), // Asegura que el dropdown se muestre dentro del modal
+        width: "100%",
+        placeholder: "Selecciona una opción",
+        allowClear: false
+    });
+
 
 })
 
@@ -41,12 +57,14 @@ async function ObtenerDatosReceta(id) {
 
 
 async function cargarDatosReceta() {
-    if (recetaData && recetaData > 0) {
+    if (RecetaData && RecetaData > 0) {
 
-        const datosReceta = await ObtenerDatosReceta(recetaData);
+        const datosReceta = await ObtenerDatosReceta(RecetaData);
         await insertarDatosReceta(datosReceta.Receta);
         await configurarDataTableInsumos(datosReceta.Insumos);
-        await configurarDataTableSubrecetas(datosReceta.Subrecetas);
+        await configurarDataTableSubrecetas(datosReceta.SubRecetas);
+
+
 
         calcularDatosReceta();
 
@@ -59,30 +77,32 @@ async function insertarDatosReceta(datos) {
 
     document.getElementById("idReceta").value = datos.Id;
 
-
-    //Cargamos Datos del Cliente
     document.getElementById("UnidadesNegocio").value = datos.IdUnidadNegocio;
     document.getElementById("descripcion").value = datos.Descripcion;
     document.getElementById("sku").value = datos.Sku;
     document.getElementById("Categorias").value = datos.IdCategoria;
     document.getElementById("UnidadMedidas").value = datos.IdUnidadMedida;
-    document.getElementById("costoInsumos").value = formatoMoneda.format(datos.CostoInsumos);
-    document.getElementById("costoSubrecetas").value = formatoMoneda.format(datos.CostoSubrecetas);
-    document.getElementById("costoTotal").value = formatoMoneda.format(datos.CostoTotal);
 
-
+    document.getElementById("costoInsumos").value = formatoMoneda.format(datos.CostoInsumos ?? 0);
+    document.getElementById("costoRecetas").value = formatoMoneda.format(datos.CostoRecetas ?? 0);
+    document.getElementById("CostoPorcion").value = formatoMoneda.format(datos.CostoPorcion ?? 0);
+    document.getElementById("Rendimiento").value = datos.Rendimiento ?? 0;
+    document.getElementById("CostoUnitario").value = formatoMoneda.format(datos.CostoUnitario ?? 0);
 
     document.getElementById("btnNuevoModificar").textContent = "Guardar";
 
-    await calcularDatosReceta();
+    $("#tituloReceta").text("Editar Receta");
+
+
+    await calcularDatosReceta(); // si esto depende del rendimiento o costos, mantenelo
 }
 
 
 
 
 async function configurarDataTableSubrecetas(data) {
-    if (!gridSubrecetas) {
-        gridSubrecetas = $('#grd_Subrecetas').DataTable({
+    if (!gridRecetas) {
+        gridRecetas = $('#grd_Subrecetas').DataTable({
             data: data != null ? data.$values : data,
             language: {
                 sLengthMenu: "Mostrar MENU registros",
@@ -100,12 +120,12 @@ async function configurarDataTableSubrecetas(data) {
                     data: "Id",
                     render: function (data, type, row) {
                         return `
-                <button class='btn btn-sm btneditar btnacciones' type='button' onclick='editarSubreceta(${row.IdSubreceta})' title='Editar'>
-                    <i class='fa fa-pencil-square-o fa-lg text-white' aria-hidden='true'></i>
-                </button>
-                <button class='btn btn-sm btneditar btnacciones' type='button' onclick='eliminarSubreceta(${row.IdSubreceta})' title='Eliminar'>
-                    <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i>
-                </button>`;
+<button class='btn btn-sm btneditar btnacciones' type='button' onclick='editarSubreceta(${row.IdSubReceta})' title='Editar'>
+    <i class='fa fa-pencil-square-o fa-lg text-white' aria-hidden='true'></i>
+</button>
+<button class='btn btn-sm btneditar btnacciones' type='button' onclick='eliminarSubreceta(${row.IdSubReceta})' title='Eliminar'>
+    <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i>
+</button>`;
                     },
                     orderable: true,
                     searchable: true,
@@ -126,7 +146,7 @@ async function configurarDataTableSubrecetas(data) {
 
             initComplete: async function () {
                 setTimeout(function () {
-                    gridSubrecetas.columns.adjust();
+                    gridRecetas.columns.adjust();
                 }, 10);
 
 
@@ -134,7 +154,7 @@ async function configurarDataTableSubrecetas(data) {
         });
 
     } else {
-        gridSubrecetas.clear().rows.add(data).draw();
+        gridRecetas.clear().rows.add(data).draw();
     }
 }
 
@@ -227,10 +247,10 @@ async function anadirInsumo() {
         const selectedProductId = parseInt(this.value);
         const selectedProduct = insumos.find(p => p.Id === selectedProductId);
 
-        const costoUnitario = selectedProduct.CostoUnitario;
+        const CostoUnitario = selectedProduct.CostoUnitario;
         cantidadInput.val(1);
-        precioInput.val(formatoMoneda.format(costoUnitario));
-        totalInput.val(formatoMoneda.format(costoUnitario));
+        precioInput.val(formatoMoneda.format(CostoUnitario));
+        totalInput.val(formatoMoneda.format(CostoUnitario));
     });
 
     insumoSelect.trigger("change");
@@ -250,10 +270,13 @@ async function cargarInsumosModal(IdUnidadNegocio, insumosEnTabla, insumoSelecci
     let primerHabilitadoId = null;
 
     insumos.forEach(insumo => {
+        // Si ya está en la tabla y no es el que estamos editando, no lo mostramos
+        if (insumosEnTabla.includes(insumo.Id) && insumo.Id !== insumoSeleccionado) return;
+
         const option = $(`<option value="${insumo.Id}">${insumo.Descripcion}</option>`);
 
-        if (insumosEnTabla.includes(insumo.Id)) {
-            option.prop('disabled', true);
+        if (insumo.Id === insumoSeleccionado) {
+            option.prop("selected", true).prop("disabled", true);
         } else if (primerHabilitadoId === null) {
             primerHabilitadoId = insumo.Id;
         }
@@ -261,10 +284,8 @@ async function cargarInsumosModal(IdUnidadNegocio, insumosEnTabla, insumoSelecci
         insumoSelect.append(option);
     });
 
-
-    if (insumoSeleccionado !== null) {
-        insumoSelect.val(insumoSeleccionado).prop("disabled", true);
-    } else if (primerHabilitadoId !== null) {
+    // Si no se está editando, seleccionar el primer habilitado
+    if (insumoSeleccionado === null && primerHabilitadoId !== null) {
         insumoSelect.val(primerHabilitadoId).prop("disabled", false);
     }
 
@@ -275,9 +296,9 @@ async function guardarInsumo() {
     const insumoSelect = document.getElementById('insumoSelect');
     const precioManual = parseFloat(convertirMonedaAFloat(document.getElementById('precioInput').value));
     const totalInput = parseFloat(convertirMonedaAFloat(document.getElementById('totalInput').value));
-    const cantidadInput = parseInt(document.getElementById('cantidadInput').value) || 1; // Obtener cantidad, por defecto 1 si no es válida
+    const cantidadInput = parseFloat(document.getElementById('cantidadInput').value) || 1; // Obtener cantidad, por defecto 1 si no es válida
     const InsumoId = insumoSelect.value;
-    const SubrecetaNombre = insumoSelect.options[insumoSelect.selectedIndex]?.text || '';
+    const RecetaNombre = insumoSelect.options[insumoSelect.selectedIndex]?.text || '';
 
 
     let i = 0;
@@ -289,15 +310,15 @@ async function guardarInsumo() {
 
     const selectedProduct = insumos.find(p => p.IdInsumo === parseInt(InsumoId));
 
-    // Verificar si el Subreceta ya existe en la tabla
-    let SubrecetaExistente = false;
+    // Verificar si el Receta ya existe en la tabla
+    let RecetaExistente = false;
 
     if (isEditing) {
         // Si estamos editando, solo actualizamos la fila correspondiente
         gridInsumos.rows().every(function () {
             const data = this.data();
             if (data.IdInsumo == editId) {
-                data.Nombre = SubrecetaNombre;
+                data.Nombre = RecetaNombre;
                 data.CostoUnitario = precioManual; // Guardar PrecioVenta
                 data.Cantidad = cantidadInput; // Usar la cantidad del input
                 data.SubTotal = totalInput; // Recalcular el total con formato de moneda
@@ -305,25 +326,25 @@ async function guardarInsumo() {
             }
         });
     } else {
-        // Buscar si el Subreceta ya existe en la tabla
+        // Buscar si el Receta ya existe en la tabla
         gridInsumos.rows().every(function () {
             const data = this.data();
             if (data.IdInsumo == InsumoId) {
-                // Subreceta existe, sumamos las cantidades y recalculamos el total
+                // Receta existe, sumamos las cantidades y recalculamos el total
                 data.Cantidad = cantidadInput; // Sumar la cantidad proporcionada
                 data.CostoUnitario = precioManual; // Guardar PrecioVenta
                 data.SubTotal = precioManual * data.Cantidad; // Recalcular el total con formato de moneda
                 this.data(data).draw();
-                SubrecetaExistente = true;
+                RecetaExistente = true;
             }
         });
 
-        if (!SubrecetaExistente) {
-            // Si no existe, agregar un nuevo Subreceta
+        if (!RecetaExistente) {
+            // Si no existe, agregar un nuevo Receta
             gridInsumos.row.add({
                 IdInsumo: InsumoId,
                 Id: 0,
-                Nombre: SubrecetaNombre,
+                Nombre: RecetaNombre,
                 CostoUnitario: precioManual, // Agregar PrecioVenta
                 Cantidad: cantidadInput, // Usar la cantidad proporcionada
                 SubTotal: totalInput // Recalcular el total con formato de moneda
@@ -374,7 +395,7 @@ async function editarInsumo(id) {
 function eliminarInsumo(id) {
     gridInsumos.rows().every(function (rowIdx, tableLoop, rowLoop) {
         const data = this.data();
-        if (data.IdInsumo == id) {
+        if (data != null && data.IdInsumo == id) {
             gridInsumos.row(rowIdx).remove().draw();
         }
     });
@@ -386,181 +407,181 @@ async function anadirSubreceta() {
     const IdUnidadNegocio = $("#UnidadesNegocio").val();
     const SubrecetasEnTabla = [];
 
-    gridSubrecetas.rows().every(function () {
+    gridRecetas.rows().every(function () {
         const data = this.data();
-        SubrecetasEnTabla.push(Number(data.IdSubreceta));
+        SubrecetasEnTabla.push(Number(data.IdSubReceta));
     });
 
-    Subrecetas = await cargarSubrecetasModal(IdUnidadNegocio, SubrecetasEnTabla);
+    const Subrecetas = await cargarSubrecetasModal(IdUnidadNegocio, SubrecetasEnTabla);
 
+    if (!Subrecetas) return;
 
     const todosYaAgregados = Subrecetas.every(x => SubrecetasEnTabla.includes(x.Id));
 
     if (todosYaAgregados) {
-        advertenciaModal("¡Ya has agregado todos los Subrecetas de esta unidad de negocio!");
-        return false; // Detener si no hay más Subrecetas para añadir
+        advertenciaModal("¡Ya has agregado todas las subrecetas de esta unidad de negocio!");
+        return false;
     }
 
-    if (!Subrecetas) return;
-
-    const SubrecetaSelect = $("#SubrecetaSelect");
+    const SubrecetaSelect = $("#RecetaSelect");
     const precioInput = $("#precioSubrecetaInput");
-    const cantidadInput = $("#cantidadSubrecetaInput");
-    const totalInput = $("#totalSubrecetaInput");
+    const cantidadInput = $("#cantidadRecetaInput");
+    const totalInput = $("#totalRecetaInput");
 
-    SubrecetaSelect.on("change", async function () {
+    SubrecetaSelect.off("change").on("change", function () {
         const selectedProductId = parseInt(this.value);
         const selectedProduct = Subrecetas.find(p => p.Id === selectedProductId);
 
-        const CostoTotal = selectedProduct.CostoTotal;
+        const CostoUnitario = selectedProduct?.CostoUnitario || 0;
         cantidadInput.val(1);
-        precioInput.val(formatoMoneda.format(CostoTotal));
-        totalInput.val(formatoMoneda.format(CostoTotal));
+        precioInput.val(formatoMoneda.format(CostoUnitario));
+        totalInput.val(formatoMoneda.format(CostoUnitario));
     });
 
     SubrecetaSelect.trigger("change");
 
-    $('#SubrecetasModal').data('edit-id', null);
-    $('#SubrecetasModal').data('data-editing', false);
-    $('#btnGuardarSubreceta').text('Añadir');
-    $("#SubrecetasModal").modal('show');
+    $('#RecetasModal').data('edit-id', null);
+    $('#RecetasModal').data('data-editing', false);
+    $('#btnGuardarReceta').text('Añadir');
+    $("#RecetasModal").modal('show');
 }
 
-async function cargarSubrecetasModal(IdUnidadNegocio, SubrecetasEnTabla, SubrecetaSeleccionado = null) {
-    Subrecetas = await obtenerSubrecetasUnidadNegocio(IdUnidadNegocio);
-    const SubrecetaSelect = $("#SubrecetaSelect");
+async function cargarSubrecetasModal(IdUnidadNegocio, RecetasEnTabla, RecetaSeleccionado = null) {
+    Recetas = await obtenerSubrecetasUnidadNegocio(IdUnidadNegocio);
+    const RecetaSelect = $("#RecetaSelect");
 
-    SubrecetaSelect.empty();
+    RecetaSelect.empty();
 
     let primerHabilitadoId = null;
 
-    Subrecetas.forEach(Subreceta => {
-        const option = $(`<option value="${Subreceta.Id}">${Subreceta.Descripcion}</option>`);
+    Recetas.forEach(Receta => {
+        // Si estoy editando, permito que se muestre solo la Receta seleccionada
+        if (RecetasEnTabla.includes(Receta.Id) && Receta.Id !== RecetaSeleccionado) return;
 
-        if (SubrecetasEnTabla.includes(Subreceta.Id)) {
-            option.prop('disabled', true);
+        const option = $(`<option value="${Receta.Id}">${Receta.Descripcion}</option>`);
+
+        if (Receta.Id === RecetaSeleccionado) {
+            option.prop("selected", true).prop("disabled", true);
         } else if (primerHabilitadoId === null) {
-            primerHabilitadoId = Subreceta.Id;
+            primerHabilitadoId = Receta.Id;
         }
 
-        SubrecetaSelect.append(option);
+        RecetaSelect.append(option);
     });
 
-
-    if (SubrecetaSeleccionado !== null) {
-        SubrecetaSelect.val(SubrecetaSeleccionado).prop("disabled", true);
-    } else if (primerHabilitadoId !== null) {
-        SubrecetaSelect.val(primerHabilitadoId).prop("disabled", false);
+    // Si no estoy editando, selecciono el primero habilitado
+    if (RecetaSeleccionado === null && primerHabilitadoId !== null) {
+        RecetaSelect.val(primerHabilitadoId).prop("disabled", false);
     }
 
-    return Subrecetas; // Devolver los Subrecetas cargados para su uso posterior
+    return Recetas;
 }
 
 async function guardarSubreceta() {
-    const SubrecetaSelect = document.getElementById('SubrecetaSelect');
+    const SubRecetaSelect = document.getElementById('RecetaSelect');
     const precioManual = parseFloat(convertirMonedaAFloat(document.getElementById('precioSubrecetaInput').value));
-    const totalInput = parseFloat(convertirMonedaAFloat(document.getElementById('totalSubrecetaInput').value));
-    const cantidadInput = parseInt(document.getElementById('cantidadSubrecetaInput').value) || 1; // Obtener cantidad, por defecto 1 si no es válida
-    const SubrecetaId = SubrecetaSelect.value;
-    const SubrecetaNombre = SubrecetaSelect.options[SubrecetaSelect.selectedIndex]?.text || '';
+    const totalInput = parseFloat(convertirMonedaAFloat(document.getElementById('totalRecetaInput').value));
+    const cantidadInput = parseFloat(document.getElementById('cantidadRecetaInput').value) || 1;
+    const IdSubReceta = parseInt(SubRecetaSelect.value);
+    const NombreSubReceta = SubRecetaSelect.options[SubRecetaSelect.selectedIndex]?.text || '';
 
+    const modal = $('#RecetasModal');
+    const isEditing = modal.data('data-editing') === true;
+    const editId = parseInt(modal.data('edit-id')) || 0;
+    const editKey = modal.data('edit-key') || null;
 
-    let i = 0;
-
-
-    const modal = $('#SubrecetasModal');
-    const isEditing = modal.attr('data-editing') === 'true';
-    const editId = modal.attr('edit-id');
-
-    const selectedProduct = Subrecetas.find(p => p.IdSubreceta === parseInt(SubrecetaId));
-
-    // Verificar si el Subreceta ya existe en la tabla
-    let SubrecetaExistente = false;
+    let existeSubReceta = false;
 
     if (isEditing) {
-        // Si estamos editando, solo actualizamos la fila correspondiente
-        gridSubrecetas.rows().every(function () {
+        gridRecetas.rows().every(function () {
             const data = this.data();
-            if (data.IdSubreceta == editId) {
-                data.Nombre = SubrecetaNombre;
-                data.CostoTotal = precioManual; // Guardar PrecioVenta
-                data.Cantidad = cantidadInput; // Usar la cantidad del input
-                data.SubTotal = totalInput; // Recalcular el total con formato de moneda
+
+            const matchById = data.Id === editId;
+            const matchByKey = !data.Id && data.__keyTempId && data.__keyTempId === editKey;
+
+            if (matchById || matchByKey) {
+                data.IdSubReceta = IdSubReceta;
+                data.Nombre = NombreSubReceta;
+                data.CostoUnitario = precioManual;
+                data.Cantidad = cantidadInput;
+                data.SubTotal = totalInput;
                 this.data(data).draw();
+                existeSubReceta = true;
             }
         });
     } else {
-        // Buscar si el Subreceta ya existe en la tabla
-        gridSubrecetas.rows().every(function () {
+        gridRecetas.rows().every(function () {
             const data = this.data();
-            if (data.IdSubreceta == SubrecetaId) {
-                // Subreceta existe, sumamos las cantidades y recalculamos el total
-                data.Cantidad = cantidadInput; // Sumar la cantidad proporcionada
-                data.CostoUnitario = precioManual; // Guardar PrecioVenta
-                data.SubTotal = precioManual * data.Cantidad; // Recalcular el total con formato de moneda
+            if (parseInt(data.IdSubReceta) === IdSubReceta) {
+                data.Cantidad += cantidadInput;
+                data.CostoUnitario = precioManual;
+                data.SubTotal = precioManual * data.Cantidad;
                 this.data(data).draw();
-                SubrecetaExistente = true;
+                existeSubReceta = true;
             }
         });
 
-        if (!SubrecetaExistente) {
-            // Si no existe, agregar un nuevo Subreceta
-            gridSubrecetas.row.add({
-                IdSubreceta: SubrecetaId,
+        if (!existeSubReceta) {
+            gridRecetas.row.add({
                 Id: 0,
-                Nombre: SubrecetaNombre,
-                CostoUnitario: precioManual, // Agregar PrecioVenta
-                Cantidad: cantidadInput, // Usar la cantidad proporcionada
-                SubTotal: totalInput // Recalcular el total con formato de moneda
+                IdSubReceta: IdSubReceta,
+                Nombre: NombreSubReceta,
+                CostoUnitario: precioManual,
+                Cantidad: cantidadInput,
+                SubTotal: totalInput,
+                __keyTempId: Date.now()
             }).draw();
         }
     }
 
-    // Limpiar y cerrar el modal
     modal.modal('hide');
+    modal.data('edit-id', '');
+    modal.data('edit-key', '');
+    modal.data('data-editing', false);
 
     calcularDatosReceta();
-
 }
 
 async function editarSubreceta(id) {
     const IdUnidadNegocio = parseInt($("#UnidadesNegocio").val());
     const SubrecetasEnTabla = [];
-    let SubrecetaData = null;
+    let subreceta = null;
 
-    gridSubrecetas.rows().every(function () {
+    gridRecetas.rows().every(function () {
         const data = this.data();
-        SubrecetasEnTabla.push(Number(data.IdSubreceta));
+        SubrecetasEnTabla.push(Number(data.IdSubReceta));
 
-        if (data.IdSubreceta == id) {
-            SubrecetaData = data;
+        if (parseInt(data.IdSubReceta) === id) {
+            subreceta = data;
         }
     });
 
-    if (!SubrecetaData) {
-        advertenciaModal("No se encontró el Subreceta a editar.");
+    if (!subreceta) {
+        advertenciaModal("No se encontró la subreceta a editar.");
         return;
     }
 
-    Subrecetas = await cargarSubrecetasModal(IdUnidadNegocio, SubrecetasEnTabla, SubrecetaData.IdSubreceta);
-    if (!Subrecetas) return;
+    const Recetas = await cargarSubrecetasModal(IdUnidadNegocio, SubrecetasEnTabla, subreceta.IdSubReceta);
+    if (!Recetas) return;
 
-    $("#cantidadSubrecetaInput").val(SubrecetaData.Cantidad);
-    $("#precioSubrecetaInput").val(formatoMoneda.format(SubrecetaData.CostoUnitario));
-    $("#totalSubrecetaInput").val(formatoMoneda.format(SubrecetaData.SubTotal));
+    $("#cantidadRecetaInput").val(subreceta.Cantidad);
+    $("#precioSubrecetaInput").val(formatoMoneda.format(subreceta.CostoUnitario));
+    $("#totalRecetaInput").val(formatoMoneda.format(subreceta.SubTotal));
 
-    $("#SubrecetaSelect").prop("disabled", true);
+    $("#RecetaSelect").prop("disabled", true);
 
-    $('#SubrecetasModal').data('edit-id', SubrecetaData.Id);
-    $('#btnGuardarSubreceta').text('Editar');
-    $("#SubrecetasModal").modal('show');
+    $('#RecetasModal').data('edit-id', subreceta.Id || 0);
+    $('#RecetasModal').data('edit-key', subreceta.__keyTempId || null);
+    $('#RecetasModal').data('data-editing', true);
+    $('#btnGuardarReceta').text('Editar');
+    $("#RecetasModal").modal('show');
 }
 
 function eliminarSubreceta(id) {
-    gridSubrecetas.rows().every(function (rowIdx, tableLoop, rowLoop) {
+    gridRecetas.rows().every(function (rowIdx, tableLoop, rowLoop) {
         const data = this.data();
-        if (data.IdSubreceta == id) {
-            gridSubrecetas.row(rowIdx).remove().draw();
+        if (data != null && data.IdSubReceta == id) {
+            gridRecetas.row(rowIdx).remove().draw();
         }
     });
     calcularDatosReceta();
@@ -597,7 +618,7 @@ async function listaUnidadesNegocio() {
 }
 
 async function listaCategoriasFilter() {
-    const url = `/SubrecetasCategoria/Lista`;
+    const url = `/RecetasCategoria/Lista`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -670,7 +691,7 @@ async function obtenerInsumosUnidadNegocio(id) {
 
 
 async function obtenerSubrecetasUnidadNegocio(id) {
-    const url = `/Subrecetas/Lista?IdUnidadNegocio=${id}`;
+    const url = `/SubRecetas/Lista?IdUnidadNegocio=${id}`;
     const response = await fetch(url);
     const data = await response.json();
 
@@ -678,7 +699,7 @@ async function obtenerSubrecetasUnidadNegocio(id) {
     return data.map(x => ({
         Id: x.Id,
         Descripcion: x.Descripcion,
-        CostoTotal: x.CostoTotal
+        CostoUnitario: x.CostoUnitario
     }));
 
 }
@@ -691,10 +712,10 @@ document.querySelector('#insumos-tab').addEventListener('shown.bs.tab', function
     }
 });
 
-document.querySelector('#Subrecetas-tab').addEventListener('shown.bs.tab', function () {
-    if (gridSubrecetas) {
+document.querySelector('#Receta-tab').addEventListener('shown.bs.tab', function () {
+    if (gridRecetas) {
         setTimeout(function () {
-            gridSubrecetas.columns.adjust();
+            gridRecetas.columns.adjust();
         }, 10); // Un pequeño retraso para asegurar que las dimensiones estén listas
     }
 });
@@ -733,9 +754,9 @@ document.getElementById('precioInput').addEventListener('blur', function () {
 
 
 
-async function calcularTotalSubreceta() {
+async function calcularTotalReceta() {
     const precioRaw = document.getElementById('precioSubrecetaInput').value;
-    const cantidad = parseFloat(document.getElementById('cantidadSubrecetaInput').value) || 0;
+    const cantidad = parseFloat(document.getElementById('cantidadRecetaInput').value) || 0;
 
     // Extraer solo el número del campo precio
     const precio = formatoNumero(precioRaw);
@@ -743,15 +764,15 @@ async function calcularTotalSubreceta() {
     const total = precio * cantidad;
 
     // Mostrar el total formateado en el campo
-    document.getElementById('totalSubrecetaInput').value = formatoMoneda.format(total);
+    document.getElementById('totalRecetaInput').value = formatoMoneda.format(total);
 }
 
 document.getElementById('precioSubrecetaInput').addEventListener('input', function () {
-    calcularTotalSubreceta();
+    calcularTotalReceta();
 });
 
-document.getElementById('cantidadSubrecetaInput').addEventListener('input', function () {
-    calcularTotalSubreceta();
+document.getElementById('cantidadRecetaInput').addEventListener('input', function () {
+    calcularTotalReceta();
 });
 
 document.getElementById('precioSubrecetaInput').addEventListener('blur', function () {
@@ -761,39 +782,44 @@ document.getElementById('precioSubrecetaInput').addEventListener('blur', functio
     this.value = formatMoneda(convertirMonedaAFloat(this.value));
 
     // Recalcular el total cada vez que cambia el precio
-    calcularTotalSubreceta();
+    calcularTotalReceta();
 });
 
-
-
+document.getElementById('Rendimiento').addEventListener('blur', function () {
+    calcularDatosReceta();
+});
 
 async function calcularDatosReceta() {
     let InsumoTotal = 0;
+    let RecetaTotal = 0;
 
-    if (gridInsumos != null && gridInsumos.rows().count() > 0) {
+    if (gridInsumos && gridInsumos.rows().count() > 0) {
         gridInsumos.rows().every(function () {
             const producto = this.data();
             InsumoTotal += parseFloat(producto.SubTotal);
         });
     }
 
-    let SubrecetaTotal = 0;
-
-    if (gridSubrecetas != null && gridSubrecetas.rows().count() > 0) {
-        gridSubrecetas.rows().every(function () {
+    if (gridRecetas && gridRecetas.rows().count() > 0) {
+        gridRecetas.rows().every(function () {
             const producto = this.data();
-            SubrecetaTotal += parseFloat(producto.SubTotal);
+            RecetaTotal += parseFloat(producto.SubTotal);
         });
     }
 
-    total = SubrecetaTotal + InsumoTotal;
+    const CostoPorcion = RecetaTotal + InsumoTotal;
 
+    // Obtener rendimiento desde input
+    const rendimiento = parseFloat(document.getElementById("Rendimiento").value) || 1;
 
+    // Calcular costo unitario redondeado
+    const CostoUnitario = +(CostoPorcion / rendimiento).toFixed(2);
 
-    document.getElementById("costoTotal").value = formatoMoneda.format(parseFloat(total));
-    document.getElementById("costoInsumos").value = formatoMoneda.format(parseFloat(InsumoTotal));
-    document.getElementById("costoSubrecetas").value = formatoMoneda.format(parseFloat(SubrecetaTotal));
-
+    // Mostrar en campos
+    document.getElementById("CostoUnitario").value = formatoMoneda.format(CostoUnitario);
+    document.getElementById("CostoPorcion").value = formatoMoneda.format(CostoPorcion);
+    document.getElementById("costoInsumos").value = formatoMoneda.format(InsumoTotal);
+    document.getElementById("costoRecetas").value = formatoMoneda.format(RecetaTotal);
 }
 
 function validarCampos() {
@@ -819,49 +845,43 @@ function guardarCambios() {
             let insumos = [];
             grd.rows().every(function () {
                 const insumo = this.data();
-                const insumoJson = {
-                    "IdReceta": idReceta != "" ? idReceta : 0,
+                insumos.push({
+                    "IdReceta": idReceta !== "" ? parseInt(idReceta) : 0,
                     "IdInsumo": parseInt(insumo.IdInsumo),
-                    "Id": insumo.Id != "" ? insumo.Id : 0,
+                    "Id": insumo.Id !== "" ? parseInt(insumo.Id) : 0,
                     "Nombre": insumo.Nombre,
                     "CostoUnitario": parseFloat(insumo.CostoUnitario),
                     "SubTotal": parseFloat(insumo.SubTotal),
-                    "Cantidad": parseInt(insumo.Cantidad),
-
-                };
-                insumos.push(insumoJson);
+                    "Cantidad": parseFloat(insumo.Cantidad)
+                });
             });
             return insumos;
         }
 
         function obtenerSubrecetas(grd) {
-            let Subrecetas = [];
+            let subrecetas = [];
             grd.rows().every(function () {
-                const Subreceta = this.data();
-                const SubrecetaJson = {
-                    "IdReceta": idReceta != "" ? idReceta : 0,
-                    "IdSubreceta": parseInt(Subreceta.IdSubreceta),
-                    "Id": Subreceta.Id != "" ? Subreceta.Id : 0,
-                    "Nombre": Subreceta.Nombre,
-                    "CostoUnitario": parseFloat(Subreceta.CostoUnitario),
-                    "SubTotal": parseFloat(Subreceta.SubTotal),
-                    "Cantidad": parseInt(Subreceta.Cantidad),
-
-                };
-                Subrecetas.push(SubrecetaJson);
+                const sub = this.data();
+                subrecetas.push({
+                    "IdSubReceta": parseInt(sub.IdSubReceta),
+                    "Id": sub.Id !== "" ? parseInt(sub.Id) : 0,
+                    "Nombre": sub.Nombre,
+                    "CostoUnitario": parseFloat(sub.CostoUnitario),
+                    "SubTotal": parseFloat(sub.SubTotal),
+                    "Cantidad": parseFloat(sub.Cantidad)
+                });
             });
-            return Subrecetas;
+            return subrecetas;
         }
 
         const insumos = obtenerInsumos(gridInsumos);
-        const Subrecetas = obtenerSubrecetas(gridSubrecetas);
+        const subrecetas = obtenerSubrecetas(gridRecetas);
 
-        if (insumos.length == 0) {
-            advertenciaModal("Debes agregar al menos un insumo");
+        if (insumos.length === 0 && subrecetas.length === 0) {
+            advertenciaModal("Debes agregar al menos un insumo o subreceta.");
             return;
         }
 
-        // Construcción del objeto para el modelo
         const nuevoModelo = {
             "Id": idReceta !== "" ? parseInt(idReceta) : 0,
             "IdUnidadNegocio": parseInt($("#UnidadesNegocio").val()),
@@ -869,20 +889,18 @@ function guardarCambios() {
             "Sku": $("#sku").val(),
             "IdCategoria": parseInt($("#Categorias").val()),
             "IdUnidadMedida": parseInt($("#UnidadMedidas").val()),
-            "CostoTotal": parseFloat(convertirMonedaAFloat($("#costoTotal").val())),
-            "CostoSubrecetas": parseFloat(convertirMonedaAFloat($("#costoSubrecetas").val())),
+            "CostoPorcion": parseFloat(convertirMonedaAFloat($("#CostoPorcion").val())),
+            "Rendimiento": parseFloat($("#Rendimiento").val()),
+            "CostoUnitario": parseFloat(convertirMonedaAFloat($("#CostoUnitario").val())),
+            "CostoSubRecetas": parseFloat(convertirMonedaAFloat($("#costoRecetas").val())),
             "CostoInsumos": parseFloat(convertirMonedaAFloat($("#costoInsumos").val())),
             "RecetasInsumos": insumos,
-            "RecetasSubrecetas": Subrecetas
+            "RecetasSubreceta": subrecetas
         };
 
-        // Definir la URL y el método para el envío
         const url = idReceta === "" ? "/Recetas/Insertar" : "/Recetas/Actualizar";
         const method = idReceta === "" ? "POST" : "PUT";
 
-        console.log(JSON.stringify(nuevoModelo))
-
-        // Enviar los datos al servidor
         fetch(url, {
             method: method,
             headers: {
@@ -891,21 +909,24 @@ function guardarCambios() {
             body: JSON.stringify(nuevoModelo)
         })
             .then(response => {
-
                 if (!response.ok) throw new Error(response.statusText);
                 return response.json();
             })
             .then(dataJson => {
-                console.log("Respuesta del servidor:", dataJson);
-                const mensaje = idReceta === "" ? "Receta registrada correctamente" : "Pedido modificada correctamente";
-                exitoModal(mensaje);
-                window.location.href = "/Recetas/Index";
-
+                if (dataJson.valor) {
+                    const mensaje = idReceta === "" ? "Receta registrada correctamente" : "Receta modificada correctamente";
+                    exitoModal(mensaje);
+                    window.location.href = "/Recetas/Index";
+                } else {
+                    const mensaje = idReceta === "" ? "Ha ocurrido un error al crear la Receta" : "Ha ocurrido un error al modificar la Receta";
+                    errorModal(mensaje);
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
+
     } else {
-        errorModal("Debes completar los campos requeridos.")
+        errorModal("Debes completar los campos requeridos.");
     }
 }

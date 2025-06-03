@@ -4,26 +4,27 @@ namespace SistemaPanera.Application.Models.ViewModels
 {
     public class VMReceta
     {
-    public int Id { get; set; }
+        public int Id { get; set; }
 
         public int IdUnidadNegocio { get; set; }
 
         public string Sku { get; set; } = null!;
 
         public string Descripcion { get; set; } = null!;
-        public string Categoria { get; set; } = null!;
-        public string UnidadMedida { get; set; } = null!;
-        public string UnidadNegocio { get; set; } = null!;
-
-        public int IdCategoria { get; set; }
 
         public int IdUnidadMedida { get; set; }
 
-        public decimal CostoSubrecetas { get; set; }
+        public int IdCategoria { get; set; }
+
+        public decimal? CostoSubRecetas { get; set; }
 
         public decimal CostoInsumos { get; set; }
 
-        public decimal CostoTotal { get; set; }
+        public decimal CostoPorcion { get; set; }
+
+        public decimal? Rendimiento { get; set; }
+
+        public decimal? CostoUnitario { get; set; }
 
         public DateTime FechaActualizacion { get; set; }
 
@@ -35,8 +36,11 @@ namespace SistemaPanera.Application.Models.ViewModels
 
         public virtual ICollection<RecetasInsumo> RecetasInsumos { get; set; } = new List<RecetasInsumo>();
 
-        public virtual ICollection<RecetasStock> RecetasStocks { get; set; } = new List<RecetasStock>();
-        public virtual ICollection<RecetasSubreceta> RecetasSubrecetas { get; set; } = new List<RecetasSubreceta>();
+        public virtual ICollection<RecetasSubreceta> RecetasSubreceta { get; set; } = new List<RecetasSubreceta>();
+
+        public string Categoria { get; set; }
+        public string UnidadMedida { get; set; }
+        public string UnidadNegocio { get; set; }
 
     }
 }
