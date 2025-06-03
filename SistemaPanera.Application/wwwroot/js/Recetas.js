@@ -3,16 +3,18 @@ let isEditing = false;
 
 
 const columnConfig = [
-    { index: 1, filterType: 'text' },
-    { index: 2, filterType: 'text' },
-    { index: 3, filterType: 'text' },
-    { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesNegocioFilter },
-    { index: 5, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter },
-    { index: 6, filterType: 'select', fetchDataFunc: listaRecetasCategoriaFilter },
-    { index: 7, filterType: 'text' },
-    { index: 8, filterType: 'text' },
-    { index: 9, filterType: 'text' },
+    { index: 1, filterType: 'text' }, // Descripción
+    { index: 2, filterType: 'text' }, // SKU
+    { index: 3, filterType: 'select', fetchDataFunc: listaUnidadesNegocioFilter }, // Unidad Negocio
+    { index: 4, filterType: 'select', fetchDataFunc: listaUnidadesMedidaFilter }, // Unidad Medida
+    { index: 5, filterType: 'select', fetchDataFunc: listaRecetasCategoriaFilter }, // Categoría
+    { index: 6, filterType: 'text' }, // Costo Recetas
+    { index: 7, filterType: 'text' }, // Costo Insumos
+    { index: 8, filterType: 'text' }, // Rendimiento
+    { index: 9, filterType: 'text' }, // Costo Unitario
+    { index: 10, filterType: 'text' }, // Costo Porción
 ];
+
 
 $(document).ready(() => {
 
@@ -148,23 +150,23 @@ function editarReceta(id) {
 
 
 async function eliminarReceta(id) {
-    let resultado = window.confirm("¿Desea eliminar el Receta?");
+    let resultado = window.confirm("¿Desea eliminar la Receta?");
 
     if (resultado) {
         try {
-            const response = await fetch("Recetas/Eliminar?id=" + id, {
+            const response = await fetch("/Recetas/Eliminar?id=" + id, {
                 method: "DELETE"
             });
 
             if (!response.ok) {
-                throw new Error("Error al eliminar el Receta.");
+                throw new Error("Error al eliminar la Receta.");
             }
 
             const dataJson = await response.json();
 
             if (dataJson.valor) {
                 aplicarFiltros();
-                exitoModal("Receta eliminado correctamente")
+                exitoModal("Receta eliminada correctamente")
             }
         } catch (error) {
             console.error("Ha ocurrido un error:", error);
@@ -188,36 +190,35 @@ async function configurarDataTable(data) {
                 {
                     data: "Id",
                     title: '',
-                    width: "1%", // Ancho fijo para la columna
+                    width: "1%",
                     render: function (data) {
                         return `
                 <div class="acciones-menu" data-id="${data}">
-                    <button class='btn btn-sm btnacciones' type='button' onclick='toggleAcciones(${data})' title='Acciones'>
-                        <i class='fa fa-ellipsis-v fa-lg text-white' aria-hidden='true'></i>
+                    <button class='btn btn-sm btnacciones' type='button' onclick='toggleAcciones(${data})'>
+                        <i class='fa fa-ellipsis-v fa-lg text-white'></i>
                     </button>
                     <div class="acciones-dropdown" style="display: none;">
-                        <button class='btn btn-sm btneditar' type='button' onclick='editarReceta(${data})' title='Editar'>
-                            <i class='fa fa-pencil-square-o fa-lg text-success' aria-hidden='true'></i> Editar
-                        </button>
-                        <button class='btn btn-sm btneliminar' type='button' onclick='eliminarReceta(${data})' title='Eliminar'>
-                            <i class='fa fa-trash-o fa-lg text-danger' aria-hidden='true'></i> Eliminar
-                        </button>
+                        <button class='btn btn-sm btneditar' onclick='editarReceta(${data})'><i class='fa fa-pencil-square-o text-success'></i> Editar</button>
+                        <button class='btn btn-sm btneliminar' onclick='eliminarReceta(${data})'><i class='fa fa-trash-o text-danger'></i> Eliminar</button>
                     </div>
                 </div>`;
                     },
                     orderable: false,
                     searchable: false,
                 },
-                { data: 'Descripcion' },
-                { data: 'FechaActualizacion' },
-                { data: 'Sku' },
-                { data: 'UnidadNegocio' },
-                { data: 'UnidadMedida' },
-                { data: 'Categoria' },
-                { data: 'CostoSubrecetas' },
-                { data: 'CostoInsumos' },
-                { data: 'CostoTotal' },
+                { data: 'Descripcion', title: 'Descripción' },
+               
+                { data: 'Sku', title: 'SKU' },
+                { data: 'UnidadNegocio', title: 'Unidad Negocio' },
+                { data: 'UnidadMedida', title: 'Unidad Medida' },
+                { data: 'Categoria', title: 'Categoría' },
+                { data: 'CostoRecetas', title: 'Costo Recetas' },
+                { data: 'CostoInsumos', title: 'Costo Insumos' },
+                { data: 'Rendimiento', title: 'Rendimiento' },
+                { data: 'CostoUnitario', title: 'Costo Unitario' },
+                { data: 'CostoPorcion', title: 'Costo Porción' },
             ],
+
             dom: 'Bfrtip',
             buttons: [
                 {
@@ -255,24 +256,15 @@ async function configurarDataTable(data) {
             fixedHeader: true,
 
             "columnDefs": [
+               
                 {
-                    "render": function (data, type, row) {
-                        if (data) {
-                            const date = new Date(data); // Convierte la cadena en un objeto Date
-                            //return date.toLocaleDateString('es-ES'); // Formato: 'DD/MM/YYYY'
-                            return moment(date, 'YYYY-MM-DD hh:mm').format('DD/MM/YYYY hh:mm'); // Formato: 'DD/MM/YYYY'
-                        }
+                    "render": function (data) {
+                        return formatNumber(data);
                     },
-                    "targets": [2] // Índices de las columnas de fechas
+                    "targets": [6, 7, 9, 10] // CostoRecetas, CostoInsumos, Rendimiento, CostoUnitario, CostoPorcion
                 },
-                {
-                    "render": function (data, type, row) {
-                        return formatNumber(data); // Formatear números
-                    },
-                    "targets": [7,8,9] // Índices de las columnas de números
-                },
-                
             ],
+
 
             initComplete: async function () {
                 var api = this.api();

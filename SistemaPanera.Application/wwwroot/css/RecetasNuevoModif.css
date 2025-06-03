@@ -1,44 +1,26 @@
-#grd_Subrecetas_wrapper {
-    overflow-x: auto;
+.form-control:focus, .form-select:focus {
+    border-color: #4dabf7;
+    box-shadow: 0 0 0 0.1rem rgba(77, 171, 247, 0.5);
 }
 
-#grd_Insumos_wrapper {
-    overflow-x: auto;
+.card-header.bg-gradient {
+    background: linear-gradient(to right, #2c3e50, #34495e);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+    border-color: #4dabf7 #4dabf7 #1a1a1a;
 }
 
 
-.selected {
-    background-color: #1fabca !important;
+.bg-gradient-primary {
+    background: linear-gradient(90deg, #1366f2, #6aaefc);
+    border-radius: 0.4rem;
 }
 
-select option:disabled {
-    color: red; /* Cambiar el color de la letra a rojo */
+.modal-content {
+    background-color: #323844 !important;
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: none;
 }
-
-.custom-checkbox {
-    appearance: none; /* Elimina el estilo predeterminado */
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    display: inline-block;
-    vertical-align: middle;
-    cursor: pointer;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-    /* Estado normal del checkbox */
-    .custom-checkbox:checked {
-        background-color: green;
-        border-color: green;
-    }
-
-        /* Personalización del label cuando el checkbox está seleccionado */
-        .custom-checkbox:checked + .form-check-label {
-            color: green;
-        }
-
-
-
-

@@ -159,15 +159,17 @@ async function eliminarSubReceta(id) {
             });
 
             if (!response.ok) {
-                throw new Error("Error al eliminar el SubReceta.");
+                throw new Error("Error al eliminar la SubReceta.");
             }
-
             const dataJson = await response.json();
 
             if (dataJson.valor) {
                 aplicarFiltros();
-                exitoModal("SubReceta eliminado correctamente")
+                exitoModal(dataJson.mensaje);
+            } else {
+                advertenciaModal(dataJson.mensaje);
             }
+
         } catch (error) {
             console.error("Ha ocurrido un error:", error);
         }

@@ -115,38 +115,62 @@ namespace SistemaPanera.DAL.Repository
             }
         }
 
-
-        public async Task<bool> Eliminar(int id)
+        public async Task<(bool eliminado, string mensaje)> Eliminar(int id)
         {
             try
             {
-                // 1. Eliminar registros hijos en Subrecetas_Subrecetas
+                // 1. Verificar si está usada en alguna receta
+                var recetasUsadas = await (from rs in _dbcontext.RecetasSubrecetas
+                                           join r in _dbcontext.Recetas on rs.IdReceta equals r.Id
+                                           where rs.IdSubReceta == id
+                                           select r.Descripcion).ToListAsync();
+
+                // 2. Verificar si está usada como hija de otra subreceta
+                var subrecetasPadre = await (from ss in _dbcontext.SubrecetasSubrecetas
+                                             join sr in _dbcontext.Subrecetas on ss.IdSubRecetaPadre equals sr.Id
+                                             where ss.IdSubRecetaHija == id
+                                             select sr.Descripcion).ToListAsync();
+
+                if (recetasUsadas.Any() || subrecetasPadre.Any())
+                {
+                    string msg = "No se puede eliminar la SubReceta porque está siendo utilizada en:\n";
+
+                    if (recetasUsadas.Any())
+                        msg += "- Recetas: " + string.Join(", ", recetasUsadas.Distinct()) + "\n";
+
+                    if (subrecetasPadre.Any())
+                        msg += "- SubRecetas: " + string.Join(", ", subrecetasPadre.Distinct());
+
+                    return (false, msg);
+                }
+
+                // 3. Eliminar relaciones hijas
                 var hijos = _dbcontext.SubrecetasSubrecetas
                     .Where(s => s.IdSubRecetaPadre == id)
                     .ToList();
-
                 _dbcontext.SubrecetasSubrecetas.RemoveRange(hijos);
 
-                // 2. Eliminar insumos asociados (si corresponde)
+                // 4. Eliminar insumos
                 var insumos = _dbcontext.SubrecetasInsumos
                     .Where(i => i.IdSubreceta == id)
                     .ToList();
-
                 _dbcontext.SubrecetasInsumos.RemoveRange(insumos);
 
-                // 3. Eliminar la subreceta principal
-                var model = _dbcontext.Subrecetas.First(c => c.Id == id);
+                // 5. Eliminar subreceta
+                var model = await _dbcontext.Subrecetas.FirstAsync(c => c.Id == id);
                 _dbcontext.Subrecetas.Remove(model);
 
                 await _dbcontext.SaveChangesAsync();
-                return true;
+                return (true, "SubReceta eliminada correctamente.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error al eliminar Subreceta: " + ex.Message);
-                return false;
+                return (false, "Error inesperado al eliminar la SubReceta.");
             }
         }
+
+
+
 
 
         //public async Task<bool> Insertar(Models.Subreceta model)

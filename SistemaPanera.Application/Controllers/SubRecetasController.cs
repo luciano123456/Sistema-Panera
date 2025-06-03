@@ -68,6 +68,8 @@ namespace SistemaPanera.Application.Controllers
         [HttpPost]
         public async Task<IActionResult> Insertar([FromBody] VMSubreceta model)
         {
+
+
             var subreceta = new Subreceta
             {
                 IdUnidadNegocio = model.IdUnidadNegocio,
@@ -153,10 +155,10 @@ namespace SistemaPanera.Application.Controllers
         [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)
         {
-            bool respuesta = await _SubrecetasService.Eliminar(id);
+            var (eliminado, mensaje) = await _SubrecetasService.Eliminar(id);
+            return Ok(new { valor = eliminado, mensaje });
+        }
 
-            return StatusCode(StatusCodes.Status200OK, new { valor = respuesta });
-         }
 
         [HttpGet]
         public async Task<IActionResult> EditarInfo(int id)

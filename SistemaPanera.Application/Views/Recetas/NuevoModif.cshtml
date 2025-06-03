@@ -17,16 +17,20 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
     <link href="~/css/Recetas.css" rel="stylesheet" />
     <link href="~/css/RecetasNuevoModif.css" rel="stylesheet" />
 
-
- 
+   
 }
 
-<div class="tituloRecetaclass mt-5">
-    <h2 class="tituloReceta">Nueva Receta</h2>
+<div class="bg-gradient-primary rounded-top px-3 py-2 mt-5 mb-4">
+    <h2 class="mb-0 text-white fw-bold text-center">
+        <i class="fa fa-plus-circle me-2"></i><span id="tituloReceta"></span>
+    </h2>
 </div>
+
 
 
 
@@ -50,58 +54,82 @@
     <!-- Contenido de las pestañas -->
     <div class="tab-content mt-4" id="myTabContent">
         <div class="tab-pane fade show active" id="Receta" role="tabpanel" aria-labelledby="Receta-tab">
-            <div class="card mb-4">
+            <div class="card">
+                <div class="card-header bg-gradient border-bottom border-primary">
+                    <h5 class="fw-bold mb-0"><i class="fa fa-utensils me-2"></i>Datos de la Receta</h5>
+                </div>
                 <div class="card-body">
-                    <h3 class="card-title">Datos de la Receta</h3>
-                    <input type="text" class="input-nuevo" id="idReceta" name="idReceta" hidden>
-                    <div class="form-container">
-                        <div class="form-group">
-                            <label for="txtUnidadNegocio">Unidad de Negocio</label>
-                            <select id="UnidadesNegocio" name="select" class="input-nuevo-select select-modal-personalizado mt-2">
-                                <option value="" selected>Unidad de Negocio</option>
+                    <input type="hidden" id="idReceta" name="idReceta" />
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="UnidadesNegocio" class="form-label">Unidad de Negocio</label>
+                            <select id="UnidadesNegocio" class="form-select bg-white text-black border-primary">
+                                <option value="" disabled selected>Seleccionar...</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="dniCliente">Sku</label>
-                            <input type="text" class="input-nuevo" id="sku" name="sku">
+
+                        <div class="col-md-3">
+                            <label for="sku" class="form-label">SKU</label>
+                            <input type="text" id="sku" class="form-control bg-white text-black border-primary" />
                         </div>
-                        <div class="form-group">
-                            <label for="descripcion">Descripcion</label>
-                            <input type="text" class="input-nuevo" id="descripcion" name="descripcion">
+
+                        <div class="col-md-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" id="descripcion" class="form-control bg-white text-black border-primary" />
                         </div>
-                        <div class="form-group">
-                            <label for="txtUnidadNegocio">Categoria</label>
-                            <select id="Categorias" name="select" class="input-nuevo-select select-modal-personalizado mt-2">
-                                <option value="" selected>Categoria</option>
+
+                        <div class="col-md-3">
+                            <label for="Categorias" class="form-label">Categoría</label>
+                            <select id="Categorias" class="form-select bg-white text-black border-primary">
+                                <option value="" disabled selected>Seleccionar...</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="txtUnidadNegocio">Unidad de Medida</label>
-                            <select id="UnidadMedidas" name="select" class="input-nuevo-select select-modal-personalizado mt-2">
-                                <option value="" selected>Unidad de Medida</option>
+
+                        <div class="col-md-2">
+                            <label for="UnidadMedidas" class="form-label">Unidad de Medida</label>
+                            <select id="UnidadMedidas" class="form-select bg-white text-black border-primary">
+                                <option value="" disabled selected>Seleccionar...</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="costoUnitario">Costo Subrecetas</label>
-                            <input type="text" class="input-nuevo" id="costoSubrecetas" name="costoSubrecetas">
+
+                        <div class="col-md-2">
+                            <label for="costoRecetas" class="form-label">Costo Subrecetas</label>
+                            <input type="text" id="costoRecetas" class="form-control bg-white text-black border-primary" readonly />
                         </div>
-                        <div class="form-group">
-                            <label for="costoInsumos">Costo Insumos</label>
-                            <input type="text" class="input-nuevo" id="costoInsumos" name="costoInsumos">
+
+                        <div class="col-md-2">
+                            <label for="costoInsumos" class="form-label">Costo Insumos</label>
+                            <input type="text" id="costoInsumos" class="form-control bg-white text-black border-primary" readonly />
                         </div>
-                        <div class="form-group">
-                            <label for="costoTotal">Costo Total</label>
-                            <input type="text" class="input-nuevo" id="costoTotal" name="costoTotal">
+
+                          <div class="col-md-2">
+                            <label for="CostoPorcion" class="form-label">Costo Porcion</label>
+                            <input type="text" id="CostoPorcion" class="form-control bg-white text-black border-primary" readonly />
                         </div>
+
+                        <div class="col-md-2">
+                            <label for="Rendimiento" class="form-label">Rendimiento</label>
+                            <input type="text" id="Rendimiento" class="form-control bg-white text-black border-primary" />
+                        </div>
+
+                     
+
+                        <div class="col-md-2">
+                            <label for="CostoUnitario" class="form-label">Costo Unitario</label>
+                            <input type="text" id="CostoUnitario" class="form-control bg-white text-black border-primary" readonly />
+                        </div>
+
+                      
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- Pestañas -->
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <ul class="nav nav-tabs mt-5" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="Subrecetas-tab" data-bs-toggle="tab" href="#Subrecetas" role="tab" aria-controls="Subrecetas" aria-selected="true">Subrecetas</a>
+                <a class="nav-link active" id="Recetas-tab" data-bs-toggle="tab" href="#Recetas" role="tab" aria-controls="Recetas" aria-selected="true">Subrecetas</a>
             </li>
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="insumos-tab" data-bs-toggle="tab" href="#insumos" role="tab" aria-controls="insumos" aria-selected="false">Insumos</a>
@@ -110,8 +138,8 @@
 
         <!-- Contenido de las pestañas -->
         <div class="tab-content mt-4" id="myTabContent">
-            <!-- Subrecetas -->
-            <div class="tab-pane fade show active" id="Subrecetas" role="tabpanel" aria-labelledby="Subrecetas-tab">
+            <!-- Recetas -->
+            <div class="tab-pane fade show active" id="Recetas" role="tabpanel" aria-labelledby="Recetas-tab">
                 <div class="card mb-12">
                     <div class="card-body">
                         <h3 class="card-title">Subrecetas</h3>
@@ -126,7 +154,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Aquí va el contenido de tu DataTable de Subrecetas -->
+                                <!-- Aquí va el contenido de tu DataTable de Recetas -->
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-end mt-3">
@@ -184,74 +212,123 @@
 
         <button type="submit" id="btnNuevoModificar" class="btn btn-primary mt-3" onclick="guardarCambios()">Registrar</button>
 
-
         <div class="modal fade" id="insumosModal" tabindex="-1" role="dialog" aria-labelledby="insumosModalLabel" aria-hidden="true" data-editing="false">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-centered modal-edicion" role="document">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="insumosModalLabel">Seleccionar Insumo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="insumoSelect" class="text-black">Insumo</label>
-                            <select id="insumoSelect" class="form-control"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="precioInput" class="text-black">Precio</label>
-                            <input type="text" id="precioInput" class="form-control" placeholder="Ingrese precio manual" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="cantidadInput" class="text-black">Cantidad</label>
-                            <input type="number" id="cantidadInput" class="form-control" placeholder="Ingrese cantidad">
-                        </div>
-                        <div class="form-group">
-                            <label for="totalInput" class="text-black">Total</label>
-                            <input type="text" id="totalInput" class="form-control" disabled>
-                        </div>
 
+                    <!-- Encabezado con gradiente -->
+                    <div class="modal-header colorEncabezado">
+                        <h5 class="modal-title fw-bold text-white" id="insumosModalLabel">Seleccionar Insumo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
+
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body">
+                        <form id="formInsumo" class="row g-3">
+
+                            <div class="col-md-12">
+                                <label for="insumoSelect" class="form-label">Insumo</label>
+                                <select id="insumoSelect" class="form-select">
+                                    <option selected disabled>Seleccionar un Insumo</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="precioInput" class="form-label">Precio</label>
+                                <input type="text" id="precioInput" class="form-control" placeholder="Ingrese precio manual" step="0.01" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="cantidadInput" class="form-label">Cantidad</label>
+                                <input type="number" id="cantidadInput" class="form-control" placeholder="Ingrese cantidad" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="totalInput" class="form-label">Total</label>
+                                <input type="text" id="totalInput" class="form-control" disabled>
+                            </div>
+
+                            <div id="errorCamposInsumo" class="alert alert-danger d-none">
+                                Debes completar los campos obligatorios.
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" id="btnGuardarInsumo" class="btn btn-primary" onclick="guardarInsumo()">Añadir</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fa fa-arrow-left"></i> Volver
+                        </button>
+                        <button type="button" id="btnGuardarInsumo" class="btn btn-primary" onclick="guardarInsumo()">
+                            <i class="fa fa-check"></i> Añadir
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <div class="modal fade" id="SubrecetasModal" tabindex="-1" role="dialog" aria-labelledby="SubrecetasModalLabel" aria-hidden="true" data-editing="false">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="SubrecetasModalLabel">Seleccionar Subreceta</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="SubrecetaSelect" class="text-black">Subreceta</label>
-                            <select id="SubrecetaSelect" class="form-control"></select>
-                        </div>
-                        <div class="form-group">
-                            <label for="precioSubrecetaInput" class="text-black">Precio</label>
-                            <input type="text" id="precioSubrecetaInput" class="form-control" placeholder="Ingrese precio manual" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="cantidadSubrecetaInput" class="text-black">Cantidad</label>
-                            <input type="number" id="cantidadSubrecetaInput" class="form-control" placeholder="Ingrese cantidad">
-                        </div>
-                        <div class="form-group">
-                            <label for="totalSubrecetaInput" class="text-black">Total</label>
-                            <input type="text" id="totalSubrecetaInput" class="form-control" disabled>
-                        </div>
 
+        <div class="modal fade" id="RecetasModal" tabindex="-1" role="dialog" aria-labelledby="RecetasModalLabel" aria-hidden="true" data-editing="false">
+            <div class="modal-dialog modal-dialog-centered modal-edicion" role="document">
+                <div class="modal-content">
+
+                    <!-- Encabezado con gradiente -->
+                    <div class="modal-header colorEncabezado">
+                        <h5 class="modal-title fw-bold" id="RecetasModalLabel">Seleccionar Receta</h5>
+                        <button type="button" class="btn-close" i data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
+
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body">
+                        <form id="formReceta" class="row g-3">
+
+                            <div class="col-md-12">
+                                <label for="RecetaSelect" class="form-label">Subreceta</label>
+                                <select id="RecetaSelect" class="form-select">
+                                    <option selected disabled>Seleccionar una Subreceta</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="precioSubrecetaInput" class="form-label">Precio</label>
+                                <input type="text" id="precioSubrecetaInput" class="form-control" placeholder="Ingrese precio manual" step="0.01" required readonly>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="cantidadRecetaInput" class="form-label">Cantidad</label>
+                                <input type="number" id="cantidadRecetaInput" class="form-control" placeholder="Ingrese cantidad" required>
+                                <div class="invalid-feedback">Campo obligatorio</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="totalRecetaInput" class="form-label">Total</label>
+                                <input type="text" id="totalRecetaInput" class="form-control" disabled>
+                            </div>
+
+                            <div id="errorCamposSub" class="alert alert-danger d-none">
+                                Debes completar los campos obligatorios.
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="button" id="btnGuardarSubreceta" class="btn btn-primary" onclick="guardarSubreceta()">Añadir</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fa fa-arrow-left"></i> Volver
+                        </button>
+                        <button type="button" id="btnGuardarReceta" class="btn btn-primary" onclick="guardarSubreceta()">
+                            <i class="fa fa-check"></i> Añadir
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>
+
     </div>
 
 
@@ -267,14 +344,14 @@
 
 
         <script src="~/js/utils/moment.js"></script>
-        <script src="~/js/RecetasNuevoModif.js">
+        <script src="~/js/RecetasNuevoModif.js?v=1.2">
 
             <script src="~/js/site.js"></script>
 
         <script>
-            var recetaData = @Html.Raw(Json.Serialize(ViewBag.Data ?? new { }));
+            var RecetaData = @Html.Raw(Json.Serialize(ViewBag.Data ?? new { }));
         </script>
 
-       
 
+         <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
         }

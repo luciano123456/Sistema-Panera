@@ -31,16 +31,6 @@ namespace SistemaPanera.BLL.Service
         {
             return await _contactRepo.Obtener(id);
         }
-
-        //public async Task<Receta> ObtenerPorNombre(string nombre)
-        //{
-        //    IQueryable<Receta> queryRecetaSQL = await _contactRepo.ObtenerTodos();
-
-        //    Receta Receta = queryRecetaSQL.Where(c => c.Nombre == nombre).FirstOrDefault();
-
-        //    return Receta;
-        //}
-
         public async Task<IQueryable<Receta>> ObtenerTodos()
         {
             return await _contactRepo.ObtenerTodos();
@@ -61,20 +51,6 @@ namespace SistemaPanera.BLL.Service
             return await _contactRepo.ObtenerInsumos(idReceta);
         }
 
-        //public async Task<bool> InsertarSubrecetas(List<RecetasSubreceta> Subrecetas)
-        //{
-        //    return await _contactRepo.InsertarSubrecetas(Subrecetas);
-        //}
-
-        //public async Task<bool> ActualizarSubrecetas(List<RecetasSubreceta> productos)
-        //{
-        //    return await _contactRepo.ActualizarSubrecetas(productos);
-        //}
-
-        //public async Task<List<RecetasSubreceta>> ObtenerSubrecetas(int idReceta)
-        //{
-        //    return await _contactRepo.ObtenerSubrecetas(idReceta);
-        //}
 
     }
 }

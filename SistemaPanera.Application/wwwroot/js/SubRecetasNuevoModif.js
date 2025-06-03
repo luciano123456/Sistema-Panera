@@ -296,7 +296,7 @@ async function guardarInsumo() {
     const insumoSelect = document.getElementById('insumoSelect');
     const precioManual = parseFloat(convertirMonedaAFloat(document.getElementById('precioInput').value));
     const totalInput = parseFloat(convertirMonedaAFloat(document.getElementById('totalInput').value));
-    const cantidadInput = parseInt(document.getElementById('cantidadInput').value) || 1; // Obtener cantidad, por defecto 1 si no es válida
+    const cantidadInput = parseFloat(document.getElementById('cantidadInput').value) || 1; // Obtener cantidad, por defecto 1 si no es válida
     const InsumoId = insumoSelect.value;
     const SubRecetaNombre = insumoSelect.options[insumoSelect.selectedIndex]?.text || '';
 
@@ -482,7 +482,7 @@ async function guardarSubReceta() {
     const SubRecetaSelect = document.getElementById('SubRecetaSelect');
     const precioManual = parseFloat(convertirMonedaAFloat(document.getElementById('precioSubRecetaInput').value));
     const totalInput = parseFloat(convertirMonedaAFloat(document.getElementById('totalSubRecetaInput').value));
-    const cantidadInput = parseInt(document.getElementById('cantidadSubRecetaInput').value) || 1;
+    const cantidadInput = parseFloat(document.getElementById('cantidadSubRecetaInput').value) || 1;
     const SubRecetaId = parseInt(SubRecetaSelect.value);
     const SubRecetaNombre = SubRecetaSelect.options[SubRecetaSelect.selectedIndex]?.text || '';
 

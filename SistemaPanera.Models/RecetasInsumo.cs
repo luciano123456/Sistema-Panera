@@ -11,7 +11,7 @@ public partial class RecetasInsumo
 
     public int IdInsumo { get; set; }
 
-    public int Cantidad { get; set; }
+    public decimal Cantidad { get; set; }
 
     public decimal CostoUnitario { get; set; }
 

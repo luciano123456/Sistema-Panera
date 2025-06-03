@@ -10,7 +10,7 @@ namespace SistemaPanera.DAL.Repository
 {
     public interface ISubrecetaRepository<TEntityModel> where TEntityModel : class
     {
-        Task<bool> Eliminar(int id);
+        Task<(bool eliminado, string mensaje)> Eliminar(int id);
         Task<bool> Actualizar(Subreceta model);
         Task<bool> Insertar(Subreceta model);
         Task<Subreceta> Obtener(int id);

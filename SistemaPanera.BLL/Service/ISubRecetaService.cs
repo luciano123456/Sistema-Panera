@@ -6,7 +6,7 @@ namespace SistemaPanera.BLL.Service
     {
         Task<bool> Insertar(Subreceta model);
         Task<bool> Actualizar(Subreceta model);
-        Task<bool> Eliminar(int id);
+        Task<(bool eliminado, string mensaje)> Eliminar(int id);
         Task<Subreceta> Obtener(int id);
         Task<IQueryable<Subreceta>> ObtenerTodos();
 
