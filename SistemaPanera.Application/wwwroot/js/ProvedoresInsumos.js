@@ -260,12 +260,12 @@ async function configurarDataTable(data) {
                     },
                     "targets": [5] // Índices de las columnas de fechas 
                 },
-                //{
-                //    "render": function (data, type, row) {
-                //        return formatNumber(data); // Formatear números
-                //    },
-                //    "targets": [7] // Índices de las columnas de números
-                //},
+                {
+                    "render": function (data, type, row) {
+                        return formatNumber(data); // Formatear números
+                    },
+                    "targets": [3] // Índices de las columnas de números
+                },
 
             ],
 
@@ -687,4 +687,456 @@ function validarCampos() {
 
     document.getElementById("errorCampos").classList.toggle("d-none", valido);
     return valido;
+}
+
+
+
+    let listaInsumosArray = [];
+
+async function cargarProveedores() {
+    const resp = await fetch('/Proveedores/Lista');
+    const data = await resp.json();
+    const select = document.getElementById('ProveedorImportar');
+    select.innerHTML = '<option value="">Seleccione proveedor...</option>';
+    data.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.Id;
+        opt.text = p.Nombre;
+        select.add(opt);
+    });
+}
+
+function procesarArchivoSiCompleto() {
+    const archivo = document.getElementById('archivoExcel').files[0];
+    const idProveedor = document.getElementById('ProveedorImportar').value;
+
+    limpiarModalImportar(); // <<< AÑADIDO
+
+    if (archivo && idProveedor) {
+        procesarArchivo();
+    } 
+}
+
+
+
+document.getElementById('modalImportar').addEventListener('shown.bs.modal', () => {
+    // Reset
+    document.getElementById('bloqueTabla').classList.add('d-none');
+    document.getElementById('bloqueBuscador').classList.add('d-none');
+    document.getElementById('resumenImportacion').classList.add('d-none');
+    document.getElementById('resumenContainer').classList.add('d-none');
+
+    document.getElementById('archivoExcel').value = '';
+    document.getElementById('ProveedorImportar').value = '';
+    document.querySelector('#vistaPrevia tbody').innerHTML = '';
+    document.getElementById('comparandoLoader').classList.add('d-none');
+    document.getElementById('errorImportar').classList.add('d-none');
+    document.getElementById('btnImportar').disabled = false;
+    document.getElementById('btnDescargarMaqueta').classList.remove('d-none');
+    document.getElementById('archivoExcel').addEventListener('change', procesarArchivoSiCompleto);
+    document.getElementById('ProveedorImportar').addEventListener('change', procesarArchivoSiCompleto);
+    listaInsumosArray = [];
+    cargarProveedores();
+});
+
+
+
+
+
+async function procesarArchivo() {
+    const archivo = document.getElementById('archivoExcel').files[0];
+    const idProveedor = document.getElementById('ProveedorImportar').value;
+    const loader = document.getElementById('comparandoLoader');
+    const btnImportar = document.getElementById('btnImportar');
+    const btnDescargar = document.getElementById('btnDescargarMaqueta');
+    const errorBox = document.getElementById('errorImportar');
+    const tbody = document.querySelector('#vistaPrevia tbody');
+    const resumenDiv = document.getElementById('resumenImportacion');
+
+    if (!archivo || !idProveedor) {
+        errorBox.textContent = "Seleccioná proveedor y archivo.";
+        errorBox.classList.remove('d-none');
+        return;
+    }
+
+    errorBox.classList.add('d-none');
+    resumenDiv.classList.remove('mostrar');
+    loader.classList.remove('d-none');
+    btnImportar.disabled = true;
+    btnDescargar.classList.add('d-none');
+    tbody.innerHTML = '';
+    listaInsumosArray = [];
+
+    try {
+        const data = await archivo.arrayBuffer();
+        const workbook = XLSX.read(data, { type: 'buffer' });
+        const hoja = workbook.Sheets[workbook.SheetNames[0]];
+
+        const lista = extraerBloquesDesdeMatriz(hoja);
+
+        if (lista.length === 0) {
+            throw new Error("Ninguna hoja contiene columnas reconocidas de Código, Descripción y Precio.");
+        }
+
+        const payload = {
+            IdProveedor: parseInt(idProveedor),
+            Lista: lista
+        };
+
+        const resp = await fetch('/ProveedoresInsumos/Comparar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) throw new Error(await resp.text());
+
+        const comparacion = await resp.json();
+        listaInsumosArray = comparacion;
+
+        let subas = 0, bajas = 0, nuevos = 0, totalSuba = 0, totalBaja = 0;
+
+        comparacion.forEach(item => {
+            const tr = document.createElement('tr');
+
+            const precioNuevo = parsearPrecio(item.precioNuevo);
+            const precioAnterior = parsearPrecio(item.precioAnterior);
+
+            const EPSILON = 1;
+            const sonIguales = Math.abs(precioAnterior - precioNuevo) < EPSILON;
+
+            const diferenciaValor = item.nuevo || sonIguales ? 0 : precioNuevo - precioAnterior;
+
+
+            const porcentajeValor = (precioAnterior === 0 || diferenciaValor === 0)
+                ? 0
+                : (diferenciaValor / precioAnterior) * 100;
+
+            let claseFila = '', claseCambio = '', simbolo = '', diferenciaTexto = '-', porcentajeTexto = '-';
+
+            if (item.nuevo) {
+                claseFila = 'fila-nueva-insumo';
+                nuevos++;
+            } else if (diferenciaValor !== 0) {
+                claseFila = 'fila-modificada';
+                simbolo = diferenciaValor > 0 ? '+' : '-';
+                diferenciaTexto = simbolo + formatearPrecio(Math.abs(diferenciaValor));
+                porcentajeTexto = simbolo + Math.abs(porcentajeValor).toFixed(1) + '%';
+                claseCambio = diferenciaValor > 0 ? 'text-danger fw-bold' : 'text-success fw-bold';
+
+                if (diferenciaValor > 0) {
+                    subas++;
+                    totalSuba += diferenciaValor;
+                } else {
+                    bajas++;
+                    totalBaja += Math.abs(diferenciaValor);
+                }
+            } else {
+                claseFila = 'fila-sin-cambios';
+                diferenciaTexto = '$ 0,00';
+                porcentajeTexto = '0.0%';
+            }
+
+            tr.className = claseFila;
+            tr.innerHTML = `
+        <td>${item.codigo}</td>
+        <td>
+            <button class="btn btn-sm text-danger me-2" onclick="eliminarFilaImportacion(this)" title="Eliminar insumo">
+                <i class="fa fa-trash"></i>
+            </button>
+            <span title="${item.descripcion}">${item.descripcion}</span>
+        </td>
+        <td>${item.precioAnterior != null ? formatearPrecio(precioAnterior) : '-'}</td>
+        <td>${formatearPrecio(precioNuevo)}</td>
+        <td class="${claseCambio}">${diferenciaTexto}</td>
+        <td class="${claseCambio}">${porcentajeTexto}</td>
+    `;
+
+            tbody.appendChild(tr);
+        });
+
+
+        document.getElementById('bloqueTabla').classList.remove('d-none');
+        document.getElementById('bloqueBuscador').classList.remove('d-none');
+
+        if (errores.length > 0) {
+            errorBox.textContent = `Se omitieron ${errores.length} insumos con errores:\n${errores.slice(0, 5).join('\n')}`;
+            errorBox.classList.remove('d-none');
+        }
+
+        if (subas + bajas + nuevos > 0) {
+            const promedioSuba = comparacion.filter(i => !i.nuevo && i.precioNuevo > i.precioAnterior)
+                .reduce((acc, i) => acc + ((i.precioNuevo - i.precioAnterior) / i.precioAnterior), 0) / (subas || 1);
+
+            const promedioBaja = comparacion.filter(i => !i.nuevo && i.precioNuevo < i.precioAnterior)
+                .reduce((acc, i) => acc + ((i.precioAnterior - i.precioNuevo) / i.precioAnterior), 0) / (bajas || 1);
+
+            let resumenTexto = `
+                Se han registrado <strong>${nuevos}</strong> <span class="text-primary fw-bold">nuevos insumos</span>.<br>
+                Se han registrado <strong>${subas}</strong> insumos con <span class="text-danger fw-bold">aumento de precio</span>.<br>
+                Se han registrado <strong>${bajas}</strong> insumos con <span class="text-success fw-bold">baja de precio</span>.<br>
+                <hr class="my-1">
+                Promedio de aumento: <strong class="text-danger">${(promedioSuba * 100).toFixed(1)}%</strong><br>
+                Promedio de baja: <strong class="text-success">${(promedioBaja * 100).toFixed(1)}%</strong><br>
+            `;
+
+            resumenTexto += promedioBaja > promedioSuba
+                ? `<div class="mt-2"><i class="fa fa-arrow-down text-success"></i> La baja promedio supera al aumento promedio.</div>`
+                : promedioSuba > promedioBaja
+                    ? `<div class="mt-2"><i class="fa fa-arrow-up text-danger"></i> El aumento promedio supera a la baja promedio.</div>`
+                    : `<div class="mt-2"><i class="fa fa-balance-scale text-secondary"></i> Las subas y bajas se equilibran.</div>`;
+
+            document.getElementById('resumenContainer').classList.remove('d-none');
+            resumenDiv.innerHTML = resumenTexto;
+            resumenDiv.classList.remove('mostrar');
+
+            document.getElementById('btnToggleResumen').innerHTML =
+                `<i class="fa fa-chevron-down me-1" id="iconoResumen"></i> Ver promedios`;
+        }
+
+    } catch (err) {
+        console.error(err);
+        errorBox.textContent = err.message || "Ocurrió un error durante la comparación.";
+        errorBox.classList.remove('d-none');
+    }
+
+    loader.classList.add('d-none');
+    btnImportar.disabled = false;
+    btnDescargar.classList.remove('d-none');
+}
+
+function descargarMaqueta() {
+    const wb = XLSX.utils.book_new();
+
+    const ws = XLSX.utils.json_to_sheet([], {
+        header: ["Código", "Descripción", "Precio"]
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, "Insumos");
+    XLSX.writeFile(wb, "maqueta-insumos.xlsx");
+}
+
+async function enviarDatos() {
+    const idProveedor = document.getElementById('ProveedorImportar').value;
+    const errorBox = document.getElementById('errorImportar');
+
+    // Validación inicial
+    if (!idProveedor || listaInsumosArray.length === 0) {
+        errorBox.textContent = "Debe seleccionar un proveedor y cargar al menos un insumo.";
+        errorBox.classList.remove('d-none');
+        return;
+    }
+
+    // Preparar payload con las propiedades correctas (letra inicial mayúscula)
+    const payload = {
+        IdProveedor: parseInt(idProveedor),
+        Lista: listaInsumosArray.map(x => ({
+            Codigo: x.Codigo ?? x.codigo,
+            Descripcion: x.Descripcion ?? x.descripcion,
+            CostoUnitario: x.CostoUnitario ?? x.costoUnitario ?? x.precioNuevo
+        }))
+    };
+
+    // Validación adicional por si algún item está incompleto
+    if (!payload.Lista.every(x => x.Descripcion && !isNaN(x.CostoUnitario))) {
+        errorBox.textContent = "Algunos insumos tienen datos incompletos o inválidos.";
+        errorBox.classList.remove('d-none');
+        return;
+    }
+
+    // Oculta errores anteriores
+    errorBox.classList.add('d-none');
+
+    try {
+        const resp = await fetch('/ProveedoresInsumos/Importar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+            const texto = await resp.text();
+            throw new Error(texto || "Error en la solicitud.");
+        }
+
+        const result = await resp.json();
+
+        if (result.valor) {
+            exitoModal("Insumos importados correctamente");
+            aplicarFiltros()
+            $('#modalImportar').modal('hide');
+        } else {
+            errorBox.textContent = result.mensaje || "Error al importar los insumos.";
+            errorBox.classList.remove('d-none');
+        }
+    } catch (error) {
+        errorBox.textContent = error.message || "Error inesperado al importar.";
+        errorBox.classList.remove('d-none');
+        console.error(error);
+    }
+}
+
+function filtrarVistaPrevia() {
+    const input = document.getElementById('buscadorVistaPrevia');
+    const filter = input.value.toLowerCase();
+    const rows = document.querySelectorAll("#vistaPrevia tbody tr");
+
+    rows.forEach(row => {
+        const textoFila = row.textContent.toLowerCase();
+        row.style.display = textoFila.includes(filter) ? "" : "none";
+    });
+}
+
+
+function toggleResumen() {
+    const resumen = document.getElementById('resumenImportacion');
+    const icono = document.getElementById('iconoResumen');
+    const boton = document.getElementById('btnToggleResumen');
+
+    const visible = resumen.classList.contains('mostrar');
+
+    if (visible) {
+        resumen.classList.remove('mostrar');
+        icono.classList.remove('fa-chevron-up');
+        icono.classList.add('fa-chevron-down');
+        boton.innerHTML = `<i class="fa fa-chevron-down me-1" id="iconoResumen"></i> Ver promedios`;
+    } else {
+        resumen.classList.add('mostrar');
+        icono.classList.remove('fa-chevron-down');
+        icono.classList.add('fa-chevron-up');
+        boton.innerHTML = `<i class="fa fa-chevron-up me-1" id="iconoResumen"></i> Ocultar promedios`;
+    }
+}
+
+function limpiarModalImportar() {
+    document.getElementById('bloqueTabla').classList.add('d-none');
+    document.getElementById('bloqueBuscador').classList.add('d-none');
+    document.getElementById('resumenImportacion').classList.remove('mostrar');
+    document.getElementById('resumenImportacion').classList.add('d-none');
+    document.getElementById('resumenContainer').classList.add('d-none');
+    document.getElementById('vistaPrevia').querySelector('tbody').innerHTML = '';
+    document.getElementById('errorImportar').classList.add('d-none');
+    document.getElementById('buscadorVistaPrevia').value = '';
+    listaInsumosArray = [];
+}
+
+function eliminarFilaImportacion(btn) {
+    const fila = btn.closest('tr');
+    const index = [...fila.parentElement.children].indexOf(fila);
+
+    if (index >= 0) {
+        listaInsumosArray.splice(index, 1);
+        fila.remove();
+    }
+}
+
+
+function parsearPrecio(precioTexto) {
+    if (precioTexto == null || precioTexto === '') return NaN;
+
+    const texto = precioTexto.toString().trim();
+    const limpio = texto.replace(/[^0-9.,]/g, '');
+
+    if (/,/.test(limpio) && /\.\d{3}/.test(limpio)) {
+        return parseFloat(limpio.replace(/\./g, '').replace(',', '.'));
+    }
+
+    if (/\.\d{2}$/.test(limpio) && /,\d{3}/.test(limpio)) {
+        return parseFloat(limpio.replace(/,/g, ''));
+    }
+
+    if (/,/.test(limpio)) return parseFloat(limpio.replace(',', '.'));
+    return parseFloat(limpio);
+}
+
+
+function formatearPrecio(numero) {
+    if (isNaN(numero)) return '-';
+    return '$ ' + numero
+        .toFixed(2)
+        .replace('.', ',')
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+
+function extraerBloquesDesdeMatriz(hoja) {
+    const jsonMatriz = XLSX.utils.sheet_to_json(hoja, { header: 1 });
+    const errores = [];
+    const resultados = [];
+
+    for (let fila = 0; fila < jsonMatriz.length; fila++) {
+        const row = jsonMatriz[fila];
+        if (!row || row.length === 0) continue;
+
+        for (let col = 0; col < row.length - 2; col++) {
+            const celdaCodigo = normalizarClave(row[col]);
+            const celdaDescripcion = normalizarClave(row[col + 1]);
+            const celdaPrecio = normalizarClave(row[col + 2]);
+
+            if (
+                celdaCodigo.includes("codigo") &&
+                celdaDescripcion.includes("descripcion") &&
+                celdaPrecio.includes("precio")
+            ) {
+                let f = fila + 1;
+                while (f < jsonMatriz.length) {
+                    const datos = jsonMatriz[f];
+                    if (!datos || datos.length < col + 3) break;
+
+                    const codigo = datos[col]?.toString().trim() ?? '';
+                    const descripcion = datos[col + 1]?.toString().trim().toUpperCase() ?? '';
+                    const precioRaw = datos[col + 2]?.toString().trim() ?? '';
+                    const precio = +parsearPrecio(precioRaw).toFixed(2);
+
+
+                    const esEncabezado =
+                        normalizarClave(codigo).includes('codigo') &&
+                        normalizarClave(descripcion).includes('descripcion') &&
+                        normalizarClave(precioRaw).includes('precio');
+
+                    const vacio = !codigo && !descripcion && !precioRaw;
+
+                    const esTitulo = (
+                        !codigo && descripcion &&
+                        descripcion.startsWith('-') &&
+                        descripcion.endsWith('-')
+                    );
+
+                    if (vacio || esEncabezado || esTitulo) break;
+
+                    if (!descripcion || isNaN(precio)) {
+                        errores.push(`- Fila ${f + 1}: "${codigo}" "${descripcion}" "${precioRaw}"`);
+                    } else {
+                        resultados.push({
+                            Codigo: codigo,
+                            Descripcion: descripcion,
+                            CostoUnitario: precio
+                        });
+                    }
+
+                    f++;
+                }
+
+                col += 2;
+            }
+        }
+    }
+
+    window.errores = errores;
+    return resultados;
+}
+
+function normalizarClave(clave) {
+    if (typeof clave !== 'string') return '';
+    return clave.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+
+function normalizarTexto(txt) {
+    return txt
+        ?.toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim() || '';
 }

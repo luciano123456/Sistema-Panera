@@ -3,7 +3,7 @@
 <Project>
   <PropertyGroup>
     <_PublishTargetUrl>D:\Publicaciones Webs\Sistema Panera</_PublishTargetUrl>
-    <History>True|2025-05-31T09:00:09.7815257Z||;True|2025-05-30T01:12:51.2796458-03:00||;True|2025-05-30T01:12:06.2228002-03:00||;True|2025-05-29T02:38:05.9333638-03:00||;True|2025-05-24T03:04:01.5017555-03:00||;True|2025-05-24T02:52:19.6653873-03:00||;True|2025-05-24T02:48:52.2712545-03:00||;True|2025-05-24T02:10:26.2241312-03:00||;</History>
+    <History>True|2025-06-03T19:19:25.0559037Z||;True|2025-06-03T02:50:54.2506710-03:00||;True|2025-05-31T06:00:09.7815257-03:00||;True|2025-05-30T01:12:51.2796458-03:00||;True|2025-05-30T01:12:06.2228002-03:00||;True|2025-05-29T02:38:05.9333638-03:00||;True|2025-05-24T03:04:01.5017555-03:00||;True|2025-05-24T02:52:19.6653873-03:00||;True|2025-05-24T02:48:52.2712545-03:00||;True|2025-05-24T02:10:26.2241312-03:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -11,10 +11,10 @@
       <publishTime>05/23/2025 10:18:04</publishTime>
     </File>
     <File Include="Views/Compras/NuevoModif.cshtml">
-      <publishTime>05/31/2025 05:58:52</publishTime>
+      <publishTime>06/03/2025 00:10:10</publishTime>
     </File>
     <File Include="Views/Insumos/Index.cshtml">
-      <publishTime>05/31/2025 02:19:08</publishTime>
+      <publishTime>06/03/2025 12:14:06</publishTime>
     </File>
     <File Include="Views/Locales/Index.cshtml">
       <publishTime>05/23/2025 10:18:04</publishTime>
@@ -32,19 +32,19 @@
       <publishTime>05/25/2025 12:51:16</publishTime>
     </File>
     <File Include="Views/ProveedoresInsumos/Index.cshtml">
-      <publishTime>05/29/2025 00:26:33</publishTime>
+      <publishTime>06/03/2025 16:18:51</publishTime>
     </File>
     <File Include="Views/Recetas/Index.cshtml">
-      <publishTime>05/31/2025 05:59:09</publishTime>
+      <publishTime>06/03/2025 00:10:10</publishTime>
     </File>
     <File Include="Views/Recetas/NuevoModif.cshtml">
-      <publishTime>05/31/2025 05:59:04</publishTime>
+      <publishTime>06/03/2025 00:10:10</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>05/23/2025 10:18:04</publishTime>
     </File>
     <File Include="Views/Shared/Partials/NavBarLogin.cshtml">
-      <publishTime>05/31/2025 05:29:44</publishTime>
+      <publishTime>06/03/2025 00:10:10</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
       <publishTime>05/23/2025 10:18:04</publishTime>
@@ -56,10 +56,10 @@
       <publishTime>05/23/2025 10:18:04</publishTime>
     </File>
     <File Include="Views/SubRecetas/Index.cshtml">
-      <publishTime>05/31/2025 05:59:22</publishTime>
+      <publishTime>06/03/2025 00:10:10</publishTime>
     </File>
     <File Include="Views/SubRecetas/NuevoModif.cshtml">
-      <publishTime>05/31/2025 05:59:17</publishTime>
+      <publishTime>06/03/2025 00:10:10</publishTime>
     </File>
     <File Include="Views/Usuarios/Configuracion.cshtml">
       <publishTime>05/23/2025 10:18:04</publishTime>
@@ -83,7 +83,7 @@
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/css/Insumos.css">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 12:03:34</publishTime>
     </File>
     <File Include="wwwroot/css/Login.css">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -95,7 +95,7 @@
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/css/ProvedoresInsumos.css">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 02:38:50</publishTime>
     </File>
     <File Include="wwwroot/css/Proveedores.css">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -104,10 +104,10 @@
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/css/RecetasNuevoModif.css">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 00:28:47</publishTime>
     </File>
     <File Include="wwwroot/css/site.css">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 12:24:04</publishTime>
     </File>
     <File Include="wwwroot/css/SubRecetasNuevoModif.css">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -254,7 +254,7 @@
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/js/Insumos.js">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 12:17:24</publishTime>
     </File>
     <File Include="wwwroot/js/Locales.js">
       <publishTime>01/01/0001 00:00:00</publishTime>
@@ -272,25 +272,25 @@
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/js/ProvedoresInsumos.js">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 14:38:40</publishTime>
     </File>
     <File Include="wwwroot/js/Proveedores.js">
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/js/Recetas.js">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 00:10:10</publishTime>
     </File>
     <File Include="wwwroot/js/RecetasNuevoModif.js">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 00:10:10</publishTime>
     </File>
     <File Include="wwwroot/js/site.js">
       <publishTime>01/01/0001 00:00:00</publishTime>
     </File>
     <File Include="wwwroot/js/SubRecetas.js">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 00:10:10</publishTime>
     </File>
     <File Include="wwwroot/js/SubRecetasNuevoModif.js">
-      <publishTime>01/01/0001 00:00:00</publishTime>
+      <publishTime>03/06/2025 00:10:10</publishTime>
     </File>
     <File Include="wwwroot/js/Usuarios.js">
       <publishTime>01/01/0001 00:00:00</publishTime>

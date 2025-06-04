@@ -47,6 +47,40 @@ namespace SistemaPanera.Application.Controllers
             return Ok(lista);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Comparar([FromBody] VMImportacionProveedoresInsumos model)
+        {
+            if (model == null || model.IdProveedor == 0 || model.Lista == null || !model.Lista.Any())
+                return BadRequest("Datos incompletos");
+
+            var insumosExistentes = await _ProveedoresInsumosService.ObtenerPorProveedor(model.IdProveedor);
+
+            var comparacion = model.Lista.Select(item =>
+            {
+                var codigoImportado = item.Codigo?.Trim();
+                var descripcionImportada = item.Descripcion?.Trim().ToUpper();
+
+                // Comparar solo por código si tiene valor, si no, comparar por descripción
+                var existente = !string.IsNullOrWhiteSpace(codigoImportado)
+                    ? insumosExistentes.FirstOrDefault(x =>
+                        !string.IsNullOrWhiteSpace(x.Codigo) &&
+                        x.Codigo.Trim().ToUpper() == codigoImportado.ToUpper())
+                    : insumosExistentes.FirstOrDefault(x =>
+                        x.Descripcion.Trim().ToUpper() == descripcionImportada);
+
+                return new
+                {
+                    codigo = item.Codigo,
+                    descripcion = item.Descripcion,
+                    precioNuevo = item.CostoUnitario,
+                    precioAnterior = existente?.CostoUnitario,
+                    nuevo = existente == null
+                };
+            }).ToList();
+
+            return Ok(comparacion);
+        }
+
 
 
         [HttpPost]
@@ -83,6 +117,27 @@ namespace SistemaPanera.Application.Controllers
 
             return Ok(new { valor = respuesta });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Importar([FromBody] VMImportacionProveedoresInsumos model)
+        {
+            if (model == null || model.IdProveedor == 0 || model.Lista == null || !model.Lista.Any())
+                return BadRequest(new { valor = false, mensaje = "Datos inválidos" });
+
+            var listaProcesada = model.Lista.Select(x => new ProveedoresInsumos
+            {
+                Codigo = x.Codigo,
+                Descripcion = x.Descripcion,
+                CostoUnitario = x.CostoUnitario,
+                IdProveedor = model.IdProveedor,
+                FechaActualizacion = DateTime.Now
+            }).ToList();
+
+            var resultado = await _ProveedoresInsumosService.ImportarDesdeLista(model.IdProveedor, listaProcesada);
+            return Ok(new { valor = resultado });
+        }
+
+
 
         [HttpDelete]
         public async Task<IActionResult> Eliminar(int id)

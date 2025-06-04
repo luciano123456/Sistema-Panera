@@ -1,4 +1,4 @@
-html {
+ï»¿html {
     font-size: 14px;
 }
 
@@ -312,7 +312,7 @@ label {
     width: 95% !important;
 }
 
-/* Estilo personalizado para la colección de botones */
+/* Estilo personalizado para la colecciÃ³n de botones */
 div.dt-button-collection {
     background-color: #0D82F7; /* Cambia el color de fondo */
     border-color: #0D82F7 !important; /* Cambia el color del borde */
@@ -494,7 +494,7 @@ div.dt-button-collection {
     margin-top: -30px;
     padding: 5px;
     border-radius: 4px;
-    min-width: 150px; /* Ajusta el ancho mínimo si es necesario */
+    min-width: 150px; /* Ajusta el ancho mÃ­nimo si es necesario */
 }
 
     .acciones-dropdown button {
@@ -513,7 +513,7 @@ div.dt-button-collection {
 
 .dataTables_wrapper {
     position: relative;
-    z-index: 1; /* Este valor debe ser menor que el del menú */
+    z-index: 1; /* Este valor debe ser menor que el del menÃº */
 }
 
 .dataTables_wrapper .dataTable tbody tr {
@@ -533,17 +533,17 @@ div.dt-button-collection {
 }
 
 .navbar-nav .dropdown-menu .dropdown-item {
-    color: black !important; /* Mantén el dropdown con texto negro para legibilidad */
+    color: black !important; /* MantÃ©n el dropdown con texto negro para legibilidad */
 }
 
 .navbar-nav .nav-link:hover {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.9); /* Brillo blanco */
     color: white !important; /* Asegura que el texto sea blanco */
-    transition: all 0.3s ease-in-out; /* Transición suave */
+    transition: all 0.3s ease-in-out; /* TransiciÃ³n suave */
 }
 
 .navbar-brand:hover {
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.9); /* Brillo para el título */
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.9); /* Brillo para el tÃ­tulo */
     transition: all 0.3s ease-in-out;
 }
 
@@ -577,7 +577,7 @@ table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.
 }
 
 .blinking {
-    animation: blinkTextShadow 3s ease-out; /* Duración de 3 segundos, se repite infinitamente */
+    animation: blinkTextShadow 3s ease-out; /* DuraciÃ³n de 3 segundos, se repite infinitamente */
 }
 
 
@@ -626,9 +626,9 @@ select option:disabled {
     color: #000 !important;
 }
 
-/* Placeholder también en negro si querés */
+/* Placeholder tambiÃ©n en negro si querÃ©s */
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color: #6c757d; /* o #000 si lo querés también negro */
+    color: #6c757d; /* o #000 si lo querÃ©s tambiÃ©n negro */
 }
 
 /* Error visual igual a input is-invalid */
@@ -668,4 +668,9 @@ select option:disabled {
 
 #lblDescripcion {
     color: white !important;
+}
+
+table.dataTable > thead > tr > th {
+    background-color: #323844;
+    color: white;
 }

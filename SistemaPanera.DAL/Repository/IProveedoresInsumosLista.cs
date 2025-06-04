@@ -15,5 +15,7 @@ namespace SistemaPanera.DAL.Repository
         Task<bool> Insertar(ProveedoresInsumos model);
         Task<ProveedoresInsumos> Obtener(int id);
         Task<IQueryable<ProveedoresInsumos>> ObtenerTodos();
+        Task<IQueryable<ProveedoresInsumos>> ObtenerPorProveedor(int idProveedor);
+        Task<bool> ImportarDesdeLista(int idProveedor, List<ProveedoresInsumos> lista);
     }
 }
