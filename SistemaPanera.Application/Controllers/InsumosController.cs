@@ -55,7 +55,8 @@ namespace SistemaPanera.Application.Controllers
                                 .Select(u => u.IdUnidadNegocioNavigation?.Nombre ?? "")
                                 .ToList(),
                             ProveedorDestacado = proveedorMasBarato?.IdListaProveedorNavigation?.IdProveedorNavigation?.Nombre ?? "",
-                            CostoUnitario = proveedorMasBarato?.IdListaProveedorNavigation?.CostoUnitario ?? 0
+                            CostoUnitario = proveedorMasBarato?.IdListaProveedorNavigation?.CostoUnitario ?? 0,
+                            CantidadProveedores = c.InsumosProveedores?.Count ?? 0
                         };
                     })
                     .ToList();

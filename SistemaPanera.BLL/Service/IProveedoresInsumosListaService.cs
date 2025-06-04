@@ -9,5 +9,7 @@ namespace SistemaPanera.BLL.Service
         Task<bool> Eliminar(int id);
         Task<ProveedoresInsumos> Obtener(int id);
         Task<IQueryable<ProveedoresInsumos>> ObtenerTodos();
+        Task<IQueryable<ProveedoresInsumos>> ObtenerPorProveedor(int idProveedor);
+        Task<bool> ImportarDesdeLista(int idProveedor, List<ProveedoresInsumos> lista);
     }
 }

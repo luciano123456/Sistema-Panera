@@ -10,6 +10,7 @@ const columnConfig = [
     { index: 5, filterType: 'select', fetchDataFunc: listaInsumosCategoriaFilter },
     { index: 6, filterType: 'text' },
     { index: 7, filterType: 'text' },
+    { index: 8, filterType: 'text' },
 ];
 
 
@@ -246,7 +247,19 @@ async function configurarDataTable(data) {
                 { data: 'UnidadMedida' },
                 { data: 'Categoria' },
                 { data: 'ProveedorDestacado'},
-                { data: 'CostoUnitario'},
+                { data: 'CostoUnitario' },
+                {
+                    data: null,
+                    title: "Asociado",
+                    className: "text-center",
+                    orderable: false,
+                    render: function (data, type, row) {
+                        return row.CantidadProveedores > 0
+                            ? "<i class='fa fa-check text-success'></i>"
+                            : "<i class='fa fa-times text-danger'></i>";
+                    }
+
+                }
 
             ],
             dom: 'Bfrtip',
@@ -753,37 +766,50 @@ function abrirModalProveedoresAsignados() {
 
     fetch(`/ProveedoresInsumos/Lista?idProveedor=-1`)
         .then(response => response.json())
-        .then(data => {
-            const tbody = document.querySelector("#tablaProveedoresAsignados tbody");
-            tbody.innerHTML = "";
+           .then(data => {
+               const tbody = document.querySelector("#tablaProveedoresAsignados tbody");
+               tbody.innerHTML = "";
 
-            data.forEach(item => {
-                const isChecked = proveedoresAsignados.some(x =>
-                    x.IdInsumo === parseInt(idInsumo) &&
-                    x.IdProveedor === parseInt(item.IdProveedor) &&
-                    x.IdListaProveedor === parseInt(item.Id)
-                );
+               const asignados = [];
+               const noAsignados = [];
 
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${item.Proveedor}</td>
-                    <td>${item.Descripcion}</td>
-                    <td>${item.Codigo}</td>
-                    <td>
-                        <input type="checkbox" class="chk-asignacion" data-idproveedor="${item.IdProveedor}" data-idlistaproveedor="${item.Id}" ${isChecked ? "checked" : ""}>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+               const idInsumo = parseInt($("#txtId").val());
 
-            $('#modalProveedoresAsignados')
-                .appendTo('body')
-                .modal({
-                    backdrop: false,
-                    keyboard: false
-                })
-                .modal('show');
-        });
+               data.forEach(item => {
+                   const isChecked = proveedoresAsignados.some(x =>
+                       x.IdInsumo === idInsumo &&
+                       x.IdProveedor === parseInt(item.IdProveedor) &&
+                       x.IdListaProveedor === parseInt(item.Id)
+                   );
+
+                   const tr = document.createElement("tr");
+                   tr.className = isChecked ? "fila-asignada" : "";
+                   tr.innerHTML = `
+            <td>${item.Proveedor}</td>
+            <td>${item.Descripcion}</td>
+            <td>${item.Codigo}</td>
+            <td>
+                <input type="checkbox" class="chk-asignacion" 
+                    data-idproveedor="${item.IdProveedor}" 
+                    data-idlistaproveedor="${item.Id}" 
+                    ${isChecked ? "checked" : ""}>
+            </td>
+        `;
+
+                   isChecked ? asignados.push(tr) : noAsignados.push(tr);
+               });
+
+               [...asignados, ...noAsignados].forEach(tr => tbody.appendChild(tr));
+
+               $('#modalProveedoresAsignados')
+                   .appendTo('body')
+                   .modal({
+                       backdrop: false,
+                       keyboard: false
+                   })
+                   .modal('show');
+           });
+
 }
 
 function guardarAsignacionesProveedores() {

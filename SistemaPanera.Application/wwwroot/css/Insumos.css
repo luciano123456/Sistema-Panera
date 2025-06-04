@@ -31,3 +31,7 @@
 #lblDescripcion {
     color: white !important;
 }
+
+.fila-asignada {
+    background-color: #d4edda !important; /* verde suave */
+}
