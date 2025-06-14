@@ -15,6 +15,8 @@
     <Content Remove="wwwroot\js\Locales.js" />
     <Content Remove="wwwroot\js\Login.js" />
     <Content Remove="wwwroot\js\NavBarLogin.js" />
+    <Content Remove="wwwroot\js\OrdenesCompra.js" />
+    <Content Remove="wwwroot\js\OrdenesCompraNuevoModif.js" />
     <Content Remove="wwwroot\js\ProvedoresInsumos.js" />
     <Content Remove="wwwroot\js\Proveedores.js" />
     <Content Remove="wwwroot\js\Recetas.js" />
@@ -28,6 +30,8 @@
 
   <ItemGroup>
     <None Include="wwwroot\Imagenes\Clientes.png" />
+    <None Include="wwwroot\js\OrdenesCompraNuevoModif.js" />
+    <None Include="wwwroot\js\OrdenesCompra.js" />
     <None Include="wwwroot\js\ComprasNuevoModif.js" />
     <None Include="wwwroot\js\Compras.js" />
     <None Include="wwwroot\js\ProvedoresInsumos.js" />

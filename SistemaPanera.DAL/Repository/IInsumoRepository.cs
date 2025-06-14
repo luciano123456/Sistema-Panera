@@ -15,5 +15,6 @@ namespace SistemaPanera.DAL.Repository
         Task<bool> Insertar(Insumo model);
         Task<Insumo> Obtener(int id);
         Task<IQueryable<Insumo>> ObtenerTodos();
+        Task<IQueryable<Insumo>> ObtenerPorProveedor(int idProveedor);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
+
 public partial class Local
 {
     public int Id { get; set; }
@@ -12,7 +13,13 @@ public partial class Local
 
     public virtual ICollection<Compra> Compras { get; set; } = new List<Compra>();
 
+    public virtual ICollection<FacturasProveedor> FacturasProveedores { get; set; } = new List<FacturasProveedor>();
+
     public virtual UnidadesNegocio IdUnidadNegocioNavigation { get; set; } = null!;
+
+    public virtual ICollection<InsumosStock> InsumosStocks { get; set; } = new List<InsumosStock>();
+
+    public virtual ICollection<OrdenesCompra> OrdenesCompras { get; set; } = new List<OrdenesCompra>();
 
     public virtual ICollection<RecetasStock> RecetasStocks { get; set; } = new List<RecetasStock>();
 

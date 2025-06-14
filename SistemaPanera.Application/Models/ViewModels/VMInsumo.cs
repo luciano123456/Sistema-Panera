@@ -17,8 +17,10 @@ namespace SistemaPanera.Application.Models.ViewModels
         public string UnidadMedida { get; set; }
 
         public string ProveedorDestacado { get; set; }
+        public int IdProveedorLista { get; set; }
         public decimal CostoUnitario { get; set; }
         public decimal CantidadProveedores { get; set; }
+        public decimal PrecioLista { get; set; }
 
 
         public List<string> UnidadesNegocio { get; set; } = new();

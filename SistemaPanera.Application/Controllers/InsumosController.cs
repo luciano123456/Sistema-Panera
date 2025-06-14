@@ -56,13 +56,16 @@ namespace SistemaPanera.Application.Controllers
                                 .ToList(),
                             ProveedorDestacado = proveedorMasBarato?.IdListaProveedorNavigation?.IdProveedorNavigation?.Nombre ?? "",
                             CostoUnitario = proveedorMasBarato?.IdListaProveedorNavigation?.CostoUnitario ?? 0,
-                            CantidadProveedores = c.InsumosProveedores?.Count ?? 0
+                            PrecioLista = proveedorMasBarato?.IdListaProveedorNavigation?.CostoUnitario ?? 0,
+                            CantidadProveedores = c.InsumosProveedores?.Count ?? 0,
+                            IdProveedorLista = proveedorMasBarato?.IdListaProveedorNavigation?.Id ?? 0
                         };
                     })
                     .ToList();
 
                 return Ok(lista);
-            } catch ( Exception ex)
+            }
+            catch (Exception ex)
             {
                 return Ok(null);
             }
@@ -70,6 +73,47 @@ namespace SistemaPanera.Application.Controllers
 
 
 
+        [HttpGet]
+        public async Task<IActionResult> ListaPorProveedor(int IdProveedor)
+        {
+            try
+            {
+                var insumos = await _InsumosService.ObtenerPorProveedor(IdProveedor);
+
+                var lista = insumos
+                                 .ToList() // <-- importante
+                                 .Select(c =>
+                                 {
+                                     var proveedorActual = c.InsumosProveedores
+                                         .FirstOrDefault(p =>
+                                             p.IdListaProveedorNavigation != null &&
+                                             p.IdListaProveedorNavigation.IdProveedor == IdProveedor);
+
+                                     return new VMInsumo
+                                     {
+                                         Id = c.Id,
+                                         Descripcion = c.Descripcion,
+                                         Sku = c.Sku,
+                                         IdCategoria = c.IdCategoria,
+                                         IdUnidadMedida = c.IdUnidadMedida,
+                                         FechaActualizacion = c.FechaActualizacion,
+                                         Categoria = c.IdCategoriaNavigation?.Nombre ?? "",
+                                         UnidadMedida = c.IdUnidadMedidaNavigation?.Nombre ?? "",
+                                         ProveedorDestacado = proveedorActual?.IdListaProveedorNavigation?.IdProveedorNavigation?.Nombre ?? "",
+                                         CostoUnitario = proveedorActual?.IdListaProveedorNavigation?.CostoUnitario ?? 0,
+                                         PrecioLista = proveedorActual?.IdListaProveedorNavigation?.CostoUnitario ?? 0,
+                                         CantidadProveedores = c.InsumosProveedores?.Count ?? 0,
+                                         IdProveedorLista = proveedorActual?.IdListaProveedorNavigation?.Id ?? 0
+                                     };
+                                 })
+                                 .ToList();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return Ok(null);
+            }
+        }
 
 
 

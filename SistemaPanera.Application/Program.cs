@@ -57,8 +57,11 @@ builder.Services.AddScoped<ILocalService, LocalService>();
 builder.Services.AddScoped<IRecetasCategoriaRepository<RecetasCategoria>, RecetasCategoriaRepository>();
 builder.Services.AddScoped<IRecetasCategoriaService, RecetasCategoriaService>();
 
-builder.Services.AddScoped<IRecetasTipoRepository<RecetasTipo>, RecetasTipoRepository>();
-builder.Services.AddScoped<IRecetasTiposervice, RecetasTipoService>();
+builder.Services.AddScoped<IOrdenesComprasEstadoRepository<OrdenesComprasEstado>, OrdenesComprasEstadoRepository>();
+builder.Services.AddScoped<IOrdenesComprasEstadoservice, OrdenesComprasEstadoService>();
+
+builder.Services.AddScoped<IOrdenesComprasInsumoEstadoRepository<OrdenesComprasInsumosEstado>, OrdenesComprasInsumosEstadoRepository>();
+builder.Services.AddScoped<IOrdenesComprasInsumosEstadoservice, OrdenesComprasInsumosEstadoService>();
 
 builder.Services.AddScoped<IRecetaRepository<Receta>, RecetaRepository>();
 builder.Services.AddScoped<IRecetaService, RecetaService>();
@@ -74,6 +77,9 @@ builder.Services.AddScoped<ISubrecetaService, SubrecetaService>();
 
 builder.Services.AddScoped<ICompraRepository<Compra>, CompraRepository>();
 builder.Services.AddScoped<ICompraService, CompraService>();
+
+builder.Services.AddScoped<IOrdenesCompraRepository, OrdenesCompraRepository>();
+builder.Services.AddScoped<IOrdenesCompraService, OrdenesCompraService>();
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>

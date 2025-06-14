@@ -15,7 +15,7 @@ public partial class SubrecetasSubreceta
 
     public decimal CostoUnitario { get; set; }
 
-    public decimal SubTotal { get; set; }
+    public decimal Subtotal { get; set; }
 
     public virtual Subreceta IdSubRecetaHijaNavigation { get; set; } = null!;
 

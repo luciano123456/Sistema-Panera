@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace SistemaPanera.Models;
+
 public partial class Proveedor
 {
     public int Id { get; set; }
@@ -18,5 +19,9 @@ public partial class Proveedor
 
     public string? Cuit { get; set; }
 
-    public virtual ICollection<ProveedoresInsumos> ProveedoresInsumos { get; set; } = new List<ProveedoresInsumos>();
+    public virtual ICollection<FacturasProveedor> FacturasProveedores { get; set; } = new List<FacturasProveedor>();
+
+    public virtual ICollection<OrdenesCompra> OrdenesCompras { get; set; } = new List<OrdenesCompra>();
+
+    public virtual ICollection<ProveedoresInsumos> ProveedoresInsumosLista { get; set; } = new List<ProveedoresInsumos>();
 }
