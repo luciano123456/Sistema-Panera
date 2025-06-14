@@ -142,7 +142,7 @@ namespace SistemaPanera.DAL.Repository
             return true;
         }
 
-        public async Task<Models.Insumo> Obtener(int id)
+        public async Task<Insumo> Obtener(int id)
         {
             return await _dbcontext.Insumos
                 .Include(x => x.InsumosProveedores)
@@ -156,10 +156,10 @@ namespace SistemaPanera.DAL.Repository
         }
 
 
-        public async Task<IQueryable<Models.Insumo>> ObtenerTodos()
+        public async Task<IQueryable<Insumo>> ObtenerTodos()
         {
 
-            IQueryable<Models.Insumo> query = _dbcontext.Insumos
+            IQueryable<Insumo> query = _dbcontext.Insumos
                  .Include(x => x.InsumosProveedores)
                     .ThenInclude(p => p.IdListaProveedorNavigation) // <-- FALTABA ESTO
                         .ThenInclude(lp => lp.IdProveedorNavigation) // <-- OPCIONAL si querés también el nombre del proveedor
@@ -169,6 +169,22 @@ namespace SistemaPanera.DAL.Repository
                 .Include(x => x.IdUnidadMedidaNavigation);
             return await Task.FromResult(query);
         }
+
+        public async Task<IQueryable<Insumo>> ObtenerPorProveedor(int idProveedor)
+        {
+            var query = _dbcontext.Insumos
+                .Include(x => x.InsumosProveedores)
+                    .ThenInclude(p => p.IdListaProveedorNavigation)
+                        .ThenInclude(lp => lp.IdProveedorNavigation)
+                .Include(x => x.IdCategoriaNavigation)
+                .Include(x => x.IdUnidadMedidaNavigation)
+                .Where(c => c.InsumosProveedores.Any(p =>
+                    p.IdListaProveedorNavigation != null &&
+                    p.IdListaProveedorNavigation.IdProveedor == idProveedor));
+
+            return await Task.FromResult(query);
+        }
+
 
 
 

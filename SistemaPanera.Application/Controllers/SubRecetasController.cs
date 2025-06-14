@@ -97,7 +97,7 @@ namespace SistemaPanera.Application.Controllers
                     IdSubRecetaHija = s.IdSubRecetaHija,
                     Cantidad = s.Cantidad,
                     CostoUnitario = s.CostoUnitario,
-                    SubTotal = s.SubTotal
+                    Subtotal = s.Subtotal
                 }).ToList()
             };
 
@@ -139,7 +139,7 @@ namespace SistemaPanera.Application.Controllers
                     IdSubRecetaHija = s.IdSubRecetaHija,
                     Cantidad = s.Cantidad,
                     CostoUnitario = s.CostoUnitario,
-                    SubTotal = s.SubTotal
+                    Subtotal = s.Subtotal
                 }).ToList()
 
 
@@ -201,7 +201,7 @@ namespace SistemaPanera.Application.Controllers
                 IdSubRecetaHija = p.IdSubRecetaHija,
                 Cantidad = p.Cantidad,
                 CostoUnitario = p.CostoUnitario,
-                SubTotal = p.SubTotal,
+                SubTotal = p.Subtotal,
                 Nombre = p.IdSubRecetaHijaNavigation?.Descripcion,
                 IdSubRecetaHijaNavigation = p.IdSubRecetaHijaNavigation,
                 IdSubRecetaPadreNavigation = p.IdSubRecetaPadreNavigation

@@ -63,6 +63,36 @@ function advertenciaModal(texto) {
     mostrarModalConContador('AdvertenciaModal', texto, 3000);
 }
 
+function confirmarModal(mensaje) {
+    return new Promise((resolve) => {
+        const modalEl = document.getElementById('modalConfirmar');
+        const mensajeEl = document.getElementById('modalConfirmarMensaje');
+        const btnAceptar = document.getElementById('btnModalConfirmarAceptar');
+
+        mensajeEl.innerText = mensaje;
+
+        const modal = new bootstrap.Modal(modalEl, {
+            backdrop: 'static',
+            keyboard: false
+        });
+
+        // Limpiar eventos anteriores
+        btnAceptar.onclick = null;
+
+        btnAceptar.onclick = function () {
+            resolve(true);
+            modal.hide();
+        };
+
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            resolve(false);
+        }, { once: true });
+
+        modal.show();
+    });
+}
+
+
 const formatoMoneda = new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: 'ARS', // Cambia "ARS" por el código de moneda que necesites
@@ -142,4 +172,14 @@ function toggleAcciones(id) {
         dropdownClone.classList.add('acciones-dropdown-clone');
         document.body.appendChild(dropdownClone);
     }
+}
+
+function formatearFechaParaInput(fecha) {
+    const m = moment(fecha, [moment.ISO_8601, 'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD']);
+    return m.isValid() ? m.format('YYYY-MM-DD') : '';
+}
+
+function formatearFechaParaVista(fecha) {
+    const m = moment(fecha, [moment.ISO_8601, 'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD']);
+    return m.isValid() ? m.format('DD/MM/YYYY') : '';
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using SistemaPanera.Models;
 
 namespace SistemaPanera.DAL.DataContext;
@@ -17,27 +16,15 @@ public partial class SistemaPaneraContext : DbContext
     {
     }
 
-    private readonly IConfiguration _configuration;
-
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-            var connectionString = _configuration.GetConnectionString("SistemaDB");
-            optionsBuilder.UseSqlServer(connectionString);
-        }
-    }
-
     public virtual DbSet<Compra> Compras { get; set; }
 
     public virtual DbSet<ComprasDetalle> ComprasDetalles { get; set; }
 
-    public virtual DbSet<Estado> Estados { get; set; }
-
     public virtual DbSet<EstadosUsuario> EstadosUsuarios { get; set; }
 
-    public virtual DbSet<FormasdePago> FormasdePagos { get; set; }
+    public virtual DbSet<FacturasProveedor> FacturasProveedores { get; set; }
+
+    public virtual DbSet<FacturasProveedoresInsumo> FacturasProveedoresInsumos { get; set; }
 
     public virtual DbSet<Insumo> Insumos { get; set; }
 
@@ -50,6 +37,14 @@ public partial class SistemaPaneraContext : DbContext
     public virtual DbSet<InsumosUnidadesNegocio> InsumosUnidadesNegocios { get; set; }
 
     public virtual DbSet<Local> Locales { get; set; }
+
+    public virtual DbSet<OrdenesCompra> OrdenesCompras { get; set; }
+
+    public virtual DbSet<OrdenesComprasEstado> OrdenesComprasEstados { get; set; }
+
+    public virtual DbSet<OrdenesComprasInsumo> OrdenesComprasInsumos { get; set; }
+
+    public virtual DbSet<OrdenesComprasInsumosEstado> OrdenesComprasInsumosEstados { get; set; }
 
     public virtual DbSet<Proveedor> Proveedores { get; set; }
 
@@ -66,8 +61,6 @@ public partial class SistemaPaneraContext : DbContext
     public virtual DbSet<RecetasStock> RecetasStocks { get; set; }
 
     public virtual DbSet<RecetasSubreceta> RecetasSubrecetas { get; set; }
-
-    public virtual DbSet<RecetasTipo> RecetasTipos { get; set; }
 
     public virtual DbSet<Rol> Roles { get; set; }
 
@@ -87,7 +80,9 @@ public partial class SistemaPaneraContext : DbContext
 
     public virtual DbSet<User> Usuarios { get; set; }
 
-    
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=DESKTOP-3MT5F5F; Database=Sistema_Panera; Integrated Security=true; Trusted_Connection=True; Encrypt=False");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -124,13 +119,6 @@ public partial class SistemaPaneraContext : DbContext
                 .HasConstraintName("FK_Compras_Detalle_Insumos");
         });
 
-        modelBuilder.Entity<Estado>(entity =>
-        {
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<EstadosUsuario>(entity =>
         {
             entity.Property(e => e.Nombre)
@@ -138,13 +126,69 @@ public partial class SistemaPaneraContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<FormasdePago>(entity =>
+        modelBuilder.Entity<FacturasProveedor>(entity =>
         {
-            entity.ToTable("FormasdePago");
-
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(255)
+            entity.Property(e => e.Descuentos).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Fecha).HasColumnType("datetime");
+            entity.Property(e => e.NotaInterna)
+                .HasMaxLength(500)
                 .IsUnicode(false);
+            entity.Property(e => e.Subtotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubtotalFinal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.FacturasProveedores)
+                .HasForeignKey(d => d.IdLocal)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedores_Locales");
+
+            entity.HasOne(d => d.IdOrdenCompraNavigation).WithMany(p => p.FacturasProveedores)
+                .HasForeignKey(d => d.IdOrdenCompra)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedores_OrdenesCompras");
+
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.FacturasProveedores)
+                .HasForeignKey(d => d.IdProveedor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedores_Proveedores");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.FacturasProveedores)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedores_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<FacturasProveedoresInsumo>(entity =>
+        {
+            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.DescuentoTotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.DescuentoUnitario).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Diferencia).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.PorcDescuento).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.PrecioFactura).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.PrecioFinal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.PrecioLista).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubtotalConDescuento).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.SubtotalFinal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdFacturaProveedorNavigation).WithMany(p => p.FacturasProveedoresInsumos)
+                .HasForeignKey(d => d.IdFacturaProveedor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedoresInsumos_FacturasProveedores");
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.FacturasProveedoresInsumos)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedoresInsumos_Insumos");
+
+            entity.HasOne(d => d.IdInsumoStockNavigation).WithMany(p => p.FacturasProveedoresInsumos)
+                .HasForeignKey(d => d.IdInsumoStock)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedoresInsumos_Insumos_Stock");
+
+            entity.HasOne(d => d.IdProveedorListaNavigation).WithMany(p => p.FacturasProveedoresInsumos)
+                .HasForeignKey(d => d.IdProveedorLista)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_FacturasProveedoresInsumos_Proveedores_Insumos_Listas");
         });
 
         modelBuilder.Entity<Insumo>(entity =>
@@ -194,11 +238,30 @@ public partial class SistemaPaneraContext : DbContext
         {
             entity.ToTable("Insumos_Stock");
 
-            entity.Property(e => e.Egreso).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.Ingreso).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.TipoMovimiento)
-                .HasMaxLength(50)
+            entity.Property(e => e.Concepto)
+                .HasMaxLength(200)
                 .IsUnicode(false);
+            entity.Property(e => e.Entrada).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Fecha).HasColumnType("datetime");
+            entity.Property(e => e.Salida).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.TipoMovimiento)
+                .HasMaxLength(70)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.InsumosStocks)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Insumos_Stock_Insumos");
+
+            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.InsumosStocks)
+                .HasForeignKey(d => d.IdLocal)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Insumos_Stock_Locales");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.InsumosStocks)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Insumos_Stock_Unidades_Negocio");
         });
 
         modelBuilder.Entity<InsumosUnidadesNegocio>(entity =>
@@ -225,6 +288,84 @@ public partial class SistemaPaneraContext : DbContext
             entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.Locales)
                 .HasForeignKey(d => d.IdUnidadNegocio)
                 .HasConstraintName("FK_Locales_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<OrdenesCompra>(entity =>
+        {
+            entity.Property(e => e.CostoTotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.FechaEmision).HasColumnType("datetime");
+            entity.Property(e => e.FechaEntrega).HasColumnType("datetime");
+            entity.Property(e => e.NotaInterna)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.IdEstadoNavigation).WithMany(p => p.OrdenesCompras)
+                .HasForeignKey(d => d.IdEstado)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesCompras_OrdenesComprasEstados");
+
+            entity.HasOne(d => d.IdLocalNavigation).WithMany(p => p.OrdenesCompras)
+                .HasForeignKey(d => d.IdLocal)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesCompras_Locales");
+
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.OrdenesCompras)
+                .HasForeignKey(d => d.IdProveedor)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesCompras_Proveedores");
+
+            entity.HasOne(d => d.IdUnidadNegocioNavigation).WithMany(p => p.OrdenesCompras)
+                .HasForeignKey(d => d.IdUnidadNegocio)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesCompras_Unidades_Negocio");
+        });
+
+        modelBuilder.Entity<OrdenesComprasEstado>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_Estados");
+
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<OrdenesComprasInsumo>(entity =>
+        {
+            entity.Property(e => e.CantidadEntregada).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CantidadPedida).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.CantidadRestante).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.NotaInterna)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.PrecioLista).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Subtotal).HasColumnType("decimal(20, 2)");
+
+            entity.HasOne(d => d.IdEstadoNavigation).WithMany(p => p.OrdenesComprasInsumos)
+                .HasForeignKey(d => d.IdEstado)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesComprasInsumos_OrdenesComprasInsumosEstados");
+
+            entity.HasOne(d => d.IdInsumoNavigation).WithMany(p => p.OrdenesComprasInsumos)
+                .HasForeignKey(d => d.IdInsumo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesComprasInsumos_Insumos");
+
+            entity.HasOne(d => d.IdOrdenCompraNavigation).WithMany(p => p.OrdenesComprasInsumos)
+                .HasForeignKey(d => d.IdOrdenCompra)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesComprasInsumos_OrdenesCompras");
+
+            entity.HasOne(d => d.IdProveedorListaNavigation).WithMany(p => p.OrdenesComprasInsumos)
+                .HasForeignKey(d => d.IdProveedorLista)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_OrdenesComprasInsumos_Proveedores_Insumos_Listas");
+        });
+
+        modelBuilder.Entity<OrdenesComprasInsumosEstado>(entity =>
+        {
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(200)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Proveedor>(entity =>
@@ -264,7 +405,7 @@ public partial class SistemaPaneraContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.FechaActualizacion).HasColumnType("datetime");
 
-            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.ProveedoresInsumos)
+            entity.HasOne(d => d.IdProveedorNavigation).WithMany(p => p.ProveedoresInsumosLista)
                 .HasForeignKey(d => d.IdProveedor)
                 .HasConstraintName("FK_Proveedores_Insumos_Listas_Proveedores");
         });
@@ -326,6 +467,7 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.ToTable("Recetas_Insumos");
 
+            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
 
@@ -363,6 +505,7 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.ToTable("Recetas_Subrecetas");
 
+            entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
 
@@ -374,17 +517,6 @@ public partial class SistemaPaneraContext : DbContext
                 .HasForeignKey(d => d.IdSubReceta)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Recetas_Subrecetas_Subrecetas");
-        });
-
-        modelBuilder.Entity<RecetasTipo>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK_Productos_Tipos");
-
-            entity.ToTable("Recetas_Tipos");
-
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(255)
-                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Rol>(entity =>
@@ -455,7 +587,6 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.HasOne(d => d.IdSubrecetaNavigation).WithMany(p => p.SubrecetasInsumos)
                 .HasForeignKey(d => d.IdSubreceta)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Subrecetas_Insumos_Subrecetas");
         });
 
@@ -488,7 +619,7 @@ public partial class SistemaPaneraContext : DbContext
 
             entity.Property(e => e.Cantidad).HasColumnType("decimal(20, 2)");
             entity.Property(e => e.CostoUnitario).HasColumnType("decimal(20, 2)");
-            entity.Property(e => e.SubTotal).HasColumnType("decimal(20, 2)");
+            entity.Property(e => e.Subtotal).HasColumnType("decimal(20, 2)");
 
             entity.HasOne(d => d.IdSubRecetaHijaNavigation).WithMany(p => p.SubrecetasSubrecetaIdSubRecetaHijaNavigations)
                 .HasForeignKey(d => d.IdSubRecetaHija)

@@ -27,6 +27,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="@Url.Action("Index", "Recetas")">Recetas</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "OrdenesCompra")">Ordenes de Compra</a>
+                </li>
                 @* <li class="nav-item">
                     <a class="nav-link" href="@Url.Action("Index", "Compras")">Compras</a>
                 </li> *@
@@ -140,6 +143,10 @@
                     <button type="button" class="btnConfiguraciones mt-2" onclick="abrirConfiguracion('Rol', 'Roles')">
                         <img src="/Imagenes/Configuracion.png" alt="Icono Roles" class="imgConfiguraciones">
                         <span>Roles</span>
+                    </button>
+                    <button type="button" class="btnConfiguraciones mt-2" onclick="abrirConfiguracion('Estados', 'OrdenesComprasEstado')">
+                        <img src="/Imagenes/Configuracion.png" alt="Icono Roles" class="imgConfiguraciones">
+                        <span>O. de Compra Estados</span>
                     </button>
                     @* <button type="button" class="btnConfiguraciones mt-2" onclick="abrirConfiguracion('Estados de Usuarios', 'EstadosUsuarios')">
                     <img src="/Imagenes/Roles.png" alt="Icono Roles" class="imgConfiguraciones">
